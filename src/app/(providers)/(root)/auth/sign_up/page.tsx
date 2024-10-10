@@ -55,6 +55,7 @@ function SignUpPage() {
 
       </div>
     </main>
+
   );
 }
 

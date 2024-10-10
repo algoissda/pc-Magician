@@ -1,5 +1,16 @@
-// import { create } from "zustand";
+import { create } from "zustand";
 
-// create
+type AuthStoreState = {
+    isLoggedIn: boolean;
+    logIn: () => void;
+    logOut: () => void;
+}
 
-//ZUSTAND를 사용하기 위해 라이브러리를 설치해놓음.
+export const useAuthStore = create<AuthStoreState>((set) => ({
+    isLoggedIn : false,
+    logIn:() => set({isLoggedIn: true}),
+    logOut: () => set({isLoggedIn: false}),
+
+}))
+
+//ZUSTAND를 사용하기 위해서 zustand 깔기.
