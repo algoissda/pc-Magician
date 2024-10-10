@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import React from "react";
 
@@ -5,7 +6,7 @@ function Header() {
   return (
     <main>
       <div className="h-[30px] box-border border-b border-b-slate-950">
-        <ul className="m-[6px] items-center flex justify-end m-auto m-0 w-[1280px]">
+        <ul className="items-center flex justify-end m-auto w-[1280px]">
           <li className="gap-x-4">
             <p>임시</p>
           </li>
@@ -38,8 +39,11 @@ function Header() {
           </ul>
         </nav>
 
-        <input type="search" className="ml-[130px] border border-gray-600 rounded-xl w-72 h-8" placeholder="검색어를 입력해주세요" />
-
+        <input
+          type="search"
+          className="ml-[250px] border border-gray-600 rounded-xl w-[550px] h-8"
+          placeholder="검색어를 입력해주세요"
+        />
 
         <div className="ml-auto flex items-center gap-x-4">
           <nav className="ml-5">
