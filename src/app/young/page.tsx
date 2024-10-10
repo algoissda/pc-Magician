@@ -1,5 +1,5 @@
 function YoungPage() {
-  return <div>유진영</div>;
+  return <main>유진영</main>;
 }
 
 export default YoungPage;
