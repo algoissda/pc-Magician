@@ -1,7 +1,7 @@
 
 function Page() {
     return (
-        <div>sangki</div>
+        <main>sangki</main>
     )
 }
 
