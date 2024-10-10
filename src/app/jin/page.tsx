@@ -1,7 +1,7 @@
 import React from "react";
 
 function JinPage() {
-  return <div>양진우</div>;
+  return <main>양진우</main>;
 }
 
 export default JinPage;
