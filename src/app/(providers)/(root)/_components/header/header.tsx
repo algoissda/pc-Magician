@@ -11,7 +11,7 @@ function Header() {
           </li>
         </ul>
       </div>
-      <header className="bg-white sticky top-0 h-16 border-b-slate-950 border-b flex items-center px-16 z-10 shrink-0">
+      <header className=" bg-white sticky top-0 h-16 border-b-slate-950 border-b flex items-center px-16 z-10 shrink-0">
         <Link className="text-xl font-extrabold text-center" href="/">
           CustomPC
         </Link>
@@ -38,18 +38,21 @@ function Header() {
           </ul>
         </nav>
 
+        <input type="search" className="ml-[130px] border border-gray-600 rounded-xl w-72 h-8" placeholder="검색어를 입력해주세요" />
+
+
         <div className="ml-auto flex items-center gap-x-4">
           <nav className="ml-5">
             <ul>
               <li className="text-[15px] font-medium">
-                <Link href="">회원가입</Link>
+                <Link href={"/auth/sign_up"}>회원가입</Link>
               </li>
             </ul>
           </nav>
           <nav className="ml-5">
             <ul>
               <li className="text-[15px] font-medium">
-                <Link href="">로그안</Link>
+                <Link href="">로그인</Link>
               </li>
             </ul>
           </nav>
