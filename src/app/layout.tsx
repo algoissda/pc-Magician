@@ -13,7 +13,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={"antialiased"}>{children}</body>
+      <body className={"antialiased"}>
+        {children}
+        <div id="global-modal"></div>
+      </body>
     </html>
   );
 }
