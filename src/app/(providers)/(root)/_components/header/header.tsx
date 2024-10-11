@@ -1,8 +1,22 @@
+'use client';
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import React from "react";
+import { supabase } from "../../../../../../supabase/client";
+import { useAuthStore } from "../../../../../../zustand/auth.store";
+
 
 function Header() {
+
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const logOut = useAuthStore((state) => state.logOut);
+
+  //로그아웃 버튼 눌렀을 때 로그아웃 되게
+  const handleClickLogOutButton = async() => {
+    await supabase.auth.signOut();
+    logOut();
+    alert("로그아웃되었습니다");
+  }
+
   return (
     <main>
       <div className="h-[30px] box-border border-b border-b-slate-950">
@@ -46,20 +60,31 @@ function Header() {
         />
 
         <div className="ml-auto flex items-center gap-x-4">
-          <nav className="ml-5">
+          {isLoggedIn ? (
             <ul>
               <li className="text-[15px] font-medium">
-                <Link href={"/auth/sign_up"}>회원가입</Link>
+                <button onClick={handleClickLogOutButton} >로그아웃</button>
               </li>
             </ul>
-          </nav>
-          <nav className="ml-5">
-            <ul>
-              <li className="text-[15px] font-medium">
-                <Link href="">로그인</Link>
-              </li>
-            </ul>
-          </nav>
+          ) : (
+            <>
+              <nav className="ml-5">
+              <ul>
+                <li className="text-[15px] font-medium">
+                  <Link href={"/auth/sign_up"}>회원가입</Link>
+                </li>
+              </ul>
+            </nav>
+            <nav className="ml-5">
+              <ul>
+                <li className="text-[15px] font-medium">
+                  <Link href="">로그인</Link>
+                </li>
+              </ul>
+            </nav>
+          </>
+          )}
+
           <img
             src="https://static.coupangcdn.com/image/coupang/common/pc_header_img_sprite_new_gnb.svg#cart"
             alt=""
