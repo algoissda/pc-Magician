@@ -1,12 +1,15 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { supabase } from "../../../../../../supabase/client";
 import { useAuthStore } from "../../../../../../zustand/auth.store";
 import Modal from "../modal/modal"; //모달 페이지 가져오기
 
+
 function Header() {
+  const router = useRouter();
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const logOut = useAuthStore((state) => state.logOut);
   const isInitalizedAuth = useAuthStore((state) => state.isInitalizedAuth);
@@ -17,6 +20,14 @@ function Header() {
     logOut();
     alert("로그아웃되었습니다");
   };
+
+  const handleClickMyCartButton = () => {
+    if(!isLoggedIn){
+
+      setIsModalOpen(true);
+
+    }
+  }
 
   //모달 페이지를 위한 함수
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -102,11 +113,14 @@ function Header() {
           )
         ) : null }
         {/* -------------------------------------------------------------------------------------------------------------- */}
-        <img
-          src="https://www.citypng.com/public/uploads/preview/hd-shopping-cart-white-logo-icon-transparent-png-701751694973936amdcratijm.png"
-          alt=""
-          className="w-[30px] ml-5"
-        />
+        <Link href={"/my/cart"} onClick={handleClickMyCartButton}>
+          <img
+            src="https://www.citypng.com/public/uploads/preview/hd-shopping-cart-white-logo-icon-transparent-png-701751694973936amdcratijm.png"
+            alt=""
+            className="w-[30px] ml-5"
+          />
+        </Link>
+
       </div>
     </header>
   );
