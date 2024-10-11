@@ -1,14 +1,15 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
+import { useState } from "react";
 import { supabase } from "../../../../../../supabase/client";
 import { useAuthStore } from "../../../../../../zustand/auth.store";
-import { useState } from "react";
 import Modal from "../modal/modal"; //모달 페이지 가져오기
 
 function Header() {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const logOut = useAuthStore((state) => state.logOut);
+  const isInitalizedAuth = useAuthStore((state) => state.isInitalizedAuth);
 
   //로그아웃 버튼 눌렀을 때 로그아웃 되게
   const handleClickLogOutButton = async () => {
@@ -55,14 +56,17 @@ function Header() {
       />
 
       <div className="ml-auto flex items-center gap-x-4">
-        {isLoggedIn ? (
-          <ul>
-            <li className="text-[15px] font-medium text-white">
-              <button onClick={handleClickLogOutButton}>로그아웃</button>
-            </li>
+
+        {/* -------------------------------------------------------------------------------------------------------------- */}
+        {isInitalizedAuth ? (
+          isLoggedIn ? (
+            <ul>
+              <li className="text-[15px] font-medium text-white">
+                <button onClick={handleClickLogOutButton}>로그아웃</button>
+              </li>
           </ul>
-        ) : (
-          <>
+          ) : (
+            <>
             <nav className="ml-5">
               <ul>
                 <li className="text-[15px] font-medium text-white">
@@ -95,8 +99,9 @@ function Header() {
               {/* 모달 페이지 끝 */}
             </nav>
           </>
-        )}
-
+          )
+        ) : null }
+        {/* -------------------------------------------------------------------------------------------------------------- */}
         <img
           src="https://www.citypng.com/public/uploads/preview/hd-shopping-cart-white-logo-icon-transparent-png-701751694973936amdcratijm.png"
           alt=""
