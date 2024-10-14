@@ -7,7 +7,6 @@ import { supabase } from "../../../../../../supabase/client";
 import { useAuthStore } from "../../../../../../zustand/auth.store";
 import Modal from "../modal/modal"; //모달 페이지 가져오기
 
-
 function Header() {
   const router = useRouter();
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
@@ -22,12 +21,11 @@ function Header() {
   };
 
   const handleClickMyCartButton = () => {
-    if(!isLoggedIn){
-
+    if (isLoggedIn) {
+      router.push("/");
       setIsModalOpen(true);
-
     }
-  }
+  };
 
   //모달 페이지를 위한 함수
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -55,7 +53,7 @@ function Header() {
       <nav className="ml-5">
         <ul>
           <li className="text-[15px] font-medium text-white">
-            <Link href="">임시</Link>
+            <Link href="">임시(예산에 따른 견적추천)</Link>
           </li>
         </ul>
       </nav>
@@ -67,7 +65,6 @@ function Header() {
       />
 
       <div className="ml-auto flex items-center gap-x-4">
-
         {/* -------------------------------------------------------------------------------------------------------------- */}
         {isInitalizedAuth ? (
           isLoggedIn ? (
@@ -75,43 +72,43 @@ function Header() {
               <li className="text-[15px] font-medium text-white">
                 <button onClick={handleClickLogOutButton}>로그아웃</button>
               </li>
-          </ul>
+            </ul>
           ) : (
             <>
-            <nav className="ml-5">
-              <ul>
-                <li className="text-[15px] font-medium text-white">
-                  <Link href={"/auth/sign_up"}>회원가입</Link>
-                </li>
-              </ul>
-            </nav>
-            <nav className="ml-5">
-              {/* 모달 페이지 */}
-              <ul>
-                <li className="text-[15px] font-medium text-white">
-                  <button onClick={() => setIsModalOpen(true)}>로그인</button>
-                  <Modal
-                    open={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                  >
-                    <p>
-                      아이디가 없으신가요?&emsp;
-                      <Link
-                        href={"/auth/sign_up"}
-                        className="text-blue-500"
-                        onClick={() => setIsModalOpen(false)}
-                      >
-                        회원가입 하러 가기
-                      </Link>
-                    </p>
-                  </Modal>
-                </li>
-              </ul>
-              {/* 모달 페이지 끝 */}
-            </nav>
-          </>
+              <nav className="ml-5">
+                <ul>
+                  <li className="text-[15px] font-medium text-white">
+                    <Link href={"/auth/sign_up"}>회원가입</Link>
+                  </li>
+                </ul>
+              </nav>
+              <nav className="ml-5">
+                {/* 모달 페이지 */}
+                <ul>
+                  <li className="text-[15px] font-medium text-white">
+                    <button onClick={() => setIsModalOpen(true)}>로그인</button>
+                    <Modal
+                      open={isModalOpen}
+                      onClose={() => setIsModalOpen(false)}
+                    >
+                      <p>
+                        아이디가 없으신가요?&emsp;
+                        <Link
+                          href={"/auth/sign_up"}
+                          className="text-blue-500"
+                          onClick={() => setIsModalOpen(false)}
+                        >
+                          회원가입 하러 가기
+                        </Link>
+                      </p>
+                    </Modal>
+                  </li>
+                </ul>
+                {/* 모달 페이지 끝 */}
+              </nav>
+            </>
           )
-        ) : null }
+        ) : null}
         {/* -------------------------------------------------------------------------------------------------------------- */}
         <Link href={"/my/cart"} onClick={handleClickMyCartButton}>
           <img
@@ -120,7 +117,6 @@ function Header() {
             className="w-[30px] ml-5"
           />
         </Link>
-
       </div>
     </header>
   );

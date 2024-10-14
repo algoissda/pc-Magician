@@ -1,14 +1,12 @@
-import { PropsWithChildren } from 'react'
-import AuthProvider from './_provider/AuthProvider'
+import { PropsWithChildren } from "react";
+import AuthProvider from "./_provider/AuthProvider";
 
-function ProviderLayout({children} : PropsWithChildren) {
+function ProviderLayout({ children }: PropsWithChildren) {
   return (
     <>
-        <AuthProvider>
-            {children}
-        </AuthProvider>
+      <AuthProvider>{children}</AuthProvider>
     </>
-  )
+  );
 }
 
-export default ProviderLayout
+export default ProviderLayout;

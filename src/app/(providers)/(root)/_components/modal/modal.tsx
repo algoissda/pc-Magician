@@ -8,16 +8,14 @@ interface ModalProps {
   onClose: () => void;
   children: ReactNode;
 }
-
 //모달 페이지임!!
 
 const Modal = ({ open, onClose, children }: ModalProps) => {
-
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleClickLogInButton = async() => {
+  const handleClickLogInButton = async () => {
     if (!email) return alert("이메일을 입력해주세요.");
     if (!email.includes("@") && !email.includes("."))
       return alert("이메일 양식이 맞지 않습니다.");
@@ -33,13 +31,12 @@ const Modal = ({ open, onClose, children }: ModalProps) => {
     if (!response.error) {
       alert("로그인에 실패했습니다.");
     } else {
-
       alert("로그인에 성공했습니다,홈페이지로 이동합니다.");
       onClose();
     }
 
     router.push("/");
-  }
+  };
 
   if (!open) return null;
   return ReactDOM.createPortal(
@@ -78,7 +75,10 @@ const Modal = ({ open, onClose, children }: ModalProps) => {
               />
             </div>
             <div className="mt-2"></div>
-            <button onClick={handleClickLogInButton} className="border-slate-700 py-4 px-12 text-[15px] w-full font-semibold bg-black text-white">
+            <button
+              onClick={handleClickLogInButton}
+              className="border-slate-700 py-4 px-12 text-[15px] w-full font-semibold bg-black text-white"
+            >
               로그인하기
             </button>
             <button onClick={onClose}>모달 닫기</button>

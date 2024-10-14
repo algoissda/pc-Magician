@@ -34,9 +34,9 @@ function SignUpForm() {
     router.push("/");
   };
   return (
-    <main className="px-5 lg:px-8 lg:py-10 flex flex-col grow w-full items-stretch mx-auto max-w-screen-lg">
+    <main className="px-5 lg:px-8 pt-[6%] pb-[16%] flex flex-col grow w-full items-stretch mx-auto max-w-screen-lg text-white">
       <h2 className="text-3xl font-bold text-center my-16">회원가입</h2>
-      <section className="flex flex-col items-center gap-y-4 max-w-sm mx-auto w-full">
+      <section className="flex flex-col items-center gap-y-4 max-w-sm mx-auto w-full h-full">
         <div className="grid gap-y-2 w-full">
           <label className="text-sm font-medium">이메일</label>
           <input
@@ -44,7 +44,7 @@ function SignUpForm() {
             onChange={(e) => setEmail(e.target.value)}
             type="text"
             id="email"
-            className="block border w-full px-6 py-3 rounded outline-none transition border-slate-300 focus:border-black"
+            className="block border w-full px-6 py-3 rounded outline-none transition text-black border-slate-300 focus:border-black"
           />
         </div>
         <div className="grid gap-y-2 w-full">
@@ -54,7 +54,7 @@ function SignUpForm() {
             onChange={(e) => setPassword(e.target.value)}
             type="password"
             id="password"
-            className="block border w-full px-6 py-3 rounded outline-none transition border-slate-300 focus:border-black"
+            className="block border w-full px-6 py-3 rounded outline-none transition text-black border-slate-300 focus:border-black"
           />
         </div>
         <div className="grid gap-y-2 w-full">
@@ -64,13 +64,13 @@ function SignUpForm() {
             onChange={(e) => setPasswordConfirm(e.target.value)}
             type="password"
             id="passwordConfirm"
-            className="block border w-full px-6 py-3 rounded outline-none transition border-slate-300 focus:border-black"
+            className="block border w-full px-6 py-3 rounded outline-none transition text-black border-slate-300 focus:border-black"
           />
         </div>
         <div className="mt-2 w-full">
           <button
             onClick={handleClickSignUpButton}
-            className="border py-4 px-3 border-slate-700 text-[15px] font-bold bg-black text-white w-full"
+            className="border py-4 px-3 border-slate-700 text-[15px] font-bold bg-red-500 w-full"
           >
             회원가입하기
           </button>
