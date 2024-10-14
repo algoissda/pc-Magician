@@ -6,6 +6,7 @@ import { useState } from "react";
 import { supabase } from "../../../../../../supabase/client";
 import { useAuthStore } from "../../../../../../zustand/auth.store";
 import Modal from "../modal/modal"; //모달 페이지 가져오기
+import { IoMdMenu } from "react-icons/io";
 
 function Header() {
   const router = useRouter();
@@ -21,11 +22,9 @@ function Header() {
   };
 
   const handleClickMyCartButton = () => {
-    if (!isLoggedIn) {
+    if (isLoggedIn) {
       router.push("/");
       setIsModalOpen(true);
-    }else{
-      router.push("/my/cart");
     }
   };
 
@@ -34,14 +33,14 @@ function Header() {
 
   return (
     <header className="bg-gray-800 sticky top-0 h-16 border-b-slate-950 border-b flex items-center px-16 z-10 shrink-0">
+      <IoMdMenu className="h-20" />
       <Link className="text-white text-xl font-extrabold text-center" href="/">
         CustomPC
       </Link>
-
       <nav className="ml-20">
         <ul>
           <li className="text-[15px] font-medium text-white">
-            <Link href="">내 견적(임시)</Link>
+            <Link href="/my/estimate">내 견적</Link>
           </li>
         </ul>
       </nav>
@@ -59,13 +58,11 @@ function Header() {
           </li>
         </ul>
       </nav>
-
       <input
         type="search"
         placeholder="검색어를 입력해주세요"
         className="inline-block ml-auto border border-gray-600 rounded-xl w-[550px] px-4 h-8 bg-white"
       />
-
       <div className="ml-auto flex items-center gap-x-4">
         {/* -------------------------------------------------------------------------------------------------------------- */}
         {isInitalizedAuth ? (
@@ -112,13 +109,13 @@ function Header() {
           )
         ) : null}
         {/* -------------------------------------------------------------------------------------------------------------- */}
-        <button onClick={handleClickMyCartButton}>
+        <Link href={"/my/cart"} onClick={handleClickMyCartButton}>
           <img
             src="https://www.citypng.com/public/uploads/preview/hd-shopping-cart-white-logo-icon-transparent-png-701751694973936amdcratijm.png"
             alt=""
             className="w-[30px] ml-5"
           />
-        </button>
+        </Link>
       </div>
     </header>
   );
