@@ -21,9 +21,11 @@ function Header() {
   };
 
   const handleClickMyCartButton = () => {
-    if (isLoggedIn) {
+    if (!isLoggedIn) {
       router.push("/");
       setIsModalOpen(true);
+    }else{
+      router.push("/my/cart");
     }
   };
 
@@ -110,13 +112,13 @@ function Header() {
           )
         ) : null}
         {/* -------------------------------------------------------------------------------------------------------------- */}
-        <Link href={"/my/cart"} onClick={handleClickMyCartButton}>
+        <button onClick={handleClickMyCartButton}>
           <img
             src="https://www.citypng.com/public/uploads/preview/hd-shopping-cart-white-logo-icon-transparent-png-701751694973936amdcratijm.png"
             alt=""
             className="w-[30px] ml-5"
           />
-        </Link>
+        </button>
       </div>
     </header>
   );
