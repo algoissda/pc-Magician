@@ -42,17 +42,22 @@ const Modal = ({ open, onClose, children }: ModalProps) => {
 
   const handleClickModalOutSide = () => {
     onClose();
-  }
-  const handleClickModalBody = (e : React.MouseEvent<HTMLDivElement>) => {
+  };
+  const handleClickModalBody = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
-  }
+  };
 
   return ReactDOM.createPortal(
-
     <>
-      <div onClick={handleClickModalOutSide} className="bg-black/50 flex items-center justify-center fixed top-0 left-0 right-0 bottom-0 z-20">
+      <div
+        onClick={handleClickModalOutSide}
+        className="bg-black/50 flex items-center justify-center fixed top-0 left-0 right-0 bottom-0 z-20"
+      >
         {/* 모달 바깥쪽을 클릭시 닫히는거 구현할 예정 */}
-        <div onClick={handleClickModalBody} className="modal_body bg-white rounded-md w-full max-w-[400px] px-5 py-8">
+        <div
+          onClick={handleClickModalBody}
+          className="modal_body bg-white rounded-md w-full max-w-[400px] px-5 py-8"
+        >
           <h2 className="font-bold text-3xl text-center my-12">로그인</h2>
           <section className="flex flex-col items-center gap-y-4 max-w-sm mx-auto w-full">
             <div className="grid gap-y-1.5 w-full">
@@ -90,7 +95,7 @@ const Modal = ({ open, onClose, children }: ModalProps) => {
             >
               로그인하기
             </button>
-            <button onClick={onClose}>모달 닫기</button>
+            {/* <button onClick={onClose}>모달 닫기</button> */}
             {children}
           </section>
         </div>
