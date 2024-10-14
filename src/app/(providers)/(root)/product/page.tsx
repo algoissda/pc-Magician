@@ -1,9 +1,8 @@
-
+/* eslint-disable @next/next/no-img-element */
 import { AiFillHeart } from "react-icons/ai"; // 하트 아이콘 임포트
 
 function ProductPage() {
-  return(
-
+  return (
     <main className="flex justify-center items-center min-h-screen bg-gray-900">
       <div className="flex bg-gray-800 p-10 rounded-lg shadow-lg w-full max-w-full mx-4">
         <img
@@ -14,15 +13,29 @@ function ProductPage() {
         <div className="flex flex-col justify-between ml-8 w-2/3">
           <div>
             <p className="text-white text-2xl font-bold">
-              GeForce® GTX 1060 Integrated with 6GB GDDR5 192bit memory WINDFORCE
-              2X with Blade Fan Design
+              GeForce® GTX 1060 Integrated with 6GB GDDR5 192bit memory
+              WINDFORCE 2X with Blade Fan Design
             </p>
             <p className="mt-5 text-red-500 text-xl">PRICE : 999$</p>
-            <p className="mt-5 text-xl text-white" text-white text-xl>블라블라</p>
-            <p className="mt-5 text-xl text-white" text-white text-xl>blabla</p>
+            <p className="mt-5 text-xl text-white" text-white text-xl>
+              블라블라
+            </p>
+            <p className="mt-5 text-xl text-white" text-white text-xl>
+              blabla
+            </p>
+            <p className="mt-5 text-xl text-white" text-white text-xl>
+              blabla
+            </p>
+            <p className="mt-5 text-xl text-white" text-white text-xl>
+              blabla
+            </p>
+            <p className="mt-5 text-xl text-white" text-white text-xl>
+              blabla
+            </p>
+            <p className="mt-5 text-xl text-white" text-white text-xl>
+              blabla
+            </p>
           </div>
-
-
 
           <button className="flex items-center mt-4">
             <AiFillHeart className="text-red-500 text-2xl mr-2" />
@@ -35,20 +48,13 @@ function ProductPage() {
                 장바구니 담기
               </button>
               <button className="bg-blue-500 text-white py-3 px-6 rounded hover:bg-blue-600 w-full text-lg">
-                내 견적
+                내 견적에 추가
               </button>
             </div>
           </div>
         </div>
       </div>
     </main>
-
-
-
-
-
-
-
   );
 }
 

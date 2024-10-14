@@ -11,7 +11,7 @@ function MainPage() {
       <ul className="mt-20 grid grid-cols-4 gap-x-8 gap-y-32">
         <Link
           href={"/product"}
-          className="text-white transition  hover:scale-110 hover:bg-red-500 hover:border-slate-50 rounded-lg hover:text-black hover:font-bold"
+          className="text-white transition transform hover:scale-110 hover:bg-red-500 hover:border-slate-50 rounded-lg hover:text-black hover:font-bold"
         >
           그래픽카드
           <img
