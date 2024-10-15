@@ -33,9 +33,9 @@ const Modal = ({ open, onClose, children }: ModalProps) => {
     } else {
       alert("로그인에 성공했습니다,홈페이지로 이동합니다.");
       onClose();
+      router.push("/");
     }
 
-    router.push("/");
   };
 
   if (!open) return null;
