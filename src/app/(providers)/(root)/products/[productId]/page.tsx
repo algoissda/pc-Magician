@@ -7,7 +7,10 @@ async function ProductPage(props) {
   const product = await fetchProduct(productId);
   console.log(product);
   return (
-    <main className="flex justify-center items-center min-h-screen bg-gray-900">
+    <main className="flex flex-col justify-center items-center min-h-screen bg-gray-900">
+      <div className="mb-4">
+        <h2 className="text-center text-white text-4xl mb-5">{product?.product_name}</h2>
+      </div>
       <div className="flex bg-gray-800 p-10 rounded-lg shadow-lg w-full max-w-full mx-4">
         <img
           className="w-1/3 rounded-lg"
@@ -43,6 +46,7 @@ async function ProductPage(props) {
         </div>
       </div>
     </main>
+
   );
 }
 

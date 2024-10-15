@@ -37,6 +37,14 @@ function Header() {
       router.push("/my/estimate");
     }
   }
+  const handleClickBudgetButton = () => {
+    if (!isLoggedIn) {
+      router.push("/");
+      setIsModalOpen(true);
+    } else {
+      router.push("/my/Budget");
+    }
+  }
 
   //모달 페이지를 위한 함수
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,7 +71,7 @@ function Header() {
       <nav className="ml-5">
         <ul>
           <li className="text-[15px] font-medium text-white">
-            <Link href={"/my/Budget"}>(예산에 따른 견적추천)</Link>
+            <button onClick={handleClickBudgetButton}>예산에 따른 견적추천</button>
           </li>
         </ul>
       </nav>
