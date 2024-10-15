@@ -35,7 +35,6 @@ function Header() {
 
   return (
     <header className="bg-gray-800 sticky top-0 h-16 border-b-slate-950 border-b flex items-center px-16 z-10 shrink-0">
-      <IoMdMenu className="h-20" />
       <Link className="text-white text-xl font-extrabold text-center" href="/">
         CustomPC
       </Link>
