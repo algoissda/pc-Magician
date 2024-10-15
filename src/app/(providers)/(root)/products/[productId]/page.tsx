@@ -6,8 +6,8 @@ async function ProductPage(props) {
   const productId = Number(props.params.productId);
   const product = await fetchProduct(productId);
   console.log(product);
-return (
-  <main className="flex justify-center items-center min-h-screen bg-gray-900">
+  return (
+    <main className="flex justify-center items-center min-h-screen bg-gray-900">
       <div className="flex bg-gray-800 p-10 rounded-lg shadow-lg w-full max-w-full mx-4">
         <img
           className="w-1/3 rounded-lg"
@@ -19,10 +19,10 @@ return (
             <p className="text-white text-2xl font-bold">
               {product?.product_name}
             </p>
-            <p className="mt-5 text-xl text-white">
-              {product?.type}
+            <p className="mt-5 text-xl text-white">{product?.type}</p>
+            <p className="mt-5 text-red-500 text-xl">
+              PRICE : {product?.price.toLocaleString()}₩
             </p>
-            <p className="mt-5 text-red-500 text-xl">PRICE : {product?.price.toLocaleString()}₩</p>
           </div>
 
           <button className="flex items-center mt-4">
