@@ -63,7 +63,7 @@ function Header() {
       <nav className="ml-5">
         <ul>
           <li className="text-[15px] font-medium text-white">
-            <Link href="">임시(예산에 따른 견적추천)</Link>
+            <Link href={"/my/Budget"}>(예산에 따른 견적추천)</Link>
           </li>
         </ul>
       </nav>
