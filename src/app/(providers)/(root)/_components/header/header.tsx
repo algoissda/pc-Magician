@@ -6,7 +6,6 @@ import { useState } from "react";
 import { supabase } from "../../../../../../supabase/client";
 import { useAuthStore } from "../../../../../../zustand/auth.store";
 import Modal from "../modal/modal"; //모달 페이지 가져오기
-import { IoMdMenu } from "react-icons/io";
 
 function Header() {
   const router = useRouter();
@@ -30,6 +29,15 @@ function Header() {
     }
   };
 
+  const handleClickEstimateButton = () => {
+    if (!isLoggedIn) {
+      router.push("/");
+      setIsModalOpen(true);
+    } else {
+      router.push("/my/estimate");
+    }
+  }
+
   //모달 페이지를 위한 함수
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -41,7 +49,7 @@ function Header() {
       <nav className="ml-20">
         <ul>
           <li className="text-[15px] font-medium text-white">
-            <Link href="/my/estimate">내 견적</Link>
+            <button onClick={handleClickEstimateButton}>내 견적</button>
           </li>
         </ul>
       </nav>
