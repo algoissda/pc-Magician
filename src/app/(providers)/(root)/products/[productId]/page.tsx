@@ -1,40 +1,28 @@
 /* eslint-disable @next/next/no-img-element */
+import { fetchProduct } from "@/api/products.api";
 import { AiFillHeart } from "react-icons/ai"; // 하트 아이콘 임포트
 
-function ProductPage() {
-  return (
-    <main className="flex justify-center items-center min-h-screen bg-gray-900">
+async function ProductPage(props) {
+  const productId = Number(props.params.productId);
+  const product = await fetchProduct(productId);
+  console.log(product);
+return (
+  <main className="flex justify-center items-center min-h-screen bg-gray-900">
       <div className="flex bg-gray-800 p-10 rounded-lg shadow-lg w-full max-w-full mx-4">
         <img
           className="w-1/3 rounded-lg"
-          src="https://static.gigabyte.com/StaticFile/Image/Global/ef510bf594c2f68685ca325beb694287/Product/15431/Png"
-          alt="Graphics Card"
+          src={product?.image_url}
+          alt={product?.product_name}
         />
         <div className="flex flex-col justify-between ml-8 w-2/3">
           <div>
             <p className="text-white text-2xl font-bold">
-              GeForce® GTX 1060 Integrated with 6GB GDDR5 192bit memory
-              WINDFORCE 2X with Blade Fan Design
+              {product?.product_name}
             </p>
-            <p className="mt-5 text-red-500 text-xl">PRICE : 999$</p>
-            <p className="mt-5 text-xl text-white" text-white text-xl>
-              블라블라
+            <p className="mt-5 text-xl text-white">
+              {product?.type}
             </p>
-            <p className="mt-5 text-xl text-white" text-white text-xl>
-              blabla
-            </p>
-            <p className="mt-5 text-xl text-white" text-white text-xl>
-              blabla
-            </p>
-            <p className="mt-5 text-xl text-white" text-white text-xl>
-              blabla
-            </p>
-            <p className="mt-5 text-xl text-white" text-white text-xl>
-              blabla
-            </p>
-            <p className="mt-5 text-xl text-white" text-white text-xl>
-              blabla
-            </p>
+            <p className="mt-5 text-red-500 text-xl">PRICE : {product?.price.toLocaleString()}₩</p>
           </div>
 
           <button className="flex items-center mt-4">

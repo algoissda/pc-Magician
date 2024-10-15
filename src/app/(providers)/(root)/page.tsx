@@ -15,7 +15,7 @@ async function MainPage() {
             {products &&
         products.map((product) => (
               <Link key={product.id}
-                href={"/product"}
+                href={`/products/${product.id}`}
                 className="text-white transition transform hover:scale-110 hover:bg-red-500 hover:border-slate-50 rounded-lg hover:text-black hover:font-bold"
               >
                 <p>{product.type}</p>

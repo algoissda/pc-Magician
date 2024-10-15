@@ -1,9 +1,11 @@
-type Product = {
-  id?: number;
-  image_url?: string | null;
-  price?: number | null;
+
+export interface Product {
+  id: number;
   product_name: string;
+  price: number;
   type: string;
-};
+  image_url: string;
+}
+
 
 export default Product;
