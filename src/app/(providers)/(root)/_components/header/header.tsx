@@ -20,73 +20,35 @@ function Header() {
     alert("로그아웃되었습니다");
   };
 
-  const handleClickMyCartButton = () => {
-    if (!isLoggedIn) {
-      router.push("/");
-      setIsModalOpen(true);
-    } else {
-      router.push("/my/cart");
-    }
-  };
-
-  const handleClickEstimateButton = () => {
-    if (!isLoggedIn) {
-      router.push("/");
-      setIsModalOpen(true);
-    } else {
-      router.push("/my/estimate");
-    }
+  //예산에 따른 견적추천 (홈페이지로 바뀔 거)
+  const handleClickPartListButton = () => {
+      router.push("/my/PartList");
   }
-  const handleClickBudgetButton = () => {
-    if (!isLoggedIn) {
-      router.push("/");
-      setIsModalOpen(true);
-    } else {
-      router.push("/my/Budget");
-    }
-  }
-
   //모달 페이지를 위한 함수
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <header className="bg-gray-800 sticky top-0 h-16 border-b-slate-950 border-b flex items-center px-16 z-10 shrink-0">
       <Link className="text-white text-xl font-extrabold text-center" href="/">
-        CustomPC
+        PC Magician
       </Link>
-      <nav className="ml-20">
-        <ul>
-          <li className="text-[15px] font-medium text-white">
-            <button onClick={handleClickEstimateButton}>내 견적</button>
-          </li>
-        </ul>
-      </nav>
       <nav className="ml-5">
         <ul>
           <li className="text-[15px] font-medium text-white">
-            <Link href="">임시(가격대별 견적 추천)</Link>
+            <button onClick={handleClickPartListButton}>Today's Part Prices</button>
           </li>
         </ul>
       </nav>
-      <nav className="ml-5">
-        <ul>
-          <li className="text-[15px] font-medium text-white">
-            <button onClick={handleClickBudgetButton}>예산에 따른 견적추천</button>
-          </li>
-        </ul>
-      </nav>
-      <input
-        type="search"
-        placeholder="검색어를 입력해주세요"
-        className="inline-block ml-auto border border-gray-600 rounded-xl w-[550px] px-4 h-8 bg-white"
-      />
+
       <div className="ml-auto flex items-center gap-x-4">
         {/* -------------------------------------------------------------------------------------------------------------- */}
         {isInitalizedAuth ? (
           isLoggedIn ? (
             <ul>
               <li className="text-[15px] font-medium text-white">
-                <button onClick={handleClickLogOutButton}>로그아웃</button>
+                <button className="mr-8">My Saved Builds</button>
+                <button onClick={handleClickLogOutButton}>log-out</button>
+
               </li>
             </ul>
           ) : (
@@ -94,7 +56,7 @@ function Header() {
               <nav className="ml-5">
                 <ul>
                   <li className="text-[15px] font-medium text-white">
-                    <Link href={"/auth/sign_up"}>회원가입</Link>
+                    <Link href={"/auth/sign_up"}>sign-up</Link>
                   </li>
                 </ul>
               </nav>
@@ -102,7 +64,7 @@ function Header() {
                 {/* 모달 페이지 */}
                 <ul>
                   <li className="text-[15px] font-medium text-white">
-                    <button onClick={() => setIsModalOpen(true)}>로그인</button>
+                    <button onClick={() => setIsModalOpen(true)}>log-in</button>
                     <Modal
                       open={isModalOpen}
                       onClose={() => setIsModalOpen(false)}
@@ -126,13 +88,7 @@ function Header() {
           )
         ) : null}
         {/* -------------------------------------------------------------------------------------------------------------- */}
-        <button onClick={handleClickMyCartButton}>
-          <img
-            src="https://www.citypng.com/public/uploads/preview/hd-shopping-cart-white-logo-icon-transparent-png-701751694973936amdcratijm.png"
-            alt=""
-            className="w-[30px] ml-5"
-          />
-        </button>
+
       </div>
     </header>
   );

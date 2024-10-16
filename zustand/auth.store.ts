@@ -15,4 +15,5 @@ export const useAuthStore = create<AuthStoreState>((set) => ({
     isInitalizedAuth : false,
     initAuth: () => set({isInitalizedAuth: true}),
 }));
+
 //ZUSTAND를 사용하기 위해서 zustand 깔기.

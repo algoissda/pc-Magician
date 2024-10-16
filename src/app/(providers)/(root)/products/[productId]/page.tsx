@@ -1,11 +1,15 @@
+'use client';
+
 /* eslint-disable @next/next/no-img-element */
 import { fetchProduct } from "@/api/products.api";
 import { AiFillHeart } from "react-icons/ai"; // 하트 아이콘 임포트
+import EstimateButton from "../_comtonents/estimateButton";
 
 async function ProductPage(props) {
-  const productId = Number(props.params.productId);
+  const productId = props.params.productId;
   const product = await fetchProduct(productId);
-  console.log(product);
+
+
   return (
     <main className="flex flex-col justify-center items-center min-h-screen bg-gray-900">
       <div className="mb-4">
@@ -35,12 +39,8 @@ async function ProductPage(props) {
 
           <div className="flex flex-col mt-4 space-y-2">
             <div className="flex justify-between">
-              <button className="bg-blue-500 text-white py-3 px-6 rounded hover:bg-blue-600 w-full mr-2 text-lg">
-                장바구니 담기
-              </button>
-              <button className="bg-blue-500 text-white py-3 px-6 rounded hover:bg-blue-600 w-full text-lg">
-                내 견적에 추가
-              </button>
+              {/* 버튼 컴포넌트화 시켜서 오류 없앴음 */}
+              <EstimateButton productName={product?.product_name} />
             </div>
           </div>
         </div>
