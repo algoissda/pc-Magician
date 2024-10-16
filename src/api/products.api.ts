@@ -3,7 +3,7 @@ import Product from "../../types/products.type";
 
 
 export async function getProducts(){
-    const response = await supabase.from("products").select("*").limit(2213000);
+    const response = await supabase.from("products").select("*").limit(221300);
     const data = response.data;
     return data;
 }
