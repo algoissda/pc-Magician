@@ -23,7 +23,7 @@ function Header() {
 
   //예산에 따른 견적추천 (홈페이지로 바뀔 거)
   const handleClickPartListButton = () => {
-    router.push("/my/PartList");
+    router.push("/my/partlist");
   };
   //모달 페이지를 위한 함수
   const [isModalOpen, setIsModalOpen] = useState(false);

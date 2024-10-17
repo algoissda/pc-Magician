@@ -6,7 +6,6 @@ async function MySavedBuildsPage() {
   const data = response.data;
   console.log("111111111",data);
 
-  {}
   return (
     <main className="text-white">
       <h2 className="mt-10 text-3xl font-bold ml-20">저장된 견적</h2>
