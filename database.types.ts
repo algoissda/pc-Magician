@@ -1,4 +1,3 @@
-
 export type Json =
   | string
   | number
@@ -10,21 +9,39 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      estimate: {
+      builds: {
         Row: {
+          cpu: string | null
+          created_at: string
+          hdd: string | null
           id: number
-          productName: string
-          userId: string
+          mbord: string | null
+          price: number | null
+          ram: string | null
+          ssd: string | null
+          vga: string | null
         }
         Insert: {
+          cpu?: string | null
+          created_at?: string
+          hdd?: string | null
           id?: number
-          productName: string
-          userId?: string
+          mbord?: string | null
+          price?: number | null
+          ram?: string | null
+          ssd?: string | null
+          vga?: string | null
         }
         Update: {
+          cpu?: string | null
+          created_at?: string
+          hdd?: string | null
           id?: number
-          productName?: string
-          userId?: string
+          mbord?: string | null
+          price?: number | null
+          ram?: string | null
+          ssd?: string | null
+          vga?: string | null
         }
         Relationships: []
       }
@@ -52,6 +69,27 @@ export type Database = {
           price?: number | null
           product_name?: string
           type?: string
+        }
+        Relationships: []
+      }
+      saved_builds: {
+        Row: {
+          build_id: number | null
+          created_at: string
+          id: number
+          uid: string | null
+        }
+        Insert: {
+          build_id?: number | null
+          created_at?: string
+          id?: number
+          uid?: string | null
+        }
+        Update: {
+          build_id?: number | null
+          created_at?: string
+          id?: number
+          uid?: string | null
         }
         Relationships: []
       }

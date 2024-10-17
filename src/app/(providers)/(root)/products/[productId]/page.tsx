@@ -1,5 +1,3 @@
-'use client';
-
 /* eslint-disable @next/next/no-img-element */
 import { fetchProduct } from "@/api/products.api";
 import { AiFillHeart } from "react-icons/ai"; // 하트 아이콘 임포트
