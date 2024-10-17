@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import Build from './_components/Build a PC/Build';
+import ViewBuildsByPrice from './_components/view_builds_by_price/page';
+import CommunityBuilds from './_components/community_builds/page';
 
 function MainPage() {
 
@@ -13,9 +15,13 @@ function MainPage() {
                 <Build />
             );
         } else if (activeTab === 'View Builds by Price') {
-            return <h3 className="text-2xl font-semibold text-white">가격에 따른 빌드 보기</h3>;
+            return(
+              <ViewBuildsByPrice />
+            );
         } else if (activeTab === 'Community Builds') {
-            return <h3 className="text-2xl font-semibold text-white">커뮤니티 빌드</h3>;
+            return (
+              <CommunityBuilds />
+            );
         }
         return null;
     };
