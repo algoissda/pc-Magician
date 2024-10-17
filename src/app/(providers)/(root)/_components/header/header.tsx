@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
@@ -22,8 +23,8 @@ function Header() {
 
   //예산에 따른 견적추천 (홈페이지로 바뀔 거)
   const handleClickPartListButton = () => {
-      router.push("/my/PartList");
-  }
+    router.push("/my/PartList");
+  };
   //모달 페이지를 위한 함수
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -35,7 +36,9 @@ function Header() {
       <nav className="ml-5">
         <ul>
           <li className="text-[15px] font-medium text-white">
-            <button onClick={handleClickPartListButton}>Today's Part Prices</button>
+            <button onClick={handleClickPartListButton}>
+              Today's Part Prices
+            </button>
           </li>
         </ul>
       </nav>
@@ -46,9 +49,10 @@ function Header() {
           isLoggedIn ? (
             <ul>
               <li className="text-[15px] font-medium text-white">
-                <button className="mr-8">My Saved Builds</button>
+                <Link href={"/my/SavedBuild"}>
+                  <button className="mr-8">My Saved Builds</button>
+                </Link>
                 <button onClick={handleClickLogOutButton}>log-out</button>
-
               </li>
             </ul>
           ) : (
@@ -88,7 +92,6 @@ function Header() {
           )
         ) : null}
         {/* -------------------------------------------------------------------------------------------------------------- */}
-
       </div>
     </header>
   );
