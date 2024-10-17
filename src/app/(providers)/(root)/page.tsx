@@ -1,10 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { ComponentProps, useState } from 'react';
 
 function MainPage() {
 
     const [activeTab, setActiveTab] = useState<string>('Build a PC');
+    const [estimateType , setEstimateType] = useState("");
+    const [cpuType, setCpuType] = useState("");
+    const [gpuType, setGpuType] = useState("");
+    const [useType, setUseType] = useState("");
+
+    const handleChangeEstimateType: ComponentProps<"input">["onChange"] = (e) => {
+      setEstimateType(e.target.value);
+    }
+    const handleChangeCpuType: ComponentProps<"select">["onChange"] = (e) => {
+      setCpuType(e.target.value);
+    }
+    const handleChangeGpuType: ComponentProps<"select">["onChange"] = (e) => {
+      setGpuType(e.target.value);
+    }
+    const handleChangeUseType: ComponentProps<"select">["onChange"] = (e) => {
+      setUseType(e.target.value);
+    }
+
+    console.log(estimateType,cpuType,gpuType,useType );
+
 
     const renderFormContent = () => {
         if (activeTab === 'Build a PC') {
@@ -38,25 +58,33 @@ function MainPage() {
                     </div>
                     <div className="w-2/3">
                         <h3 className="text-2xl font-semibold text-white">예산</h3>
-                        <input
+                        <input value={estimateType} onChange={handleChangeEstimateType}
                             type="number"
                             className="w-1/2 p-2 mb-4 border border-gray-700 bg-gray-800 text-white rounded"
                             placeholder="예산 입력"
                         />
                         <h3 className="text-2xl font-semibold text-white">CPU 선호</h3>
-                        <select className="w-1/2 p-2 mb-4 border border-gray-700 bg-gray-800 text-white rounded">
+                        <select value={cpuType} onChange={handleChangeCpuType} className="w-1/2 p-2 mb-4 border border-gray-700 bg-gray-800 text-white rounded">
                             <option value="">선호하는 CPU를 선택하세요</option>
                             <option value="Intel">Intel</option>
                             <option value="AMD">AMD</option>
                         </select>
                         <h3 className="text-2xl font-semibold text-white">GPU 선호</h3>
-                        <select className="w-1/2 p-2 mb-4 border border-gray-700 bg-gray-800 text-white rounded">
+                        <select value={gpuType} onChange={handleChangeGpuType} className="w-1/2 p-2 mb-4 border border-gray-700 bg-gray-800 text-white rounded">
                             <option value="">선호하는 GPU를 선택하세요</option>
                             <option value="NVIDIA">NVIDIA</option>
                             <option value="AMD">AMD</option>
                         </select>
                         <h3 className="text-2xl font-semibold text-white">사용 용도</h3>
-                        <textarea className="w-1/2 p-2 mb-4 border border-gray-700 bg-gray-800 text-white rounded" placeholder="용도를 입력하세요"></textarea>
+                        <select value={useType} onChange={handleChangeUseType} className="w-1/2 p-2 mb-4 border border-gray-700 bg-gray-800 text-white rounded">
+                          <option value="">용도를 선택해주세요</option>
+                          <option value="사용">무사무용</option>
+                          <option value="게임용">게임용</option>
+                          <option value="3D렌더링용">3D렌더링용</option>
+                          <option value="영상편집용">영상편집용</option>
+                          <option value="그래픽디자인용">그래픽디자인용</option>
+                          <option value="사내서버용">사내서버용</option>
+                        </select>
 
                         <button className="mt-4 w-full py-2 bg-green-600 text-white rounded hover:bg-green-500">
                             RUN
@@ -84,7 +112,6 @@ function MainPage() {
                   <button onClick={() => setActiveTab('Community Builds')} className="mb-2 p-2 bg-blue-600 text-white rounded hover:bg-blue-500">Community Builds</button>
               </div>
             </div>
-
             <div className="flex-grow p-5">
                 {renderFormContent()}
             </div>
