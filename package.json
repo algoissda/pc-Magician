@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "gen": "npx supabase gen types typescript --project-id abjnjbgmscwluvuphhdd > database.types.ts"
+    "gen": "npx supabase gen types typescript --project-id abjnjbgmscwluvuphhdd > supabase/database.types.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
