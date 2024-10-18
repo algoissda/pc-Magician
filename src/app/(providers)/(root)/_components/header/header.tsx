@@ -29,13 +29,16 @@ function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <header className="bg-gray-800 sticky top-0 h-16 border-b-slate-950 border-b flex items-center px-16 z-10 shrink-0">
-      <Link className="text-white text-xl font-extrabold text-center" href="/">
+    <header className=" sticky top-0 h-[100px] border-b-[3px] border-b-gray-400 shadow-md shadow-gray-300 bg-black flex items-center px-16 z-10 shrink-0">
+      <Link
+        className="text-white text-[40px] font-extrabold text-center font-serif"
+        href="/"
+      >
         PC Magician
       </Link>
       <nav className="ml-5">
         <ul>
-          <li className="text-[15px] font-medium text-white">
+          <li className="text-[18px] ml-[70px] text-white">
             <button onClick={handleClickPartListButton}>
               Today's Part Prices
             </button>
@@ -48,26 +51,24 @@ function Header() {
         {isInitalizedAuth ? (
           isLoggedIn ? (
             <ul>
-              <li className="text-[15px] font-medium text-white">
+              <li className="text-[18px] font-medium text-white">
                 <Link href={"/my/SavedBuild"}>
                   <button className="mr-8">My Saved Builds</button>
                 </Link>
-                <button onClick={handleClickLogOutButton}>log-out</button>
+                <button
+                  className="border text-black font-serif font-bold text-[20px] border-b-white bg-white rounded-3xl p-2 px-3 "
+                  onClick={handleClickLogOutButton}
+                >
+                  log-out
+                </button>
               </li>
             </ul>
           ) : (
             <>
               <nav className="ml-5">
-                <ul>
-                  <li className="text-[15px] font-medium text-white">
-                    <Link href={"/auth/sign_up"}>sign-up</Link>
-                  </li>
-                </ul>
-              </nav>
-              <nav className="ml-5">
                 {/* 모달 페이지 */}
                 <ul>
-                  <li className="text-[15px] font-medium text-white">
+                  <li className="border text-black font-serif font-bold text-[20px] border-b-white bg-white rounded-3xl p-2 px-3">
                     <button onClick={() => setIsModalOpen(true)}>log-in</button>
                     <Modal
                       open={isModalOpen}
@@ -87,6 +88,13 @@ function Header() {
                   </li>
                 </ul>
                 {/* 모달 페이지 끝 */}
+              </nav>
+              <nav className="ml-5">
+                <ul>
+                  <li className="border text-black font-serif font-bold text-[20px] border-b-white bg-white rounded-3xl p-2 px-3">
+                    <Link href={"/auth/sign_up"}>sign-up</Link>
+                  </li>
+                </ul>
               </nav>
             </>
           )
