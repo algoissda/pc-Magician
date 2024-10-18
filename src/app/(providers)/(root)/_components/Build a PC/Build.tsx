@@ -1,7 +1,7 @@
 "use client";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import React, { useState, ComponentProps } from "react";
+import React, { ComponentProps, useState } from "react";
 import { supabase } from "../../../../../../supabase/client";
 import Product from "../../../../../../types/products.type";
 
@@ -15,7 +15,7 @@ function Build() {
   const [estimateType, setEstimateType] = useState<string>("");
   const [cpuType, setCpuType] = useState<string>("");
   const [gpuType, setGpuType] = useState<string>("");
-  const [build, setBuild] = useState<Part[]>([]); // 여기에 부품 종류별로 ㅍㄹ요한 정보들이 들어있음 객체임
+  const [build, setBuild] = useState<Part[]>([]);
   const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
 
   if (!googleApiKey) {
@@ -140,56 +140,83 @@ function Build() {
   ];
 
   return (
-    <div className="flex">
-      <div className="w-1/3 pr-4">
-        <h3 className="text-2xl font-semibold text-white mb-3">부품 목록</h3>
-        <div className="rounded-lg border border-gray-500 p-4">
-          <ul className="pl-5 pr-5 text-gray-300 pb-6 pt-2">
-            {partTypes.map((partType) => (
-              <React.Fragment key={partType}>
-                <li>{partType}</li>
-                <li className="border-b border-b-gray-500 pb-5">
-                  {build.find((part) => part.type === partType)?.name || "N/A"}
-                </li>
-              </React.Fragment>
-            ))}
-          </ul>
+    <div>
+      <main className=" bg-white p-[1px] rounded-2xl mt-16 mx-20 h-[66vh]">
+        <div className="flex bg-black rounded-2xl w-full h-full">
+          <div className="w-1/2 mr-4 p-4">
+            <div className="p-[1px] rounded-xl bg-white h-full">
+              <div className="bg-black rounded-xl px-2 h-full">
+                <ul className="text-gray-300">
+                  {partTypes.map((partType) => (
+                    <React.Fragment key={partType}>
+                      <li className="border-b border-gray-700 text-lg flex flex-col py-2 justify-between h-16">
+                        <span className="text-white">{partType}</span>
+                        <span className="text-gray-400 text-[10px]">
+                          {build.find((part) => part.type === partType)?.name ||
+                            "N/A"}
+                        </span>
+                      </li>
+                    </React.Fragment>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div className="w-2/3">
+            <div className="p-4 relative">
+              {/* <div className="absolute top-3 right-3 text-purple-400 cursor-pointer">
+                🔄
+              </div> */}
+              <div className="mb-4 flex items-center">
+                <label className="text-white text-xl">예산:</label>
+                <div className="flex items-center">
+                  <input
+                    value={estimateType}
+                    onChange={handleChangeEstimateType}
+                    type="number"
+                    className="w-full p-2 border border-gray-700 bg-[#0f1113] text-white rounded mr-2"
+                    placeholder="예산 입력"
+                  />
+                  <span className="text-purple-400 text-lg block w-8">
+                    만원
+                  </span>
+                </div>
+              </div>
+              <div className="mb-4">
+                <label className="text-white text-xl">CPU 선호</label>
+                <select
+                  value={cpuType}
+                  onChange={handleChangeCpuType}
+                  className="w-full p-2 border border-gray-700 bg-[#0f1113] text-white rounded"
+                >
+                  <option value="">선호하는 CPU를 선택하세요</option>
+                  <option value="Intel">Intel</option>
+                  <option value="AMD">AMD</option>
+                </select>
+              </div>
+              <div className="mb-4">
+                <label className="text-white text-xl">GPU 선호</label>
+                <select
+                  value={gpuType}
+                  onChange={handleChangeGpuType}
+                  className="w-full p-2 border border-gray-700 bg-[#0f1113] text-white rounded"
+                >
+                  <option value="">선호하는 GPU를 선택하세요</option>
+                  <option value="NVIDIA">NVIDIA</option>
+                  <option value="AMD">AMD</option>
+                </select>
+              </div>
+              <div className="text-white text-lg mb-4">Price : XXX,XXX,XXX</div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="w-2/3">
-        <h3 className="text-2xl font-semibold text-white">예산</h3>
-        <input
-          value={estimateType}
-          onChange={handleChangeEstimateType}
-          type="number"
-          className="w-1/2 p-2 mb-4 border border-gray-700 bg-gray-800 text-white rounded"
-          placeholder="예산 입력"
-        />
-        <h3 className="text-2xl font-semibold text-white">CPU 선호</h3>
-        <select
-          value={cpuType}
-          onChange={handleChangeCpuType}
-          className="w-1/2 p-2 mb-4 border border-gray-700 bg-gray-800 text-white rounded"
-        >
-          <option value="">선호하는 CPU를 선택하세요</option>
-          <option value="Intel">Intel</option>
-          <option value="AMD">AMD</option>
-        </select>
-        <h3 className="text-2xl font-semibold text-white">GPU 선호</h3>
-        <select
-          value={gpuType}
-          onChange={handleChangeGpuType}
-          className="w-1/2 p-2 mb-4 border border-gray-700 bg-gray-800 text-white rounded"
-        >
-          <option value="">선호하는 GPU를 선택하세요</option>
-          <option value="NVIDIA">NVIDIA</option>
-          <option value="AMD">AMD</option>
-        </select>
+      </main>
+      <div className="mt-6 flex justify-center">
         <button
           onClick={handleEstimate}
-          className="mt-4 w-full py-2 bg-green-600 text-white rounded hover:bg-green-500"
+          className="px-10 py-3 bg-gradient-to-r from-green-400 to-purple-500 text-white text-xl rounded-full hover:bg-gradient-to-r hover:from-green-300 hover:to-purple-400"
         >
-          견적 생성
+          SAVE
         </button>
       </div>
     </div>

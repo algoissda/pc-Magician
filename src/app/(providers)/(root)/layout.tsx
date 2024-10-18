@@ -1,13 +1,16 @@
-import React, { PropsWithChildren } from "react";
+import { PropsWithChildren } from "react";
 import Header from "./_components/header/header";
-import Footer from "./_components/footer/footer";
+// import Footer from "./_components/footer/footer";
 
 function RootLayout({ children }: PropsWithChildren) {
   return (
-    <div id="root-layout" className="bg-black">
+    <div
+      id="root-layout"
+      className="bg-black h-screen flex flex-col overflow-hidden"
+    >
       <Header />
-      {children}
-      <Footer />
+      <div className="flex-grow overflow-hidden">{children}</div>
+      {/* <Footer /> */}
     </div>
   );
 }
