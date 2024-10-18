@@ -2,11 +2,28 @@
 
 import { ComponentProps, useState } from "react";
 
+import { Database } from "../../../../../../supabase/database.types";
+
+
+
 function Build() {
   const [estimateType, setEstimateType] = useState("");
   const [cpuType, setCpuType] = useState("");
   const [gpuType, setGpuType] = useState("");
   const [useType, setUseType] = useState("");
+
+    //나중에 하는 거로 함
+//   const handleClickBuildButton = async () => {
+//     const data: Database["public"]["Tables"]["builds"]["Insert"] ={
+//         price,
+//         cpu,
+//         vga,
+//         ram,
+//         mbord,
+//         ssd,
+//         hdd,
+//     };
+// }
 
   const handleChangeEstimateType: ComponentProps<"input">["onChange"] = (e) => {
     setEstimateType(e.target.value);
@@ -19,6 +36,7 @@ function Build() {
   };
   const handleChangeUseType: ComponentProps<"select">["onChange"] = (e) => {
     setUseType(e.target.value);
+
   };
   return (
     <div className="flex">
@@ -90,7 +108,7 @@ function Build() {
           <option value="그래픽디자인용">그래픽디자인용</option>
           <option value="사내서버용">사내서버용</option>
         </select>
-        <button className="mt-4 w-full py-2 bg-green-600 text-white rounded hover:bg-green-500">
+        <button onClick={handleClickBuildButton} className="mt-4 w-full py-2 bg-green-600 text-white rounded hover:bg-green-500">
           RUN
         </button>
       </div>

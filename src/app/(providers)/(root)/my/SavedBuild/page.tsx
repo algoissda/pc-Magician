@@ -11,7 +11,7 @@ async function MySavedBuildsPage() {
       <h2 className="mt-10 text-3xl font-bold ml-20">저장된 견적</h2>
 
       <div className="max-h-max">
-        <div className="flex flex-wrap justify-start mt-8 mx-20">
+        <div className="flex flex-wrap justify-start mt-8 mx-20 ">
           <div className="border p-4 m-2 w-1/3 max-w-xs flex flex-col justify-between">
             <h3 className="ml-5">sangki</h3>
               <ul className=" pl-5 pr-5 text-gray-300 pb-6 pt-2">
