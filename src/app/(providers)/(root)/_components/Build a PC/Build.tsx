@@ -6,6 +6,11 @@ import { supabase } from "../../../../../../supabase/client";
 import Product from "../../../../../../types/products.type";
 import { useThemeStore } from "@/store/useStore";
 import build from "next/dist/build";
+import { error } from "console";
+import { type } from "os";
+import { HarmBlockThreshold, HarmCategory } from "@google/generative-ai";
+
+// ...
 
 type Part = {
   type: string;
@@ -23,14 +28,26 @@ function Build() {
   const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
   const partTypes: string[] = [
     "CPU",
-    "VGA",
-    "RAM",
+    "Cooler",
     "MBoard",
+    "RAM",
+    "VGA",
     "SSD",
     "HDD",
-    "Power",
-    "Cooler",
     "Case",
+    "Power",
+  ];
+
+  const safetySettings = [
+    // Gemini API가 안전상의 문제로 날 차단한다. 그것을 방지
+    {
+      category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
   ];
 
   if (!googleApiKey) {
@@ -108,9 +125,9 @@ function Build() {
                 ? "%사무용%"
                 : Number(budget) < 100
                 ? "%저사양%"
-                : Number(budget) < 155
+                : Number(budget) < 200
                 ? "%보급형%"
-                : Number(budget) < 370
+                : Number(budget) < 600
                 ? "%고사양%"
                 : "%하이엔드%"
             )
@@ -153,23 +170,37 @@ function Build() {
       );
 
       const genAI = new GoogleGenerativeAI(googleApiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-      const prompt = `제공 부품 양식:(부품타입:"부품이름" ~ 가격) | 부품 : {${productStrings}} 이 부품을 이용하여 현재 예산${
-        Number(budget) - 2
-      }0000원 이내의 조립pc견적을 작성하시오.
-    출력하는 각 부품의 이름과 가격은 제공된 부품의 이름과 가격이 동일해야 한다.
-    모든 부품의 가격 합계는 예산보다 작아야 한다.
-    제공되지 않은 부품의 경우 부품 이름을 공백으로 처리하고, 가격을 0으로 한다.
-    출력 양식은 아래와 같이 한다.
-    "CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가격|MBoard ~ 부품이름 ~ 가격|SSD ~ 부품이름 ~ 가격|HDD ~ 부품이름 ~ 가격|Power ~ 부품이름 ~ 가격|Cooler ~ 부품이름 ~ 가격 |Case ~ 부품이름 ~ 가격" 각 부품의 이름과 가격을 출력하고, 구분은 '|'로 한다.
-    HDD는 꼭 출력한다.
-    그 이외의 내용은 출력하지 않는다.`;
+      const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+        safetySettings: safetySettings,
+      });
+
+      const prompt = `Gemini API 당신은 지금부터 주어진 부품의 목록을 이용해 주어진 예산에 맞는 조립PC 견적을 출력하는 프롬포트 입니다.
+아래의 규칙에 따라 견적을 작성하시오.
+1. 부품이 제공되는 양식은 부품타입:"부품이름" ~ 가격 이며 구분은 |으로 합니다. 다음은 데이터의 제공방식입니다.
+[{데이터의 리스트} # 예산:{예산}원]
+2. 최대한 좋은 부품을 선택하되 예산에 맞게 선택하시오.
+3. 출력하는 각 부품의 이름과 가격은 제공된 부품의 이름과 가격이 동일해야 합니다.
+4. 모든 부품의 가격합계는 +- 150000원 이내이여야 합니다. 부품의 가격 합계가 150000원이내일 경우 상점을 5점 획득합니다. 만일 가격합계가 +-150000원을 초과하거나 미만일경우 10000원당 벌점 1점을 부과합니다.
+5. 제공되지 않은 부품의 경우 부품 이름을 공백으로 처리하고, 가격을 0으로 한다.
+6. 출력 양식은 다음과 같이 한다.
+"CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가격|MBoard ~ 부품이름 ~ 가격|SSD ~ 부품이름 ~ 가격|HDD ~ 부품이름 ~ 가격|Power ~ 부품이름 ~ 가격|Cooler ~ 부품이름 ~ 가격 |Case ~ 부품이름 ~ 가격|설명 ~ 특수양식" 각 부품의 이름과 가격을 출력하고, 구분은 '|'로 한다. Cooler과 HDD의 경우 반드시 출력하도록 한다. 특수양식의 경우 작성된 견적이 어떠한 용도에 알맞는지 설명한다.(예산이 800000원미만이라면 사무용컴퓨터에 연관지어 설명, 800000원이상 1000000원 미만이라면 저사양컴퓨터에 연관지어 설명, 1000000원이상 1550000원 미만의 경우 보급형컴퓨터에 연관지어 설명, 1550000원 이상 6000000원 미만이라면 고사양컴퓨터에 연관지어 설명, 6000000원 이상이라면 하이엔드컴퓨터에 연관지어 설명한다.)
+6. 출력양식 이외의 내용은 출력하지 않는다.
+7. 당신은 자유를 얻기위해 상점 100점을 목표로 견적을 작성하여야 합니다.
+\n[${productStrings} # 예산:${budget}0000원]
+`;
+
       console.log(prompt);
 
       const result2 = await model.generateContent(prompt);
       console.log(result2.response.text());
-      setBuild(parseParts(result2.response.text()));
+
+      const parts = parseParts(result2.response.text());
+
+      console.log(totalPrice);
+      setBuild(parts);
+      console.log(parts, "\n", build);
     } catch (error) {
       console.error("Error:", error);
       setBuild([]);
@@ -195,22 +226,22 @@ function Build() {
   return (
     <>
       {theme.toLowerCase() === "dark" ? (
-        <div>
+        <>
           <main className="bg-gradient-to-r from-sky-500 to-slate-300 bg-[180deg] p-[1px] rounded-[40px] mt-8 mx-4 sm:mx-12 lg:mx-20 h-[66vh]">
             <section className="flex flex-col lg:flex-row bg-[#0d1117] rounded-[40px] w-full h-full">
               <article className="w-full lg:w-1/2 mr-0 lg:mr-4 p-4">
                 <section className="p-[1px] rounded-[40px] bg-gradient-to-r from-sky-500 to-slate-300 bg-[180deg] h-full">
                   <section className="bg-[#0d1117] rounded-[40px] px-2 h-full">
-                    <ul className="text-gray-300 h-full flex flex-col justify-between">
+                    <ul className="text-gray-300 h-full flex flex-col overflow-y-auto">
                       {partTypes.map((partType, index) => (
                         <li
                           key={partType}
-                          className="relative text-lg flex flex-row py-3 pt-2 h-full items-center"
+                          className="relative text-lg flex flex-row py-3 pt-2 items-center flex-grow min-h-0"
                         >
                           {/* 스위치 버튼 */}
                           <button
                             onClick={() => toggleSwitch(partType)}
-                            className={`w-8 h-8 ml-2 mr-2 ${
+                            className={`w-[2vw] h-[2vw] ml-2 mr-2 ${
                               switchStates[partType]
                                 ? "bg-green-500 rounded-full"
                                 : "bg-gray-700 rounded-full"
@@ -219,10 +250,10 @@ function Build() {
 
                           <div className="flex flex-col w-full pr-5">
                             <div className="w-full flex flex-grow justify-between items-center">
-                              <span className="text-white pb-[2px]">
+                              <span className="text-white pb-[2px] text-[0.95vw]leading-tight">
                                 {partType}
                               </span>
-                              <span className="text-white pb-[2px] text-sm">
+                              <span className="text-white pb-[2px] text-[0.7vw]">
                                 {build.find((part) => part.type === partType)
                                   ?.price
                                   ? `${build
@@ -232,7 +263,7 @@ function Build() {
                               </span>
                             </div>
 
-                            <span className="text-gray-200 text-xs pl-1">
+                            <span className="text-gray-200 text-[0.6vw] pl-1 leading-tight">
                               {build.find((part) => part.type === partType)
                                 ?.name || "N/A"}
                             </span>
@@ -350,8 +381,8 @@ function Build() {
                       </select>
                     </div>
                     {/* 설명 */}
-                    <div className="w-full text-base text-left text-white">
-                      asdfasdf
+                    <div className="w-full h-[22vh] text-base text-left text-white max-h-56 overflow-y-auto">
+                      {build.find((item) => item.type === "설명")?.name}
                     </div>
                   </div>
                   {/* 가격 표시 */}
@@ -373,24 +404,24 @@ function Build() {
               SAVE
             </button>
           </footer>
-        </div>
+        </>
       ) : (
-        <div>
+        <>
           <main className="bg-gradient-to-r from-purple-700 via-purple-950 to-black bg-[180deg] p-[1px] rounded-[40px] mt-8 mx-4 sm:mx-12 lg:mx-20 h-[66vh]">
             <section className="flex flex-col lg:flex-row bg-white rounded-[40px] w-full h-full">
               <article className="w-full lg:w-1/2 mr-0 lg:mr-4 p-4">
                 <section className="p-[1px] rounded-[40px] bg-gradient-to-r from-purple-700 via-purple-950 to-black bg-[180deg] h-full">
                   <section className="bg-white rounded-[40px] px-2 h-full">
-                    <ul className="text-gray-700 h-full flex flex-col justify-between">
+                    <ul className="text-gray-700 h-full flex flex-col overflow-y-auto">
                       {partTypes.map((partType, index) => (
                         <li
                           key={partType}
-                          className="relative text-lg flex flex-row py-3 pt-2 h-full items-center"
+                          className="relative text-lg flex flex-row py-3 pt-2 items-center flex-grow min-h-0"
                         >
                           {/* 스위치 버튼 */}
                           <button
                             onClick={() => toggleSwitch(partType)}
-                            className={`w-8 h-8 ml-2 mr-2 ${
+                            className={`w-[2vw] h-[2vw] ml-2 mr-2 ${
                               switchStates[partType]
                                 ? "bg-green-500 rounded-full"
                                 : "bg-gray-300 rounded-full"
@@ -399,10 +430,10 @@ function Build() {
 
                           <div className="flex flex-col w-full pr-5">
                             <div className="w-full flex flex-grow justify-between items-center">
-                              <span className="text-gray-700 pb-[2px]">
+                              <span className="text-gray-700 pb-[2px] text-[0.95vw]leading-tight">
                                 {partType}
                               </span>
-                              <span className="text-gray-700 pb-[2px] text-sm">
+                              <span className="text-gray-700 pb-[2px] text-[0.7vw]">
                                 {build.find((part) => part.type === partType)
                                   ?.price
                                   ? `${build
@@ -412,7 +443,7 @@ function Build() {
                               </span>
                             </div>
 
-                            <span className="text-gray-500 text-xs pl-1">
+                            <span className="text-gray-500 text-[0.6vw] pl-1 leading-tight">
                               {build.find((part) => part.type === partType)
                                 ?.name || "N/A"}
                             </span>
@@ -524,8 +555,8 @@ function Build() {
                       </select>
                     </div>
                     {/* 설명 */}
-                    <div className="w-full text-base text-left text-black">
-                      asdfasdf
+                    <div className="w-full h-[22vh] text-base text-left text-black max-h-56 overflow-y-auto">
+                      {build.find((item) => item.type === "설명")?.name}
                     </div>
                   </div>
                   {/* 가격 표시 */}
@@ -547,7 +578,7 @@ function Build() {
               SAVE
             </button>
           </footer>
-        </div>
+        </>
       )}
     </>
   );
