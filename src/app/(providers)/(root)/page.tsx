@@ -45,14 +45,19 @@ function MainPage() {
     <>
       {theme.toLowerCase() === "dark" ? (
         <div className="relative flex bg-[#0d1117] overflow-hidden h-screen">
-          <div className="absolute inset-0 bg-gradient-to-r from-pink-500/0 to-black z-0 pointer-events-none"></div>
+          <div
+            className={`absolute inset-0 bg-gradient-to-r from-pink-500/0 to-black z-0 pointer-events-none theme-opacity opacity-100`}
+          ></div>
+          <div
+            className={`absolute inset-0 bg-gradient-to-r from-gray-400/0 to-gray-400 z-0 pointer-events-none theme-opacity opacity-0`}
+          ></div>
           <img
-            src="https://image.fmkorea.com/files/attach/new2/20220402/4366334374/3971144225/4489369357/325b8f59cf94d48a14dd7eecdce52630.jpg"
+            src="https://i.namu.wiki/i/kDxN8Y1I3QnwN_7WmesRlM5L-p54NzRD1fCxyKAm5JB0NsE2Kg562c5gfGH6vKIB0LQIVrMaehxTxwlDVa91cA.webp"
             alt=""
             className={`absolute inset-0 h-full transform transition-all duration-300 ease-in-out ${
               theme !== "dark"
-                ? "left-[-4%] opacity-100"
-                : "left-[-104%] opacity-0"
+                ? "left-[-15%] opacity-100"
+                : "left-[-100%] opacity-0"
             } pointer-events-none blur-mask`}
           />
           <img
@@ -61,19 +66,33 @@ function MainPage() {
             className={`absolute inset-0 h-full transform transition-all duration-300 ease-in-out ${
               theme === "dark"
                 ? "left-[-20%] opacity-70 scale-x-[-1]"
-                : "left-[-120%] opacity-0 scale-x-[-1]"
+                : "left-[-100%] opacity-0 scale-x-[-1]"
             } pointer-events-none blur-mask`}
           />
           <nav className="w-full lg:w-1/4 p-5 ml-10 lg:ml-28 mt-10 lg:mt-[3rem] z-10">
             <header className="flex flex-col items-start justify-center ml-4 lg:ml-10">
               <button>
-                <h1
-                  onClick={() => setActiveTab("")}
-                  className="main-text text-transparent whitespace-nowrap bg-clip-text bg-gradient-to-r from-white via-blue-300 to-violet-500 bg-[60deg] font-serif text-[70px] mb-10 text-left"
-                >
-                  Custom PC <br />
-                  Magician
-                </h1>
+                <div className="relative inline-block w-96">
+                  {/* 보이지 않지만 크기를 차지하는 요소 */}
+                  <h1 className="invisible text-[70px] font-serif mb-10">
+                    Custom PC <br />
+                    Magician
+                  </h1>
+                  <h1
+                    onClick={() => setActiveTab("")}
+                    className={`theme-opacity absolute top-0 left-0 inset-0 text-transparent whitespace-nowrap bg-clip-text bg-gradient-to-r from-white via-blue-300 to-violet-500 bg-[60deg] font-serif text-[70px] mb-10 text-left transition-all duration-500 ease-in-out opacity-100`}
+                  >
+                    Custom PC <br />
+                    Magician
+                  </h1>
+                  <h1
+                    onClick={() => setActiveTab("")}
+                    className={`theme-opacity absolute top-0 left-0 inset-0 text-transparent whitespace-nowrap bg-clip-text bg-gradient-to-r from-violet-700 via-blue-950 to-black bg-[60deg] font-serif text-[70px] mb-10 text-left transition-all duration-500 ease-in-out opacity-0`}
+                  >
+                    Custom PC <br />
+                    Magician
+                  </h1>
+                </div>
               </button>
               <section className="font-serif w-full lg:w-60 mb-4 p-[1px] bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400 rounded-full">
                 <button
@@ -143,14 +162,19 @@ function MainPage() {
         </div>
       ) : (
         <div className="relative flex bg-white overflow-hidden h-screen">
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-400/0 to-gray-400 z-0 pointer-events-none"></div>
+          <div
+            className={`absolute inset-0 bg-gradient-to-r from-pink-500/0 to-black z-0 pointer-events-none theme-opacity opacity-0`}
+          ></div>
+          <div
+            className={`absolute inset-0 bg-gradient-to-r from-gray-400/0 to-gray-400 z-0 pointer-events-none theme-opacity opacity-100`}
+          ></div>
           <img
-            src="https://image.fmkorea.com/files/attach/new2/20220402/4366334374/3971144225/4489369357/325b8f59cf94d48a14dd7eecdce52630.jpg"
+            src="https://i.namu.wiki/i/kDxN8Y1I3QnwN_7WmesRlM5L-p54NzRD1fCxyKAm5JB0NsE2Kg562c5gfGH6vKIB0LQIVrMaehxTxwlDVa91cA.webp"
             alt=""
             className={`absolute inset-0 h-full transform transition-all duration-300 ease-in-out ${
               theme !== "dark"
-                ? "left-[-4%] opacity-100"
-                : "left-[-104%] opacity-0"
+                ? "left-[-15%] opacity-100"
+                : "left-[-100%] opacity-0"
             } pointer-events-none blur-mask`}
           />
 
@@ -160,20 +184,33 @@ function MainPage() {
             className={`absolute inset-0 h-full transform transition-all duration-300 ease-in-out ${
               theme === "dark"
                 ? "left-[-20%] opacity-70 scale-x-[-1]"
-                : "left-[-120%] opacity-0 scale-x-[-1]"
+                : "left-[-100%] opacity-0 scale-x-[-1]"
             } pointer-events-none blur-mask`}
           />
 
           <nav className="w-full lg:w-1/4 p-5 ml-10 lg:ml-28 mt-10 lg:mt-[3rem] z-10">
             <header className="flex flex-col items-start justify-center ml-4 lg:ml-10">
               <button>
-                <h1
-                  onClick={() => setActiveTab("")}
-                  className="main-text text-transparent whitespace-nowrap bg-clip-text bg-gradient-to-r from-violet-700 via-black to-black bg-[60deg] font-serif text-[70px] mb-10 text-left"
-                >
-                  Custom PC <br />
-                  Magician
-                </h1>
+                <div className="relative inline-block w-96">
+                  <h1 className="invisible text-[70px] font-serif mb-10">
+                    Custom PC <br />
+                    Magician
+                  </h1>
+                  <h1
+                    onClick={() => setActiveTab("")}
+                    className={`theme-opacity absolute top-0 left-0 inset-0 text-transparent whitespace-nowrap bg-clip-text bg-gradient-to-r from-white via-blue-300 to-violet-500 bg-[60deg] font-serif text-[70px] mb-10 text-left transition-all duration-500 ease-in-out opacity-0`}
+                  >
+                    Custom PC <br />
+                    Magician
+                  </h1>
+                  <h1
+                    onClick={() => setActiveTab("")}
+                    className={`theme-opacity absolute top-0 left-0 inset-0 text-transparent whitespace-nowrap bg-clip-text bg-gradient-to-r from-violet-700 via-blue-950 to-black bg-[60deg] font-serif text-[70px] mb-10 text-left transition-all duration-500 ease-in-out opacity-100`}
+                  >
+                    Custom PC <br />
+                    Magician
+                  </h1>
+                </div>
               </button>
               <section className="font-serif w-full lg:w-60 mb-4 p-[1px] bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400 rounded-full">
                 <button
