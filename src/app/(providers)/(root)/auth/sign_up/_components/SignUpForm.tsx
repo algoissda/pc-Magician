@@ -70,7 +70,7 @@ function SignUpForm() {
         <div className="mt-2 w-full">
           <button
             onClick={handleClickSignUpButton}
-            className="border py-4 px-3 border-slate-700 text-[15px] font-bold bg-red-500 w-full"
+            className="border py-4 px-3 border-slate-700 text-[15px] font-bold bg-sky-950 w-full"
           >
             회원가입하기
           </button>

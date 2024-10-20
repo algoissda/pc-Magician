@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* CSS에 추가할 부분 */
+* {
+  transition: background-color 0.8s, opacity 0.8s, color 0.2s;
+  .main-text {
+    transition: background-color 3s, color 0.8s;
+  }
+}
+
+.blur-mask {
+  mask-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0) 80%
+  );
+  transition: left 2s, opacity 0.8s;
+}

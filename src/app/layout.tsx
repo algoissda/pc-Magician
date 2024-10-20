@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
+// pages/_app.js 또는 _app.tsx
+import { config } from "@fortawesome/fontawesome-svg-core";
+import "@fortawesome/fontawesome-svg-core/styles.css"; // Font Awesome 스타일을 가져옵니다.
+config.autoAddCss = false; // 기본적으로 스타일을 자동으로 추가하지 않도록 설정
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -13,7 +17,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={"antialiased"}>
+      <head>
+        <link
+          rel="preload"
+          href="/path/to/Mona-Sans.woff2"
+          as="font"
+          type="font/woff2"
+        ></link>
+      </head>
+      <body className={"antialiased bg-black"}>
         {children}
         <div id="global-modal"></div>
       </body>

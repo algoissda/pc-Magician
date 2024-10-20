@@ -5,17 +5,19 @@ import { useState } from "react";
 import Build from "./_components/Build a PC/Build";
 import CommunityBuilds from "./_components/community_builds/page";
 import ViewBuildsByPrice from "./_components/view_builds_by_price/page";
+import { useThemeStore } from "@/store/useStore";
 
 function MainPage() {
+  const theme = useThemeStore((state) => state.theme);
   const [activeTab, setActiveTab] = useState<string>("");
 
   const renderFormContent = () => {
     if (activeTab === "") {
       return (
-        <div className="relative h-full w-full">
+        <div className="relative h-[110%] w-[110%] right-[-50px] top-[-80px]">
           <img
             className="absolute top-[10%] right-[0] w-[80%] object-cover"
-            src="https://cdn.discordapp.com/attachments/1108383158266761337/1296724705616723998/dsadasdasda.png?ex=6713547d&is=671202fd&hm=e0f22573d5a2549914414534b1aedf48885b4ed740d464b3af02555d7e74cdfc&"
+            src="https://cdn.discordapp.com/attachments/1118439327064666113/1297130842329448529/image.png?ex=6714cebc&is=67137d3c&hm=198e229a006441312c93e97bf199193cecfd77e45e4b39fbf2005864e5e209b4&"
             alt="Custom PC"
           />
         </div>
@@ -40,58 +42,207 @@ function MainPage() {
   };
 
   return (
-    <div className="flex bg-black overflow-hidden h-screen">
-      <div className="w-1/4 p-5 ml-28 mt-[3rem]">
-        <div className="flex flex-col items-start justify-center ml-10">
-          <button>
-            <p
-              onClick={() => setActiveTab("")}
-              className="text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-300 to-violet-700 bg-[60deg] font-serif text-[70px] mb-10 text-left"
-            >
-              Custom PC <br />
-              Magician
-            </p>
-          </button>
-          <div className="font-serif w-60 mb-4 p-[1px] bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400 rounded-full">
-            <button
-              onClick={() => setActiveTab("Build a PC")}
-              className={
-                activeTab !== "Build a PC"
-                  ? "w-full p-2 text-3xl h-[50px] bg-[#0f1113] text-white rounded-full"
-                  : "w-full p-2 text-3xl h-[50px] bg-[#ffffff] text-black rounded-full"
-              }
-            >
-              Build a PC
-            </button>
-          </div>
-          <div className="font-serif w-60 mb-4 p-[1px] bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400 rounded-full">
-            <button
-              onClick={() => setActiveTab("View Builds by Price")}
-              className={
-                activeTab !== "View Builds by Price"
-                  ? "w-full p-2 bg-[#0f1113] text-white rounded-full text-xl h-[50px]"
-                  : "w-full p-2 bg-[#ffffff] text-black rounded-full text-xl h-[50px]"
-              }
-            >
-              View Builds by Price
-            </button>
-          </div>
-          <div className="font-serif w-60 mb-4 p-[1px] bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400 rounded-full">
-            <button
-              onClick={() => setActiveTab("Community Builds")}
-              className={
-                activeTab !== "Community Builds"
-                  ? "w-full p-2 bg-[#0f1113] text-white rounded-full text-2xl h-[50px]"
-                  : "w-full p-2 bg-[#ffffff] text-black rounded-full text-2xl h-[50px]"
-              }
-            >
-              Community Builds
-            </button>
-          </div>
+    <>
+      {theme.toLowerCase() === "dark" ? (
+        <div className="relative flex bg-[#0d1117] overflow-hidden h-screen">
+          <div className="absolute inset-0 bg-gradient-to-r from-pink-500/0 to-black z-0 pointer-events-none"></div>
+          <img
+            src="https://image.fmkorea.com/files/attach/new2/20220402/4366334374/3971144225/4489369357/325b8f59cf94d48a14dd7eecdce52630.jpg"
+            alt=""
+            className={`absolute inset-0 h-full transform transition-all duration-300 ease-in-out ${
+              theme !== "dark"
+                ? "left-[-4%] opacity-100"
+                : "left-[-104%] opacity-0"
+            } pointer-events-none blur-mask`}
+          />
+          <img
+            src="https://tumblbug-pci.imgix.net/6eec8030c730675bec7c1ff93f61a08162934ebd/7bb35479921a8dfd09d353f5b8716b88ca913235/57e7c6e9fe723a1167b0ce458db447bcc07935ed/30603416-80c1-43cc-bd36-4f8f239b1508.png?auto=format%2Ccompress&fit=max&h=930&lossless=true&w=1240&s=25719117e6379d625fde0fa3c61af94a"
+            alt=""
+            className={`absolute inset-0 h-full transform transition-all duration-300 ease-in-out ${
+              theme === "dark"
+                ? "left-[-20%] opacity-70 scale-x-[-1]"
+                : "left-[-120%] opacity-0 scale-x-[-1]"
+            } pointer-events-none blur-mask`}
+          />
+          <nav className="w-full lg:w-1/4 p-5 ml-10 lg:ml-28 mt-10 lg:mt-[3rem] z-10">
+            <header className="flex flex-col items-start justify-center ml-4 lg:ml-10">
+              <button>
+                <h1
+                  onClick={() => setActiveTab("")}
+                  className="main-text text-transparent whitespace-nowrap bg-clip-text bg-gradient-to-r from-white via-blue-300 to-violet-500 bg-[60deg] font-serif text-[70px] mb-10 text-left"
+                >
+                  Custom PC <br />
+                  Magician
+                </h1>
+              </button>
+              <section className="font-serif w-full lg:w-60 mb-4 p-[1px] bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400 rounded-full">
+                <button
+                  onClick={() => setActiveTab("Build a PC")}
+                  className={
+                    activeTab !== "Build a PC"
+                      ? "w-full p-2 text-lg sm:text-xl md:text-2xl lg:text-3xl h-[50px] bg-[#0f1113] rounded-full"
+                      : "w-full p-2 text-lg sm:text-xl md:text-2xl lg:text-3xl h-[50px] bg-[#ffffff] rounded-full"
+                  }
+                >
+                  <p
+                    className={
+                      activeTab !== "Build a PC"
+                        ? " text-white"
+                        : " text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-violet-800 bg-[60deg]"
+                    }
+                  >
+                    Build a PC
+                  </p>
+                </button>
+              </section>
+              <section className="font-serif w-full lg:w-60 mb-4 p-[1px] bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400 rounded-full">
+                <button
+                  onClick={() => setActiveTab("View Builds by Price")}
+                  className={
+                    activeTab !== "View Builds by Price"
+                      ? "w-full p-2 text-base sm:text-lg md:text-xl h-[50px] bg-[#0f1113] rounded-full"
+                      : "w-full p-2 text-base sm:text-lg md:text-xl h-[50px] bg-[#ffffff] rounded-full"
+                  }
+                >
+                  <p
+                    className={
+                      activeTab !== "View Builds by Price"
+                        ? " text-white"
+                        : " text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-violet-800 bg-[60deg]"
+                    }
+                  >
+                    View Builds by Price
+                  </p>
+                </button>
+              </section>
+              <section className="font-serif w-full lg:w-60 mb-4 p-[1px] bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400 rounded-full">
+                <button
+                  onClick={() => setActiveTab("Community Builds")}
+                  className={
+                    activeTab !== "Community Builds"
+                      ? "w-full p-2 text-lg sm:text-xl md:text-2xl h-[50px] bg-[#0f1113] rounded-full"
+                      : "w-full p-2 text-lg sm:text-xl md:text-2xl h-[50px] bg-[#ffffff] rounded-full"
+                  }
+                >
+                  <p
+                    className={
+                      activeTab !== "Community Builds"
+                        ? " text-white"
+                        : " text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-violet-800 bg-[60deg]"
+                    }
+                  >
+                    Community Builds
+                  </p>
+                </button>
+              </section>
+            </header>
+          </nav>
+          <main className="flex-grow p-5 h-full z-10">
+            {renderFormContent()}
+          </main>
         </div>
-      </div>
-      <div className="flex-grow p-5 h-full">{renderFormContent()}</div>
-    </div>
+      ) : (
+        <div className="relative flex bg-white overflow-hidden h-screen">
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-400/0 to-gray-400 z-0 pointer-events-none"></div>
+          <img
+            src="https://image.fmkorea.com/files/attach/new2/20220402/4366334374/3971144225/4489369357/325b8f59cf94d48a14dd7eecdce52630.jpg"
+            alt=""
+            className={`absolute inset-0 h-full transform transition-all duration-300 ease-in-out ${
+              theme !== "dark"
+                ? "left-[-4%] opacity-100"
+                : "left-[-104%] opacity-0"
+            } pointer-events-none blur-mask`}
+          />
+
+          <img
+            src="https://tumblbug-pci.imgix.net/6eec8030c730675bec7c1ff93f61a08162934ebd/7bb35479921a8dfd09d353f5b8716b88ca913235/57e7c6e9fe723a1167b0ce458db447bcc07935ed/30603416-80c1-43cc-bd36-4f8f239b1508.png?auto=format%2Ccompress&fit=max&h=930&lossless=true&w=1240&s=25719117e6379d625fde0fa3c61af94a"
+            alt=""
+            className={`absolute inset-0 h-full transform transition-all duration-300 ease-in-out ${
+              theme === "dark"
+                ? "left-[-20%] opacity-70 scale-x-[-1]"
+                : "left-[-120%] opacity-0 scale-x-[-1]"
+            } pointer-events-none blur-mask`}
+          />
+
+          <nav className="w-full lg:w-1/4 p-5 ml-10 lg:ml-28 mt-10 lg:mt-[3rem] z-10">
+            <header className="flex flex-col items-start justify-center ml-4 lg:ml-10">
+              <button>
+                <h1
+                  onClick={() => setActiveTab("")}
+                  className="main-text text-transparent whitespace-nowrap bg-clip-text bg-gradient-to-r from-violet-700 via-black to-black bg-[60deg] font-serif text-[70px] mb-10 text-left"
+                >
+                  Custom PC <br />
+                  Magician
+                </h1>
+              </button>
+              <section className="font-serif w-full lg:w-60 mb-4 p-[1px] bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400 rounded-full">
+                <button
+                  onClick={() => setActiveTab("Build a PC")}
+                  className={
+                    activeTab !== "Build a PC"
+                      ? "w-full p-2 text-lg sm:text-xl md:text-2xl lg:text-3xl h-[50px] bg-white rounded-full"
+                      : "w-full p-2 text-lg sm:text-xl md:text-2xl lg:text-3xl h-[50px] bg-slate-700 rounded-full"
+                  }
+                >
+                  <p
+                    className={
+                      activeTab !== "Build a PC"
+                        ? "text-gray-800"
+                        : "text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-200 bg-[60deg]"
+                    }
+                  >
+                    Build a PC
+                  </p>
+                </button>
+              </section>
+              <section className="font-serif w-full lg:w-60 mb-4 p-[1px] bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400 rounded-full">
+                <button
+                  onClick={() => setActiveTab("View Builds by Price")}
+                  className={
+                    activeTab !== "View Builds by Price"
+                      ? "w-full p-2 text-base sm:text-lg md:text-xl h-[50px] bg-white rounded-full"
+                      : "w-full p-2 text-base sm:text-lg md:text-xl h-[50px] bg-slate-700 rounded-full"
+                  }
+                >
+                  <p
+                    className={
+                      activeTab !== "View Builds by Price"
+                        ? "text-gray-800"
+                        : "text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-200 bg-[60deg]"
+                    }
+                  >
+                    View Builds by Price
+                  </p>
+                </button>
+              </section>
+              <section className="font-serif w-full lg:w-60 mb-4 p-[1px] bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400 rounded-full">
+                <button
+                  onClick={() => setActiveTab("Community Builds")}
+                  className={
+                    activeTab !== "Community Builds"
+                      ? "w-full p-2 text-lg sm:text-xl md:text-2xl h-[50px] bg-white rounded-full"
+                      : "w-full p-2 text-lg sm:text-xl md:text-2xl h-[50px] bg-slate-700 rounded-full"
+                  }
+                >
+                  <p
+                    className={
+                      activeTab !== "Community Builds"
+                        ? "text-gray-800"
+                        : "text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-200 bg-[60deg]"
+                    }
+                  >
+                    Community Builds
+                  </p>
+                </button>
+              </section>
+            </header>
+          </nav>
+          <main className="flex-grow p-5 h-full z-10">
+            {renderFormContent()}
+          </main>
+        </div>
+      )}
+    </>
   );
 }
 
