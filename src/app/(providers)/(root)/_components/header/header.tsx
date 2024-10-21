@@ -139,39 +139,3 @@ const HeaderContent = ({
     </header>
   );
 };
-
-function Header() {
-  const theme = useThemeStore((state) => state.theme);
-  const setTheme = useThemeStore((state) => state.setTheme);
-  const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
-
-  const router = useRouter();
-  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-  const logOut = useAuthStore((state) => state.logOut);
-  const isInitalizedAuth = useAuthStore((state) => state.isInitalizedAuth);
-
-  const handleClickLogOutButton = async () => {
-    await supabase.auth.signOut();
-    logOut();
-    alert("로그아웃되었습니다");
-  };
-
-  const handleClickPartListButton = () => router.push("/my/partlist");
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  return (
-    <HeaderContent
-      theme={theme}
-      handleClickPartListButton={handleClickPartListButton}
-      handleClickLogOutButton={handleClickLogOutButton}
-      isInitalizedAuth={isInitalizedAuth}
-      isLoggedIn={isLoggedIn}
-      setIsModalOpen={setIsModalOpen}
-      isModalOpen={isModalOpen}
-      toggleTheme={toggleTheme}
-    />
-  );
-}
-
-export default Header;
