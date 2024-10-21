@@ -1,12 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { useThemeStore } from "@/store/useStore";
 import { useState } from "react";
 import Build from "./_components/Build a PC/Build";
 import CommunityBuilds from "./_components/community_builds/page";
 import ViewBuildsByPrice from "./_components/view_builds_by_price/page";
-import { useThemeStore } from "@/store/useStore";
-import CustomPcImg from "../../../../img/image_720.png";
 
 function MainPage() {
   const theme = useThemeStore((state) => state.theme);
@@ -17,7 +16,7 @@ function MainPage() {
       return (
         <div className="relative h-[110%] w-[110%] right-[-50px] top-[-80px]">
           <img
-            className="absolute top-[10%] right-[0] w-[80%] object-cover"
+            className="absolute top-[13%] left-[180px] right-[] w-[80%] object-cover"
             src="https://i.ibb.co/vx1KXC8/image-720.png"
             alt="Custom PC"
           />
