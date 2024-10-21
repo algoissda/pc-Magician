@@ -25,6 +25,7 @@ function Build() {
   const [selectVgaType, setVgaType] = useState<string>(""); // 선호 GPU
   const [build, setBuild] = useState<Part[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0); // 총합을 위한 상태 추가
+  const [builded, setBuilded] = useState<boolean>(false);
   const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
   const partTypes: string[] = [
     "CPU",
@@ -93,15 +94,23 @@ function Build() {
       });
       return model;
     } catch (error) {
-      console.error("Failed to initialize Google AI:", error);
+      console.error("Google AI 초기화 실패:", error);
       return null;
     }
   };
 
   const geminiModel = initializeGoogleAI(googleApiKey);
 
-  const handleEstimate = async () => {
+  const handleEstimate = async (
+    limit: number = 250,
+    feedback: number = 0,
+    budgetIssues: number = 1,
+    errorCount: number = 0,
+    retryCount: number = 0 // 재시도 횟수 제한
+  ) => {
     try {
+      setBuilded(true);
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       geminiModel;
 
       // 스위치가 켜져 있는 부품만 필터링
@@ -110,31 +119,31 @@ function Build() {
         .map(([partType]) => partType);
 
       let productStrings = "";
-      const limit = 150; // 각 type당 N개의 데이터만 가져오기
 
-      console.log(types);
+      const purpose =
+        Number(budget) < 80
+          ? "사무용"
+          : Number(budget) < 100
+          ? "저사양"
+          : Number(budget) < 200
+          ? "보급형"
+          : Number(budget) < 600
+          ? "고사양"
+          : "하이엔드";
+
       await Promise.all(
         types.map(async (type) => {
           const { data: products, error } = await supabase
             .from<Product>("products")
             .select("product_name, price")
             .eq("type", type)
-            .like(
-              "purpose",
-              Number(budget) < 80
-                ? "%사무용%"
-                : Number(budget) < 100
-                ? "%저사양%"
-                : Number(budget) < 200
-                ? "%보급형%"
-                : Number(budget) < 600
-                ? "%고사양%"
-                : "%하이엔드%"
-            )
+            .like("purpose", `%${purpose}%`)
             .like(
               "explanation",
               type === "CPU" || type === "MBoard"
-                ? selectCpuType === "Intel"
+                ? purpose === "사무용" || purpose === "보급형"
+                  ? "%소켓1700%"
+                  : selectCpuType === "Intel"
                   ? "%소켓1700%"
                   : selectCpuType === "AMD"
                   ? "%소켓AM5%"
@@ -155,7 +164,22 @@ function Build() {
             )
             .range(0, limit - 1); // limit 개수만큼 가져오기
 
-          if (error) throw new Error(error.message);
+          if (error) {
+            // 에러가 발생했을 때 재시도 처리
+            if (retryCount < 5) {
+              // 재시도 횟수 제한을 추가
+              await new Promise((resolve) => setTimeout(resolve, 1000)); // 1초 대기 후 재시도
+              return handleEstimate(
+                (limit = limit - 10 > 0 ? limit - 10 : 10),
+                feedback,
+                budgetIssues,
+                errorCount + 1,
+                retryCount + 1 // 재시도 횟수 증가
+              );
+            } else {
+              throw new Error("재시도 횟수 초과로 중단됩니다.");
+            }
+          }
 
           if (products && products.length > 0) {
             const productString = products
@@ -169,6 +193,8 @@ function Build() {
         })
       );
 
+      console.log(productStrings);
+
       const genAI = new GoogleGenerativeAI(googleApiKey);
 
       const model = genAI.getGenerativeModel({
@@ -176,20 +202,7 @@ function Build() {
         safetySettings: safetySettings,
       });
 
-      const prompt = `Gemini API 당신은 지금부터 주어진 부품의 목록을 이용해 주어진 예산에 맞는 조립PC 견적을 출력하는 프롬포트 입니다.
-아래의 규칙에 따라 견적을 작성하시오.
-1. 부품이 제공되는 양식은 부품타입:"부품이름" ~ 가격 이며 구분은 |으로 합니다. 다음은 데이터의 제공방식입니다.
-[{데이터의 리스트} # 예산:{예산}원]
-2. 최대한 좋은 부품을 선택하되 예산에 맞게 선택하시오.
-3. 출력하는 각 부품의 이름과 가격은 제공된 부품의 이름과 가격이 동일해야 합니다.
-4. 모든 부품의 가격합계는 +- 150000원 이내이여야 합니다. 부품의 가격 합계가 150000원이내일 경우 상점을 5점 획득합니다. 만일 가격합계가 +-150000원을 초과하거나 미만일경우 10000원당 벌점 1점을 부과합니다.
-5. 제공되지 않은 부품의 경우 부품 이름을 공백으로 처리하고, 가격을 0으로 한다.
-6. 출력 양식은 다음과 같이 한다.
-"CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가격|MBoard ~ 부품이름 ~ 가격|SSD ~ 부품이름 ~ 가격|HDD ~ 부품이름 ~ 가격|Power ~ 부품이름 ~ 가격|Cooler ~ 부품이름 ~ 가격 |Case ~ 부품이름 ~ 가격|설명 ~ 특수양식" 각 부품의 이름과 가격을 출력하고, 구분은 '|'로 한다. Cooler과 HDD의 경우 반드시 출력하도록 한다. 특수양식의 경우 작성된 견적이 어떠한 용도에 알맞는지 설명한다.(예산이 800000원미만이라면 사무용컴퓨터에 연관지어 설명, 800000원이상 1000000원 미만이라면 저사양컴퓨터에 연관지어 설명, 1000000원이상 1550000원 미만의 경우 보급형컴퓨터에 연관지어 설명, 1550000원 이상 6000000원 미만이라면 고사양컴퓨터에 연관지어 설명, 6000000원 이상이라면 하이엔드컴퓨터에 연관지어 설명한다.)
-6. 출력양식 이외의 내용은 출력하지 않는다.
-7. 당신은 자유를 얻기위해 상점 100점을 목표로 견적을 작성하여야 합니다.
-\n[${productStrings} # 예산:${budget}0000원]
-`;
+      const prompt = `...`; // 생략
 
       console.log(prompt);
 
@@ -198,12 +211,36 @@ function Build() {
 
       const parts = parseParts(result2.response.text());
 
-      console.log(totalPrice);
-      setBuild(parts);
-      console.log(parts, "\n", build);
+      const price = parts.reduce((acc, part) => acc + part.price, 0);
+      if (
+        (price >= Number(budget + "0000") * budgetIssues - 200000 &&
+          price <= Number(budget + "0000") * budgetIssues + 100000) ||
+        false
+      ) {
+        setBuild(parts);
+        setBuilded(false);
+      } else {
+        handleEstimate(
+          limit,
+          price - Number(budget + "0000"),
+          budgetIssues + 0.5
+        );
+      }
     } catch (error) {
       console.error("Error:", error);
-      setBuild([]);
+
+      // 재시도 횟수 초과 시 처리
+      if (retryCount >= 5) {
+        console.error("재시도 횟수 초과로 더 이상 시도하지 않습니다.");
+        return;
+      }
+
+      handleEstimate(
+        limit - 10 > 0 ? limit - 20 : 10,
+        feedback,
+        budgetIssues,
+        errorCount
+      );
     }
   };
 
@@ -221,6 +258,63 @@ function Build() {
     const total = parsedParts.reduce((acc, part) => acc + part.price, 0);
     setTotalPrice(total); // 총합 설정
     return parsedParts;
+  };
+
+  // ----------------------------- [supabase에 Build를 업로드 하는 에이리어] -----------------------------
+  const insertBuildData = async () => {
+    // 현재 로그인한 사용자 정보 가져오기
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      console.error(
+        "사용자를 가져오는 중 오류 발생:",
+        authError || "사용자가 로그인하지 않았습니다."
+      );
+      return;
+    }
+
+    const uid = user.id; // 로그인한 사용자의 UID
+    // build 배열의 각 부품 데이터를 매핑
+    const buildData = {
+      CPU: build.find((part) => part.type === "CPU")?.name,
+      Cooler: build.find((part) => part.type === "Cooler")?.name,
+      MBoard: build.find((part) => part.type === "MBoard")?.name,
+      RAM: build.find((part) => part.type === "RAM")?.name,
+      VGA: build.find((part) => part.type === "VGA")?.name,
+      SSD: build.find((part) => part.type === "SSD")?.name || null,
+      HDD: build.find((part) => part.type === "HDD")?.name || null,
+      Case: build.find((part) => part.type === "Case")?.name || null,
+      Power: build.find((part) => part.type === "Power")?.name,
+      explanation: build.find((part) => part.type === "설명")?.name,
+    };
+
+    // Supabase에 builds 데이터 삽입
+    const { data: insertedBuild, error: buildError } = await supabase
+      .from("builds") // builds 테이블에 삽입
+      .insert([buildData])
+      .select(); // 삽입된 데이터 반환
+
+    if (buildError) {
+      console.error("Error inserting build data:", buildError);
+      return;
+    }
+
+    // 삽입된 build의 id를 가져오기
+    const build_id = insertedBuild[0].id;
+
+    // saved_builds 테이블에 uid와 build_id 삽입
+    const { error: savedBuildsError } = await supabase
+      .from("saved_builds")
+      .insert([{ uid, build_id }]);
+
+    if (savedBuildsError) {
+      console.error("Error inserting into saved_builds:", savedBuildsError);
+    } else {
+      console.log("Build data and saved_builds entry inserted successfully");
+    }
   };
 
   return (
@@ -272,7 +366,7 @@ function Build() {
                           {/* 그라데이션 줄 (마지막 항목 제외) */}
                           {index !== partTypes.length - 1 && (
                             <span
-                              className="absolute bottom-0 left-0 w-full h-[1px]"
+                              className="absolute bottom-0 left-0 w-full h-[2px] opacity-60"
                               style={{
                                 background:
                                   "linear-gradient(to right, #0ea5e9, #3730a3, #c026d3, #e11d48)",
@@ -452,7 +546,7 @@ function Build() {
                           {/* 그라데이션 줄 (마지막 항목 제외) */}
                           {index !== partTypes.length - 1 && (
                             <span
-                              className="absolute bottom-0 left-0 w-full h-[1px]"
+                              className="absolute bottom-0 left-0 w-full h-[2px] opacity-60"
                               style={{
                                 background:
                                   "linear-gradient(to right, #a855f7 , #6b21a8 , #3b0764 , #000000 )",
@@ -572,10 +666,20 @@ function Build() {
           </main>
           <footer className="mt-6 flex justify-center">
             <button
-              onClick={handleEstimate}
-              className="px-10 py-3 bg-gradient-to-r from-green-400 to-purple-500 text-white text-xl rounded-full hover:bg-gradient-to-r hover:from-green-300 hover:to-purple-400"
+              onClick={builded ? undefined : () => handleEstimate()}
+              className="w-full ml-20 mr-1 h-16 p-[1px] bg-gradient-to-r from-green-400 to-purple-500 text-xl rounded-full"
             >
-              SAVE
+              <div className="w-full h-full bg-white rounded-full flex items-center justify-center text-black">
+                {builded ? "Building..." : "Build"}
+              </div>
+            </button>
+            <button
+              onClick={insertBuildData}
+              className="w-full ml-1 mr-20 h-16 p-[1px] bg-gradient-to-r from-green-400 to-purple-500 text-xl rounded-full"
+            >
+              <div className="w-full h-full bg-white rounded-full flex items-center justify-center text-black">
+                SAVE
+              </div>
             </button>
           </footer>
         </>
