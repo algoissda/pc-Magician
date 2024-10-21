@@ -51,8 +51,8 @@ function MainPage() {
           <div
             className={`absolute inset-0 bg-gradient-to-r from-gray-400/0 to-gray-400 z-0 pointer-events-none theme-opacity opacity-0`}
           ></div>
-          {/* <img
-            src="https://i.namu.wiki/i/kDxN8Y1I3QnwN_7WmesRlM5L-p54NzRD1fCxyKAm5JB0NsE2Kg562c5gfGH6vKIB0LQIVrMaehxTxwlDVa91cA.webp"
+          <img
+            src="https://img.chuing.net/i/HQJVyeG/%EC%82%AC%EB%B3%B8%20-3333.jpg"
             alt=""
             className={`absolute inset-0 h-full transform transition-all duration-300 ease-in-out ${
               theme !== "dark"
@@ -68,7 +68,7 @@ function MainPage() {
                 ? "left-[-20%] opacity-70 scale-x-[-1]"
                 : "left-[-100%] opacity-0 scale-x-[-1]"
             } pointer-events-none blur-mask`}
-          /> */}
+          />
           <nav className="w-full lg:w-1/4 p-5 ml-10 lg:ml-28 mt-10 lg:mt-[3rem] z-10">
             <header className="flex flex-col items-start justify-center ml-4 lg:ml-10">
               <button>
@@ -168,8 +168,8 @@ function MainPage() {
           <div
             className={`absolute inset-0 bg-gradient-to-r from-gray-400/0 to-gray-400 z-0 pointer-events-none theme-opacity opacity-100`}
           ></div>
-          {/* <img
-            src="https://i.namu.wiki/i/kDxN8Y1I3QnwN_7WmesRlM5L-p54NzRD1fCxyKAm5JB0NsE2Kg562c5gfGH6vKIB0LQIVrMaehxTxwlDVa91cA.webp"
+          <img
+            src="https://img.chuing.net/i/HQJVyeG/%EC%82%AC%EB%B3%B8%20-3333.jpg"
             alt=""
             className={`absolute inset-0 h-full transform transition-all duration-300 ease-in-out ${
               theme !== "dark"
@@ -186,7 +186,7 @@ function MainPage() {
                 ? "left-[-20%] opacity-70 scale-x-[-1]"
                 : "left-[-100%] opacity-0 scale-x-[-1]"
             } pointer-events-none blur-mask`}
-          /> */}
+          />
 
           <nav className="w-full lg:w-1/4 p-5 ml-10 lg:ml-28 mt-10 lg:mt-[3rem] z-10">
             <header className="flex flex-col items-start justify-center ml-4 lg:ml-10">
