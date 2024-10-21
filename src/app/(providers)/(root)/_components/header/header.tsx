@@ -65,19 +65,30 @@ function Header() {
             {/* -------------------------------------------------------------------------------------------------------------- */}
             {isInitalizedAuth ? (
               isLoggedIn ? (
-                <ul>
-                  <li className="text-[18px] font-medium text-white">
-                    <Link href={"/my/SavedBuild"}>
-                      <button className="mr-8">My Saved Builds</button>
-                    </Link>
-                    <button
-                      className="border text-black font-serif font-bold text-[20px] border-b-white bg-white rounded-3xl p-2 px-3 "
-                      onClick={handleClickLogOutButton}
-                    >
-                      log-out
-                    </button>
-                  </li>
-                </ul>
+                <>
+                  <ul>
+                    <li className="text-[18px] font-medium text-white">
+                      <Link href={"/my/SavedBuild"}>
+                        <button className="mr-8">My Saved Builds</button>
+                      </Link>
+                      <button
+                        className="border text-black font-serif font-bold text-[20px] border-b-white bg-white rounded-3xl p-2 px-3 "
+                        onClick={handleClickLogOutButton}
+                      >
+                        log-out
+                      </button>
+                    </li>
+                  </ul>
+                  <button
+                    onClick={toggleTheme}
+                    className="bg-white w-10 h-10 rounded-full flex justify-center items-center p-[1px]"
+                  >
+                    <FontAwesomeIcon
+                      className="bg-black w-9 h-9 rounded-full text-3xl text-white"
+                      icon={faSun}
+                    />
+                  </button>
+                </>
               ) : (
                 <>
                   <nav className="ml-5">
@@ -149,19 +160,30 @@ function Header() {
             {/* -------------------------------------------------------------------------------------------------------------- */}
             {isInitalizedAuth ? (
               isLoggedIn ? (
-                <ul>
-                  <li className="text-[18px] font-medium text-gray-700">
-                    <Link href={"/my/SavedBuild"}>
-                      <button className="mr-8">My Saved Builds</button>
-                    </Link>
-                    <button
-                      className="border text-white font-serif font-bold text-[20px] border-b-gray-300 bg-gray-700 rounded-3xl p-2 px-3"
-                      onClick={handleClickLogOutButton}
-                    >
-                      log-out
-                    </button>
-                  </li>
-                </ul>
+                <>
+                  <ul>
+                    <li className="text-[18px] font-medium text-gray-700">
+                      <Link href={"/my/SavedBuild"}>
+                        <button className="mr-8">My Saved Builds</button>
+                      </Link>
+                      <button
+                        className="border text-white font-serif font-bold text-[20px] border-b-gray-300 bg-gray-700 rounded-3xl p-2 px-3"
+                        onClick={handleClickLogOutButton}
+                      >
+                        log-out
+                      </button>
+                    </li>
+                  </ul>
+                  <button
+                    onClick={() => toggleTheme()}
+                    className="bg-black w-10 h-10 rounded-full flex justify-center items-center p-[1px]"
+                  >
+                    <FontAwesomeIcon
+                      className="bg-white w-9 h-9 rounded-full text-4xl"
+                      icon={faMoon}
+                    />
+                  </button>
+                </>
               ) : (
                 <>
                   <nav className="ml-5">
