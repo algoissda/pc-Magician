@@ -164,11 +164,7 @@ function Build() {
             .range(0, limit - 1); // limit 개수만큼 가져오기
 
           if (error) {
-            handleEstimate(
-              0,
-              (limit = limit - 10 > 0 ? limit - 10 : 10),
-              (errorCount = errorCount + 1)
-            );
+            handleEstimate(0);
             return;
           }
 
