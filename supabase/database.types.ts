@@ -11,37 +11,46 @@ export type Database = {
     Tables: {
       builds: {
         Row: {
-          cpu: string | null
+          Case: string | null
+          Cooler: string
+          CPU: string
           created_at: string
-          hdd: string | null
+          explanation: string | null
+          HDD: string | null
           id: number
-          mbord: string | null
-          price: number | null
-          ram: string | null
-          ssd: string | null
-          vga: string | null
+          MBoard: string
+          Power: string
+          RAM: string
+          SSD: string | null
+          VGA: string
         }
         Insert: {
-          cpu?: string | null
+          Case?: string | null
+          Cooler: string
+          CPU: string
           created_at?: string
-          hdd?: string | null
+          explanation?: string | null
+          HDD?: string | null
           id?: number
-          mbord?: string | null
-          price?: number | null
-          ram?: string | null
-          ssd?: string | null
-          vga?: string | null
+          MBoard: string
+          Power: string
+          RAM: string
+          SSD?: string | null
+          VGA: string
         }
         Update: {
-          cpu?: string | null
+          Case?: string | null
+          Cooler?: string
+          CPU?: string
           created_at?: string
-          hdd?: string | null
+          explanation?: string | null
+          HDD?: string | null
           id?: number
-          mbord?: string | null
-          price?: number | null
-          ram?: string | null
-          ssd?: string | null
-          vga?: string | null
+          MBoard?: string
+          Power?: string
+          RAM?: string
+          SSD?: string | null
+          VGA?: string
         }
         Relationships: []
       }

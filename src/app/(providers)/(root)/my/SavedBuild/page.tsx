@@ -2,9 +2,14 @@ import { supabase } from "../../../../../../supabase/client";
 
 async function MySavedBuildsPage() {
 
+  //builds 테이블 조회 해도 안나옴;;
   const response = await supabase.from("builds").select("*");
-  const data = response.data;
-  console.log("111111111",data);
+  console.log("ddddd", response);
+  //saved_builds 테이블은 조회 하면 나옴
+  const response2 = await supabase.from("saved_builds").select("*");
+  console.log("ddddd", response2);
+
+  //현재 builds 테이블을 조회 해야 서로 id랑 uid를 비교를 하면서 출력 해야 하기 떄문에 이 문제를 해결하기 전까지 못 건들것 같음
 
   return (
     <main className="text-white">
