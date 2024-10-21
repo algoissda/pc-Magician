@@ -489,8 +489,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
                     </div>
                   </div>
                   {/* 가격 표시 */}
-                  <div className="mt-auto text-white text-4xl text-left">
-                    {"최적가 : "}
+                  <div className="mt-auto text-white text-4xl text-r">
                     {totalPrice
                       ? `${totalPrice.toLocaleString()} 원`
                       : "XXX,XXX,XXX 원"}
@@ -663,8 +662,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
                     </div>
                   </div>
                   {/* 가격 표시 */}
-                  <div className="mt-auto text-gray-700 text-4xl text-left">
-                    {"최적가 : "}
+                  <div className="mt-auto text-gray-700 text-4xl text-r">
                     {totalPrice
                       ? `${totalPrice.toLocaleString()} 원`
                       : "XXX,XXX,XXX 원"}
