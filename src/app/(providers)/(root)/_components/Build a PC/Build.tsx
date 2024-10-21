@@ -1,14 +1,14 @@
 "use client";
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import React, { ComponentProps, useState } from "react";
+import { useThemeStore } from "@/store/useStore";
+import {
+  GoogleGenerativeAI,
+  HarmBlockThreshold,
+  HarmCategory,
+} from "@google/generative-ai";
+import { ComponentProps, useState } from "react";
 import { supabase } from "../../../../../../supabase/client";
 import Product from "../../../../../../types/products.type";
-import { useThemeStore } from "@/store/useStore";
-import build from "next/dist/build";
-import { error } from "console";
-import { type } from "os";
-import { HarmBlockThreshold, HarmCategory } from "@google/generative-ai";
 
 // ...
 
