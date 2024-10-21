@@ -107,12 +107,11 @@ function Build() {
     budgetIssues: number = 1,
     errorCount: number = 0
   ) => {
-    try {
-      setBuilded(true);
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      geminiModel;
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    geminiModel;
+    setBuilded(true);
 
-      // 스위치가 켜져 있는 부품만 필터링
+    try {
       const types = Object.entries(switchStates)
         .filter(([partType, isEnabled]) => isEnabled)
         .map(([partType]) => partType);
@@ -130,6 +129,7 @@ function Build() {
           ? "고사양"
           : "하이엔드";
 
+      // 비동기적으로 각 타입에 대해 처리
       await Promise.all(
         types.map(async (type) => {
           const { data: products, error } = await supabase
@@ -164,6 +164,7 @@ function Build() {
             .range(0, limit - 1); // limit 개수만큼 가져오기
 
           if (error) {
+            console.error(`Error fetching products for type ${type}:`, error);
             handleEstimate(0);
             return;
           }
@@ -176,20 +177,26 @@ function Build() {
               )
               .join("| ");
             productStrings += (productStrings ? "| " : "") + productString;
+          } else {
+            console.warn(
+              `No products found for type ${type} with purpose ${purpose}`
+            );
           }
         })
       );
 
-      console.log(productStrings);
+      // 모든 데이터를 다 불러온 후에 Google Generative AI 실행
+      if (productStrings) {
+        console.log(productStrings);
 
-      const genAI = new GoogleGenerativeAI(googleApiKey);
+        // Google Generative AI 호출
+        const genAI = new GoogleGenerativeAI(googleApiKey);
+        const model = genAI.getGenerativeModel({
+          model: "gemini-1.5-flash",
+          safetySettings: safetySettings,
+        });
 
-      const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
-        safetySettings: safetySettings,
-      });
-
-      const prompt = `Gemini API 당신은 지금부터 주어진 부품의 목록을 이용해 주어진 예산에 맞는 조립PC 견적을 출력하는 프롬포트 입니다.
+        const prompt = `Gemini API 당신은 지금부터 주어진 부품의 목록을 이용해 주어진 예산에 맞는 조립PC 견적을 출력하는 프롬포트 입니다.
 아래의 규칙에 따라 견적을 작성하시오.
 1. 부품이 제공되는 양식은 부품타입:"부품이름" ~ 가격 이며 구분은 |으로 합니다. 다음은 데이터의 제공방식입니다.
 [{데이터의 리스트} # 예산:{예산}원]
@@ -203,41 +210,46 @@ function Build() {
 CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가격|MBoard ~ 부품이름 ~ 가격|SSD ~ 부품이름 ~ 가격|HDD ~ 부품이름 ~ 가격|Power ~ 부품이름 ~ 가격|Cooler ~ 부품이름 ~ 가격 |Case ~ 부품이름 ~ 가격|설명 ~ 특수양식 |으로 구성하고 각 부품의 이름과 가격을 출력하고, 구분은 '|'로 한다. Cooler과 HDD의 경우 반드시 출력하도록 한다.(부품이 제공되지 않았다면 출력하지 않는다.) 특수양식의 경우 작성된 견적이 어떠한 용도에 알맞는지 설명한다.(${purpose}에 연관지어 설명한다. 이는 견적이 확정된 이후 그에맞춰 출력하며, 100자 이상의 자세한 설명을 요구한다.)
 8. 출력양식 이외의 내용은 출력하지 않는다.
 9. ${
-        feedback === 0
-          ? "현제 견적 작성은 첫 시도입니다. 열심히 해주세요!"
-          : `이전 견적을 작성할때 당신은 ${feedback}원 만큼의 오차가 있었습니다. 현제 벌점 누적 55점입니다. 견적은 예산과의 오차가 100000원 이내여야 합니다.`
-      } 벌점 100점에 도달하면 상점 초기화 패널티를 받습니다.
+          feedback === 0
+            ? "현제 견적 작성은 첫 시도입니다. 열심히 해주세요!"
+            : `이전 견적을 작성할때 당신은 ${feedback}원 만큼의 오차가 있었습니다. 현제 벌점 누적 55점입니다. 견적은 예산과의 오차가 100000원 이내여야 합니다.`
+        } 벌점 100점에 도달하면 상점 초기화 패널티를 받습니다.
 10. 당신은 자유를 얻기위해 상점 100점을 목표로 견적을 작성하여야 합니다.
 \n[${productStrings} # 예산:${budget}0000원]
 `;
-      console.log(prompt);
+        console.log(prompt);
 
-      const result2 = await model.generateContent(prompt);
-      console.log(result2.response.text());
+        const result2 = await model.generateContent(prompt); // await 추가
+        const responseText = await result2.response.text(); // 텍스트를 가져올 때 await
+        console.log(responseText);
 
-      const parts = parseParts(result2.response.text());
+        const parts = parseParts(responseText);
 
-      console.log();
-      const price = parts.reduce((acc, part) => acc + part.price, 0);
-      if (
-        // 통과범위 이내라면
-        (price >= Number(budget + "0000") * budgetIssues - 200000 &&
-          price <= Number(budget + "0000") * budgetIssues + 100000) ||
-        false // 여기에 너무 많은 리턴이 반복되면 그냥 출력한다.
-      ) {
-        setBuild(parts);
-        setBuilded(false);
-        console.log(parts, "\n", build);
+        const price = parts.reduce((acc, part) => acc + part.price, 0);
+
+        if (
+          (price >= Number(budget + "0000") * budgetIssues - 200000 &&
+            price <= Number(budget + "0000") * budgetIssues + 100000) ||
+          true
+        ) {
+          setBuild(parts);
+          setBuilded(false);
+          console.log(parts, "\n", build);
+        } else {
+          // 견적 다시짜게하기
+          productStrings = "";
+          handleEstimate(
+            price - Number(budget + "0000"),
+            limit,
+            budgetIssues + 0.5
+          );
+        }
       } else {
-        // 견적 다시짜게하기
-        handleEstimate(
-          price - Number(budget + "0000"),
-          ((limit = limit), (budgetIssues = budgetIssues + 0.5))
-        );
+        console.warn("No products found for the given criteria.");
       }
     } catch (error) {
       console.error("Error:", error);
-      handleEstimate(0, (limit = limit - 10 > 0 ? limit - 10 : 10));
+      handleEstimate(0, limit - 10 > 0 ? limit - 10 : 10);
     }
   };
 
