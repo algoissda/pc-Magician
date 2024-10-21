@@ -11,7 +11,6 @@ import { useThemeStore } from "@/store/useStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // Font Awesome 가져오기
 import { faMoon } from "@fortawesome/free-regular-svg-icons";
 import { faSun } from "@fortawesome/free-regular-svg-icons";
-import router from "next/router";
 
 function Header() {
   const theme = useThemeStore((state) => state.theme);
@@ -52,15 +51,7 @@ function Header() {
           >
             PC Magician
           </Link>
-          <nav className="ml-5">
-            <ul>
-              <li className="text-[18px] ml-[70px] text-white">
-                <button onClick={handleClickPartListButton}>
-                  Today's Part Prices
-                </button>
-              </li>
-            </ul>
-          </nav>
+
           <div className="ml-auto flex items-center gap-x-4">
             {/* -------------------------------------------------------------------------------------------------------------- */}
             {isInitalizedAuth ? (
@@ -147,15 +138,6 @@ function Header() {
           >
             PC Magician
           </Link>
-          <nav className="ml-5">
-            <ul>
-              <li className="text-[18px] ml-[70px] text-gray-700">
-                <button onClick={handleClickPartListButton}>
-                  Today's Part Prices
-                </button>
-              </li>
-            </ul>
-          </nav>
           <div className="ml-auto flex items-center gap-x-4">
             {/* -------------------------------------------------------------------------------------------------------------- */}
             {isInitalizedAuth ? (
