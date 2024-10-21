@@ -6,6 +6,7 @@ import Build from "./_components/Build a PC/Build";
 import CommunityBuilds from "./_components/community_builds/page";
 import ViewBuildsByPrice from "./_components/view_builds_by_price/page";
 import { useThemeStore } from "@/store/useStore";
+import CustomPcImg from "../../../../img/image_720.png";
 
 function MainPage() {
   const theme = useThemeStore((state) => state.theme);
@@ -17,7 +18,7 @@ function MainPage() {
         <div className="relative h-[110%] w-[110%] right-[-50px] top-[-80px]">
           <img
             className="absolute top-[10%] right-[0] w-[80%] object-cover"
-            src="https://cdn.discordapp.com/attachments/1118439327064666113/1297130842329448529/image.png?ex=6714cebc&is=67137d3c&hm=198e229a006441312c93e97bf199193cecfd77e45e4b39fbf2005864e5e209b4&"
+            src="https://i.ibb.co/vx1KXC8/image-720.png"
             alt="Custom PC"
           />
         </div>
