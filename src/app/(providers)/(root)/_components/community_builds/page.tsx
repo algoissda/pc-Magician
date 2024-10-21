@@ -1,7 +1,5 @@
-import React from "react";
-
 function CommunityBuilds() {
-  return <main>Community builds</main>;
+  return;
 }
 
 export default CommunityBuilds;
