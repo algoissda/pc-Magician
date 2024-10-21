@@ -241,7 +241,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
           handleEstimate(
             price - Number(budget + "0000"),
             limit,
-            budgetIssues + 0.1
+            budgetIssues + 0.05
           );
         }
       } else {
