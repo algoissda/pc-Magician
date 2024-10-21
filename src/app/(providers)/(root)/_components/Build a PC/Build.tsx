@@ -228,9 +228,9 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
         const price = parts.reduce((acc, part) => acc + part.price, 0);
 
         if (
-          (price >= Number(budget + "0000") * budgetIssues - 200000 &&
+          (price >= Number(budget + "0000") - 200000 &&
             price <= Number(budget + "0000") * budgetIssues + 100000) ||
-          true
+          false
         ) {
           setBuild(parts);
           setBuilded(false);
@@ -241,7 +241,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
           handleEstimate(
             price - Number(budget + "0000"),
             limit,
-            budgetIssues + 0.5
+            budgetIssues + 0.1
           );
         }
       } else {
