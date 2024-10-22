@@ -63,8 +63,15 @@ const ThemeTitle = ({ theme, setActiveTab }: any) => {
 
 // 이미지 컴포넌트화
 const ThemeImage = ({ theme, mouseX, mouseY }: any) => {
-  const moveX = (mouseX - window.innerWidth / 2) * -0.01;
-  const moveY = (mouseY - window.innerHeight / 2) * -0.01;
+  // window 객체가 존재하는지 확인하여 클라이언트에서만 실행
+  const moveX =
+    typeof window !== "undefined"
+      ? (mouseX - window.innerWidth / 2) * -0.01
+      : 0;
+  const moveY =
+    typeof window !== "undefined"
+      ? (mouseY - window.innerHeight / 2) * -0.01
+      : 0;
 
   return (
     <>

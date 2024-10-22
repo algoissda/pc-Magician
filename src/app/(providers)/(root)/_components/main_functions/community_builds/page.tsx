@@ -199,19 +199,23 @@ const CommunityBuilds = () => {
           <div
             // 패널 표시
             className={`absolute h-full inset-0 bg-black bg-opacity-50 z-40 ${
-              selectedBuild ? "block" : "hidden"
+              selectedBuild
+                ? "opacity-100 pointer-events-auto"
+                : "opacity-0 pointer-events-none"
             }`}
             onClick={() => setSelectedBuild(null)} // 빈 공간 클릭 시 패널 닫기
           >
             <div
-              className="absolute right-0 top-0 w-1/2 h-full bg-white p-6 z-50 transition-transform transform translate-x-0"
+              className={`theme-opacity absolute right-0 top-0 w-1/2 h-full bg-${
+                theme === "dark" ? "[#0d1117]" : "white"
+              } p-6 z-50 transition-transform transform translate-x-0`}
               onClick={(e) => e.stopPropagation()} // 패널 클릭 시 닫히지 않도록
             >
               <h3 className="font-bold text-lg mb-4">Build Details</h3>
               {selectedBuild && (
                 <ul
                   className={`text-${
-                    theme === "dark" ? "gray-300" : "gray-700"
+                    theme === "dark" ? "gray-100" : "gray-900"
                   } h-[80%] flex flex-col overflow-y-auto`}
                 >
                   {[
@@ -286,7 +290,7 @@ const CommunityBuilds = () => {
                         </div>
                         <span
                           className={`text-${
-                            theme === "dark" ? "gray-200" : "gray-500"
+                            theme === "dark" ? "white" : "gray-500"
                           } text-[0.6vw] pl-1`}
                         >
                           {part.value || "N/A"}
