@@ -1,17 +1,17 @@
 "use client";
 
 import { useThemeStore } from "@/store/useStore";
-import { useState } from "react";
-import { supabase } from "../../../../../../../supabase/client";
-import Product from "../../../../../../../types/products.type";
 import {
   GoogleGenerativeAI,
   HarmBlockThreshold,
   HarmCategory,
 } from "@google/generative-ai";
+import { useState } from "react";
+import { supabase } from "../../../../../../../supabase/client";
+import Product from "../../../../../../../types/products.type";
 import {
-  PartList,
   InputField,
+  PartList,
   SelectBox,
 } from "./build_components/BuildComponents";
 
@@ -44,9 +44,7 @@ function Build() {
   const [totalPrice, setTotalPrice] = useState<number>(0); // 총합을 위한 상태 추가
   const [builded, setBuilded] = useState<boolean>(false);
   const apiKeys = [
-    process.env.NEXT_PUBLIC_GOOGLE_API_KEY_1,
-    process.env.NEXT_PUBLIC_GOOGLE_API_KEY_2,
-    process.env.NEXT_PUBLIC_GOOGLE_API_KEY_3,
+    process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
     // 더 추가 가능
   ];
   const partTypes: string[] = [

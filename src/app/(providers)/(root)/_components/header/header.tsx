@@ -50,9 +50,7 @@ function Header() {
           </Link>
           <nav className="ml-5">
             <ul>
-              <li className="text-[18px] ml-[70px] text-white">
-
-              </li>
+              <li className="text-[18px] ml-[70px] text-white"></li>
             </ul>
           </nav>
           <div className="ml-auto flex items-center gap-x-4">
@@ -62,7 +60,7 @@ function Header() {
                 <>
                   <ul>
                     <li className="text-[18px] font-medium text-white">
-                      <Link href={"/my/SavedBuild"}>
+                      <Link href={"/my/saved-builds"}>
                         <button className="mr-8">My Saved Builds</button>
                       </Link>
                       <button
@@ -141,9 +139,7 @@ function Header() {
           >
             PC Magician
           </Link>
-          <nav className="ml-5">
-
-          </nav>
+          <nav className="ml-5"></nav>
           <div className="ml-auto flex items-center gap-x-4">
             {/* -------------------------------------------------------------------------------------------------------------- */}
             {isInitalizedAuth ? (
@@ -151,7 +147,7 @@ function Header() {
                 <>
                   <ul>
                     <li className="text-[18px] font-medium text-gray-700">
-                      <Link href={"/my/SavedBuild"}>
+                      <Link href={"/my/saved-builds"}>
                         <button className="mr-8">My Saved Builds</button>
                       </Link>
                       <button
