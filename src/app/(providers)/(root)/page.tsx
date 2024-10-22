@@ -2,10 +2,10 @@
 "use client";
 
 import { useThemeStore } from "@/store/useStore";
-import { useState } from "react";
-import Build from "./_components/Build a PC/Build";
-import CommunityBuilds from "./_components/community_builds/page";
-import ViewBuildsByPrice from "./_components/view_builds_by_price/page";
+import { useState, useEffect, useRef } from "react";
+import Build from "./_components/main_functions/build/Build";
+import CommunityBuilds from "./_components/main_functions/community_builds/page";
+import ViewBuildsByPrice from "./_components/main_functions/view_builds_by_price/page";
 
 // 버튼 컴포넌트화
 const ThemeButton = ({ isActive, onClick, text, size }: any) => {
@@ -61,7 +61,10 @@ const ThemeTitle = ({ theme, setActiveTab }: any) => {
 };
 
 // 이미지 컴포넌트화
-const ThemeImage = ({ theme }: any) => {
+const ThemeImage = ({ theme, mouseX, mouseY }: any) => {
+  const moveX = (mouseX - window.innerWidth / 2) * -0.01;
+  const moveY = (mouseY - window.innerHeight / 2) * -0.01;
+
   return (
     <>
       <div
@@ -78,22 +81,22 @@ const ThemeImage = ({ theme }: any) => {
       ></div>
       <img
         // 라이트 모드
-        src="https://img.chuing.net/i/HQJVyeG/%EC%82%AC%EB%B3%B8%20-3333.jpg"
+        src="https://i.ibb.co/Wxv7S2Y/asdfdasfsad.png"
         alt=""
-        className={`absolute inset-0 h-full transform transition-all duration-300 ease-in-out ${
-          theme !== "dark"
-            ? "left-[-15%] opacity-100"
-            : "left-[-100%] opacity-0"
+        style={{ transform: `translate(${moveX}px, ${moveY}px)` }}
+        className={`absolute inset-0 h-full transform transition-transform duration-500 ease-in-out ${
+          theme !== "dark" ? "left-[-5%] opacity-100" : "left-[-100%] opacity-0"
         } pointer-events-none blur-mask`}
       />
       <img
         // 다크 모드
-        src="https://tumblbug-pci.imgix.net/6eec8030c730675bec7c1ff93f61a08162934ebd/7bb35479921a8dfd09d353f5b8716b88ca913235/57e7c6e9fe723a1167b0ce458db447bcc07935ed/30603416-80c1-43cc-bd36-4f8f239b1508.png?auto=format%2Ccompress&fit=max&h=930&lossless=true&w=1240&s=25719117e6379d625fde0fa3c61af94a"
+        src="https://i.ibb.co/55wMk01/aasdasdasdasd.png"
         alt=""
-        className={`absolute inset-0 h-full transform transition-all duration-300 ease-in-out ${
+        style={{ transform: `translate(${moveX}px, ${moveY}px)` }}
+        className={`absolute inset-0 h-full transform transition-transform duration-500 ease-in-out ${
           theme === "dark"
-            ? "left-[-20%] opacity-70 scale-x-[-1]"
-            : "left-[-100%] opacity-0 scale-x-[-1]"
+            ? "left-[-20%] opacity-70 "
+            : "left-[-100%] opacity-0 "
         } pointer-events-none blur-mask`}
       />
     </>
@@ -103,6 +106,18 @@ const ThemeImage = ({ theme }: any) => {
 function MainPage() {
   const theme = useThemeStore((state) => state.theme);
   const [activeTab, setActiveTab] = useState<string>("");
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      setMousePosition({ x: event.clientX, y: event.clientY });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
 
   const renderFormContent = () => {
     return (
@@ -122,7 +137,7 @@ function MainPage() {
           <ViewBuildsByPrice />
         </div>
         <div
-          className={`absolute transition-all duration-700 top-0 ${
+          className={`absolute w-full py-14 pl-20 pr-24 block h-full transition-all duration-700 top-0 ${
             activeTab === "Community Builds" ? "left-0" : "left-[400%]"
           }`}
         >
@@ -147,11 +162,16 @@ function MainPage() {
 
   return (
     <div
-      className={`relative flex ${
-        theme === "dark" ? "bg-[#0d1117]" : "bg-white"
-      } overflow-hidden h-screen`}
+      className={`h-screen
+        relative flex ${
+          theme === "dark" ? "bg-[#0d1117]" : "bg-white"
+        } overflow-hidden h-screen`}
     >
-      <ThemeImage theme={theme} />
+      <ThemeImage
+        theme={theme}
+        mouseX={mousePosition.x}
+        mouseY={mousePosition.y}
+      />
       <nav className="w-full lg:w-1/4 p-5 ml-10 lg:ml-28 mt-10 lg:mt-[3rem] z-10">
         <header className="flex flex-col items-start justify-center ml-4 lg:ml-10">
           <button>
@@ -177,7 +197,7 @@ function MainPage() {
           />
         </header>
       </nav>
-      <main className="relative flex-grow p-5 h-full z-10 overflow-hidden">
+      <main className="relative flex-grow p-5 h-[90%] z-10 overflow-hidden">
         {renderFormContent()}
       </main>
     </div>
