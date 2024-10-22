@@ -1,4 +1,3 @@
-
 export interface Product {
   id: number;
   product_name: string;
@@ -7,5 +6,6 @@ export interface Product {
   image_url: string;
 }
 
-
 export default Product;
+
+export interface SavedBuild {}

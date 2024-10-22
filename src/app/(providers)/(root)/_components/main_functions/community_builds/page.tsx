@@ -4,6 +4,7 @@ import { useThemeStore } from "@/store/useStore";
 import { useActiveStore } from "@/store/useActiveTab";
 
 const CommunityBuilds = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [builds, setBuilds] = useState<any[]>([]);
   const [selectedBuild, setSelectedBuild] = useState<any | null>(null); // 선택된 빌드
   const [page, setPage] = useState(1);
@@ -11,7 +12,7 @@ const CommunityBuilds = () => {
   const theme = useThemeStore((state) => state.theme);
   const activeTab = useActiveStore((state) => state.activeTab);
 
-  // Function to fetch builds
+  // fetch build 하기위한 함수
   const fetchBuilds = async () => {
     try {
       console.log("Fetching community builds...");
@@ -113,10 +114,12 @@ const CommunityBuilds = () => {
       fetchBuilds();
       console.log(builds);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]); // Runs when activeTab changes
 
   // build_id로 다시 데이터 조회 후 패널에 표시할 함수
-  const fetchBuildDetails = async (buildId) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const fetchBuildDetails = async (buildId: any) => {
     try {
       const { data: buildDetails, error: buildDetailsError } = await supabase
         .from("builds")
