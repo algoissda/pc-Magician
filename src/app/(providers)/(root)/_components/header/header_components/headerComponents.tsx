@@ -24,7 +24,7 @@ export const AuthButtons = ({
   return isLoggedIn ? (
     <ul>
       <li className="text-[18px] font-medium">
-        <Link href="/my/SavedBuild">
+        <Link href="/my/saved-builds">
           <button className="mr-8">My Saved Builds</button>
         </Link>
         <button
