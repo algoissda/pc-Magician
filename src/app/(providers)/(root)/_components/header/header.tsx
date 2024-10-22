@@ -2,7 +2,6 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { supabase } from "../../../../../../supabase/client";
 import { useAuthStore } from "../../../../../../zustand/auth.store";
@@ -11,7 +10,7 @@ import { useThemeStore } from "@/store/useStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // Font Awesome 가져오기
 import { faMoon } from "@fortawesome/free-regular-svg-icons";
 import { faSun } from "@fortawesome/free-regular-svg-icons";
-import router from "next/router";
+import { useActiveStore } from "@/store/useActiveTab";
 
 function Header() {
   const theme = useThemeStore((state) => state.theme);
@@ -23,7 +22,7 @@ function Header() {
     console.log(`Theme changed to: ${theme}`); // 확인용 로그
   };
 
-  const router = useRouter();
+  const setActiveTab = useActiveStore((state) => state.setActiveTab);
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const logOut = useAuthStore((state) => state.logOut);
   const isInitalizedAuth = useAuthStore((state) => state.isInitalizedAuth);
@@ -42,12 +41,20 @@ function Header() {
     <>
       {theme.toLowerCase() === "dark" ? (
         <header className="sticky top-0 h-[100px] border-b-[3px] border-b-gray-400 shadow-md shadow-black bg-[#0d1117] flex items-center px-16 z-10 shrink-0">
-          <Link
-            className="main-text text-white text-[40px] font-extrabold text-center font-serif"
-            href="/"
+          <button
+            onClick={() => {
+              setActiveTab("");
+              console.log("asdfasdf");
+            }} // 빈 문자열을 탭으로 설정
           >
-            PC Magician
-          </Link>
+            <Link
+              href="/"
+              className="main-text text-white text-[40px] font-extrabold text-center font-serif"
+            >
+              PC Magician
+            </Link>
+          </button>
+
           <nav className="ml-5">
             <ul>
               <li className="text-[18px] ml-[70px] text-white"></li>
@@ -60,7 +67,7 @@ function Header() {
                 <>
                   <ul>
                     <li className="text-[18px] font-medium text-white">
-                      <Link href={"/my/saved-builds"}>
+                      <Link href={"/my/SavedBuild"}>
                         <button className="mr-8">My Saved Builds</button>
                       </Link>
                       <button
@@ -133,12 +140,19 @@ function Header() {
         </header>
       ) : (
         <header className="sticky top-0 h-[100px] border-b-[3px] border-b-gray-300 shadow-md shadow-gray-200 bg-white flex items-center px-16 z-10 shrink-0">
-          <Link
-            className="main-text text-black text-[40px] font-extrabold text-center font-serif"
-            href="/"
+          <button
+            onClick={() => {
+              setActiveTab("");
+              console.log("asdfasdf");
+            }} // 빈 문자열을 탭으로 설정
           >
-            PC Magician
-          </Link>
+            <Link
+              className="main-text text-black text-[40px] font-extrabold text-center font-serif"
+              href="/"
+            >
+              PC Magician
+            </Link>
+          </button>
           <nav className="ml-5"></nav>
           <div className="ml-auto flex items-center gap-x-4">
             {/* -------------------------------------------------------------------------------------------------------------- */}
@@ -147,7 +161,7 @@ function Header() {
                 <>
                   <ul>
                     <li className="text-[18px] font-medium text-gray-700">
-                      <Link href={"/my/saved-builds"}>
+                      <Link href={"/my/SavedBuild"}>
                         <button className="mr-8">My Saved Builds</button>
                       </Link>
                       <button
