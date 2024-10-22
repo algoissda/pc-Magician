@@ -1,239 +1,65 @@
-/* eslint-disable react/no-unescaped-entities */
+// header.tsx
 "use client";
-/* eslint-disable @next/next/no-img-element */
-import Link from "next/link";
 import { useState } from "react";
 import { supabase } from "../../../../../../supabase/client";
 import { useAuthStore } from "../../../../../../zustand/auth.store";
-import Modal from "../modal/modal"; //모달 페이지 가져오기
 import { useThemeStore } from "@/store/useStore";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // Font Awesome 가져오기
-import { faMoon } from "@fortawesome/free-regular-svg-icons";
-import { faSun } from "@fortawesome/free-regular-svg-icons";
 import { useActiveStore } from "@/store/useActiveTab";
+import {
+  HeaderButton,
+  AuthButtons,
+  ThemeToggleButton,
+} from "./headerComponents";
 
 function Header() {
   const theme = useThemeStore((state) => state.theme);
   const setTheme = useThemeStore((state) => state.setTheme);
-
-  // 테마 전환 함수
-  const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
-    console.log(`Theme changed to: ${theme}`); // 확인용 로그
-  };
-
   const setActiveTab = useActiveStore((state) => state.setActiveTab);
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const logOut = useAuthStore((state) => state.logOut);
   const isInitalizedAuth = useAuthStore((state) => state.isInitalizedAuth);
 
-  //로그아웃 버튼 눌렀을 때 로그아웃 되게
+  // 테마 전환 함수
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
+  };
+
+  // 로그아웃 처리 함수
   const handleClickLogOutButton = async () => {
     await supabase.auth.signOut();
     logOut();
     alert("로그아웃되었습니다");
   };
 
-  //모달 페이지를 위한 함수
+  // 모달 상태 관리
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <>
-      {theme.toLowerCase() === "dark" ? (
-        <header className="sticky top-0 h-[100px] border-b-[3px] border-b-gray-400 shadow-md shadow-black bg-[#0d1117] flex items-center px-16 z-10 shrink-0">
-          <button
-            onClick={() => {
-              setActiveTab("");
-              console.log("asdfasdf");
-            }} // 빈 문자열을 탭으로 설정
-          >
-            <Link
-              href="/"
-              className="main-text text-white text-[40px] font-extrabold text-center font-serif"
-            >
-              PC Magician
-            </Link>
-          </button>
-
-          <nav className="ml-5">
-            <ul>
-              <li className="text-[18px] ml-[70px] text-white"></li>
-            </ul>
-          </nav>
-          <div className="ml-auto flex items-center gap-x-4">
-            {/* -------------------------------------------------------------------------------------------------------------- */}
-            {isInitalizedAuth ? (
-              isLoggedIn ? (
-                <>
-                  <ul>
-                    <li className="text-[18px] font-medium text-white">
-                      <Link href={"/my/SavedBuild"}>
-                        <button className="mr-8">My Saved Builds</button>
-                      </Link>
-                      <button
-                        className="border text-black font-serif font-bold text-[20px] border-b-white bg-white rounded-3xl p-2 px-3 "
-                        onClick={handleClickLogOutButton}
-                      >
-                        log-out
-                      </button>
-                    </li>
-                  </ul>
-                  <button
-                    onClick={toggleTheme}
-                    className="bg-white w-10 h-10 rounded-full flex justify-center items-center p-[1px]"
-                  >
-                    <FontAwesomeIcon
-                      className="bg-black w-9 h-9 rounded-full text-3xl text-white"
-                      icon={faSun}
-                    />
-                  </button>
-                </>
-              ) : (
-                <>
-                  <nav className="ml-5">
-                    {/* 모달 페이지 */}
-                    <ul>
-                      <li className="border text-black font-serif font-bold text-[20px] border-b-white bg-white rounded-3xl p-2 px-3">
-                        <button onClick={() => setIsModalOpen(true)}>
-                          log-in
-                        </button>
-                        <Modal
-                          open={isModalOpen}
-                          onClose={() => setIsModalOpen(false)}
-                        >
-                          <p>
-                            아이디가 없으신가요?&emsp;
-                            <Link
-                              href={"/auth/sign_up"}
-                              className="text-blue-500"
-                              onClick={() => setIsModalOpen(false)}
-                            >
-                              회원가입 하러 가기
-                            </Link>
-                          </p>
-                        </Modal>
-                      </li>
-                    </ul>
-                    {/* 모달 페이지 끝 */}
-                  </nav>
-                  <nav className="ml-5">
-                    <ul>
-                      <li className="border text-black font-serif font-bold text-[20px] border-b-white bg-white rounded-3xl p-2 px-3">
-                        <Link href={"/auth/sign_up"}>sign-up</Link>
-                      </li>
-                    </ul>
-                  </nav>
-                  <button
-                    onClick={toggleTheme}
-                    className="bg-white w-10 h-10 rounded-full flex justify-center items-center p-[1px]"
-                  >
-                    <FontAwesomeIcon
-                      className="bg-black w-9 h-9 rounded-full text-3xl text-white"
-                      icon={faSun}
-                    />
-                  </button>
-                </>
-              )
-            ) : null}
-            {/* -------------------------------------------------------------------------------------------------------------- */}
-          </div>
-        </header>
-      ) : (
-        <header className="sticky top-0 h-[100px] border-b-[3px] border-b-gray-300 shadow-md shadow-gray-200 bg-white flex items-center px-16 z-10 shrink-0">
-          <button
-            onClick={() => {
-              setActiveTab("");
-              console.log("asdfasdf");
-            }} // 빈 문자열을 탭으로 설정
-          >
-            <Link
-              className="main-text text-black text-[40px] font-extrabold text-center font-serif"
-              href="/"
-            >
-              PC Magician
-            </Link>
-          </button>
-          <nav className="ml-5"></nav>
-          <div className="ml-auto flex items-center gap-x-4">
-            {/* -------------------------------------------------------------------------------------------------------------- */}
-            {isInitalizedAuth ? (
-              isLoggedIn ? (
-                <>
-                  <ul>
-                    <li className="text-[18px] font-medium text-gray-700">
-                      <Link href={"/my/SavedBuild"}>
-                        <button className="mr-8">My Saved Builds</button>
-                      </Link>
-                      <button
-                        className="border text-white font-serif font-bold text-[20px] border-b-gray-300 bg-gray-700 rounded-3xl p-2 px-3"
-                        onClick={handleClickLogOutButton}
-                      >
-                        log-out
-                      </button>
-                    </li>
-                  </ul>
-                  <button
-                    onClick={() => toggleTheme()}
-                    className="bg-black w-10 h-10 rounded-full flex justify-center items-center p-[1px]"
-                  >
-                    <FontAwesomeIcon
-                      className="bg-white w-9 h-9 rounded-full text-4xl"
-                      icon={faMoon}
-                    />
-                  </button>
-                </>
-              ) : (
-                <>
-                  <nav className="ml-5">
-                    {/* 모달 페이지 */}
-                    <ul>
-                      <li className="border text-white font-serif font-bold text-[20px] border-b-gray-300 bg-gray-700 rounded-3xl p-2 px-3">
-                        <button onClick={() => setIsModalOpen(true)}>
-                          log-in
-                        </button>
-                        <Modal
-                          open={isModalOpen}
-                          onClose={() => setIsModalOpen(false)}
-                        >
-                          <p>
-                            아이디가 없으신가요?&emsp;
-                            <Link
-                              href={"/auth/sign_up"}
-                              className="text-blue-500"
-                              onClick={() => setIsModalOpen(false)}
-                            >
-                              회원가입 하러 가기
-                            </Link>
-                          </p>
-                        </Modal>
-                      </li>
-                    </ul>
-                    {/* 모달 페이지 끝 */}
-                  </nav>
-                  <nav className="ml-5">
-                    <ul>
-                      <li className="border text-white font-serif font-bold text-[20px] border-b-gray-300 bg-gray-700 rounded-3xl p-2 px-3">
-                        <Link href={"/auth/sign_up"}>sign-up</Link>
-                      </li>
-                    </ul>
-                  </nav>
-                  <button
-                    onClick={() => toggleTheme()}
-                    className="bg-black w-10 h-10 rounded-full flex justify-center items-center p-[1px]"
-                  >
-                    <FontAwesomeIcon
-                      className="bg-white w-9 h-9 rounded-full text-4xl"
-                      icon={faMoon}
-                    />
-                  </button>
-                </>
-              )
-            ) : null}
-            {/* -------------------------------------------------------------------------------------------------------------- */}
-          </div>
-        </header>
-      )}
-    </>
+    <header
+      className={`sticky top-0 h-[100px] border-b-[3px] shadow-md z-10 flex items-center px-16 shrink-0 ${
+        theme === "dark"
+          ? "bg-[#0d1117] border-b-gray-400 shadow-black"
+          : "bg-white border-b-gray-300 shadow-gray-200"
+      }`}
+    >
+      <HeaderButton href="/" onClick={() => setActiveTab("")}>
+        PC Magician
+      </HeaderButton>
+      <nav className="ml-5"></nav>
+      <div className="ml-auto flex items-center gap-x-4">
+        {isInitalizedAuth && (
+          <>
+            <AuthButtons
+              isLoggedIn={isLoggedIn}
+              handleLogOut={handleClickLogOutButton}
+              isModalOpen={isModalOpen}
+              setIsModalOpen={setIsModalOpen}
+            />
+            <ThemeToggleButton theme={theme} toggleTheme={toggleTheme} />
+          </>
+        )}
+      </div>
+    </header>
   );
 }
 

@@ -2,7 +2,8 @@
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMoon, faSun } from "@fortawesome/free-regular-svg-icons";
-import Modal from "../../modal/modal";
+import Modal from "../modal/modal"; // 모달 페이지 가져오기
+import { useState } from "react";
 
 export const HeaderButton = ({ children, href, onClick }: any) => (
   <Link href={href}>
@@ -24,7 +25,7 @@ export const AuthButtons = ({
   return isLoggedIn ? (
     <ul>
       <li className="text-[18px] font-medium">
-        <Link href="/my/saved-builds">
+        <Link href="/my/SavedBuild">
           <button className="mr-8">My Saved Builds</button>
         </Link>
         <button
