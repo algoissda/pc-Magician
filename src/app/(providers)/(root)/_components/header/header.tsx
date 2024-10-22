@@ -35,10 +35,6 @@ function Header() {
     alert("로그아웃되었습니다");
   };
 
-  //예산에 따른 견적추천 (홈페이지로 바뀔 거)
-  const handleClickPartListButton = () => {
-    router.push("/my/partlist");
-  };
   //모달 페이지를 위한 함수
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -55,9 +51,7 @@ function Header() {
           <nav className="ml-5">
             <ul>
               <li className="text-[18px] ml-[70px] text-white">
-                <button onClick={handleClickPartListButton}>
-                  Today's Part Prices
-                </button>
+
               </li>
             </ul>
           </nav>
@@ -148,13 +142,7 @@ function Header() {
             PC Magician
           </Link>
           <nav className="ml-5">
-            <ul>
-              <li className="text-[18px] ml-[70px] text-gray-700">
-                <button onClick={handleClickPartListButton}>
-                  Today's Part Prices
-                </button>
-              </li>
-            </ul>
+
           </nav>
           <div className="ml-auto flex items-center gap-x-4">
             {/* -------------------------------------------------------------------------------------------------------------- */}
