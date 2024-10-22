@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../../../../../../supabase/client";
 import { useThemeStore } from "@/store/useStore";
+import { useActiveStore } from "@/store/useActiveTab";
 
 const CommunityBuilds = () => {
   const [builds, setBuilds] = useState<any[]>([]);
@@ -8,102 +9,111 @@ const CommunityBuilds = () => {
   const [page, setPage] = useState(1);
   const buildsPerPage = 100;
   const theme = useThemeStore((state) => state.theme);
+  const activeTab = useActiveStore((state) => state.activeTab);
 
-  useEffect(() => {
-    const fetchBuilds = async () => {
-      try {
-        // 사용자의 인증 상태를 확인합니다.
-        const { data: userData, error: userError } =
-          await supabase.auth.getUser();
-        let userId = null;
+  // Function to fetch builds
+  const fetchBuilds = async () => {
+    try {
+      console.log("Fetching community builds...");
+      // 사용자의 인증 상태를 확인합니다.
+      const { data: userData, error: userError } =
+        await supabase.auth.getUser();
+      let userId = null;
 
-        if (userError || !userData?.user) {
-          console.warn(
-            "User is not logged in or an error occurred: " + userError?.message
-          );
-        } else {
-          userId = userData.user.id;
-        }
-
-        // saved_builds 테이블에서 빌드를 조회합니다.
-        let query = supabase.from("saved_builds").select("uid, build_id");
-        if (userId) {
-          query = query.neq("uid", userId); // 로그인한 사용자의 빌드를 제외하고 조회
-        }
-
-        const { data: savedBuilds, error: savedBuildsError } = await query;
-        if (savedBuildsError || !savedBuilds?.length) {
-          console.warn("No saved builds found or an error occurred.");
-          return;
-        }
-
-        // 빌드 ID를 통해 builds 데이터를 가져옵니다.
-        const buildIds = [
-          ...new Set(savedBuilds.map((build) => build.build_id)),
-        ];
-        const { data: buildsData, error: buildsDataError } = await supabase
-          .from("builds")
-          .select("*")
-          .in("id", buildIds);
-        if (buildsDataError || !buildsData) {
-          throw new Error("Error fetching builds: " + buildsDataError.message);
-        }
-
-        // 제품 이름으로 가격을 조회합니다.
-        const productNames = buildsData
-          .flatMap((build) => [
-            build.Case,
-            build.Cooler,
-            build.CPU,
-            build.HDD,
-            build.MBoard,
-            build.Power,
-            build.RAM,
-            build.SSD,
-            build.VGA,
-          ])
-          .filter((part) => part !== null);
-
-        const { data: productsData, error: productsError } = await supabase
-          .from("products")
-          .select("product_name, price")
-          .in("product_name", productNames);
-        if (productsError || !productsData) {
-          throw new Error(
-            "Error fetching product prices: " + productsError.message
-          );
-        }
-
-        // 제품 가격 정보를 매핑합니다.
-        const productPriceMap = productsData.reduce((acc, product) => {
-          acc[product.product_name] = product.price;
-          return acc;
-        }, {});
-
-        // 빌드별 총 가격을 계산하고 업데이트합니다.
-        const buildsWithPrices = buildsData.map((build) => {
-          const totalPrice = [
-            build.Case,
-            build.Cooler,
-            build.CPU,
-            build.HDD,
-            build.MBoard,
-            build.Power,
-            build.RAM,
-            build.SSD,
-            build.VGA,
-          ].reduce((sum, part) => sum + (productPriceMap[part] || 0), 0);
-
-          return { ...build, totalPrice };
-        });
-
-        setBuilds(buildsWithPrices);
-      } catch (error) {
-        console.error(error.message);
+      if (userError || !userData?.user) {
+        console.warn(
+          "User is not logged in or an error occurred: " + userError?.message
+        );
+      } else {
+        userId = userData.user.id;
       }
-    };
-    fetchBuilds();
-  }, [page]);
+
+      // saved_builds 테이블에서 빌드를 조회합니다.
+      let query = supabase.from("saved_builds").select("uid, build_id");
+
+      // 로그인한 사용자의 빌드를 제외하고 조회 (로그인 상태일 때만)
+      if (userId) {
+        query = query.neq("uid", userId); // 로그인한 사용자의 빌드를 제외
+      }
+
+      const { data: savedBuilds, error: savedBuildsError } = await query;
+      if (savedBuildsError || !savedBuilds?.length) {
+        console.warn("No saved builds found or an error occurred.");
+        return;
+      }
+
+      // 빌드 ID를 통해 builds 데이터를 가져옵니다.
+      const buildIds = [...new Set(savedBuilds.map((build) => build.build_id))];
+      const { data: buildsData, error: buildsDataError } = await supabase
+        .from("builds")
+        .select("*")
+        .in("id", buildIds);
+      if (buildsDataError || !buildsData) {
+        throw new Error("Error fetching builds: " + buildsDataError.message);
+      }
+
+      // 제품 이름으로 가격을 조회합니다.
+      const productNames = buildsData
+        .flatMap((build) => [
+          build.Case,
+          build.Cooler,
+          build.CPU,
+          build.HDD,
+          build.MBoard,
+          build.Power,
+          build.RAM,
+          build.SSD,
+          build.VGA,
+        ])
+        .filter((part) => part !== null);
+
+      const { data: productsData, error: productsError } = await supabase
+        .from("products")
+        .select("product_name, price")
+        .in("product_name", productNames);
+      if (productsError || !productsData) {
+        throw new Error(
+          "Error fetching product prices: " + productsError.message
+        );
+      }
+
+      // 제품 가격 정보를 매핑합니다.
+      const productPriceMap = productsData.reduce((acc, product) => {
+        acc[product.product_name] = product.price;
+        return acc;
+      }, {});
+
+      // 빌드별 총 가격을 계산하고 업데이트합니다.
+      const buildsWithPrices = buildsData.map((build) => {
+        const totalPrice = [
+          build.Case,
+          build.Cooler,
+          build.CPU,
+          build.HDD,
+          build.MBoard,
+          build.Power,
+          build.RAM,
+          build.SSD,
+          build.VGA,
+        ].reduce((sum, part) => sum + (productPriceMap[part] || 0), 0);
+
+        return { ...build, totalPrice };
+      });
+
+      setBuilds(buildsWithPrices);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  // Detect changes in activeTab and execute fetchBuilds when it is "Community Builds"
+  useEffect(() => {
+    if (activeTab === "Community Builds") {
+      console.log("asdf");
+      fetchBuilds();
+      console.log(builds);
+    }
+  }, [activeTab]); // Runs when activeTab changes
 
   // build_id로 다시 데이터 조회 후 패널에 표시할 함수
   const fetchBuildDetails = async (buildId) => {
@@ -311,10 +321,10 @@ const CommunityBuilds = () => {
               .map((build) => (
                 <article
                   key={build.id} // build_id를 key로 사용
-                  className="flex flex-col border p-4 rounded-lg shadow-md bg-gray-50 bg-opacity-40 cursor-pointer"
+                  className="flex h-80 flex-col border p-4 rounded-lg shadow-md bg-gray-50 bg-opacity-40 cursor-pointer"
                   onClick={() => fetchBuildDetails(build.id)} // 클릭 시 build_id로 상세 정보 조회
                 >
-                  <div className="h-[100%] flex flex-wrap content-between mb-4">
+                  <div className="h-[100%] flex flex-wrap content-between">
                     <section className="h-1/3">
                       <h4 className="font-semibold">CPU</h4>
                       <small className="mt-0 line-clamp-none">
@@ -343,12 +353,12 @@ const CommunityBuilds = () => {
                           : "linear-gradient(to right, #a855f7 , #6b21a8 , #3b0764 , #000000)",
                     }}
                   />
-                  <footer className="text-right font-bold">
+                  <footer className="text-right font-bold text-xl ">
                     {build.totalPrice.toLocaleString()} 원
                   </footer>
                 </article>
               ))}
-            {emptyBoxes.map((_, index) => (
+            {/* {emptyBoxes.map((_, index) => (
               <article
                 key={index}
                 className="flex flex-col border p-4 rounded-lg shadow-md bg-gray-50 bg-opacity-40"
@@ -376,7 +386,7 @@ const CommunityBuilds = () => {
                 />
                 <footer className="text-right font-bold">가격 없음</footer>
               </article>
-            ))}
+            ))} */}
           </div>
         </div>
       </section>

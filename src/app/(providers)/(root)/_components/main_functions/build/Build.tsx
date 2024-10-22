@@ -124,7 +124,7 @@ function Build() {
       let productStrings = "";
 
       const purpose =
-        Number(budget) <= 80
+        Number(budget) <= 90
           ? "사무용"
           : Number(budget) <= 100
           ? "저사양"
@@ -325,7 +325,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
   };
 
   return (
-    <div>
+    <>
       <main
         className={`border-[1px] flex flex-row bg-${
           theme === "dark"
@@ -333,7 +333,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
             : "white border-pink-500 "
         } rounded-[40px] bg-opacity-40 mt-8 mx-20 h-[66vh]`}
       >
-        <article className="w-full lg:w-1/2 mr-0 lg:mr-4 p-4">
+        <article className="w-3/5 mr-0 lg:mr-4 p-4">
           <section
             className={`border-[1px]  p-[1px] rounded-[40px] bg-[180deg] h-full bg-${
               theme === "dark"
@@ -351,7 +351,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
           </section>
         </article>
 
-        <aside className="w-full lg:w-1/2">
+        <aside className="w-2/5">
           <section className="p-10 h-full flex flex-col">
             <div className="flex flex-wrap h-1/2 mt-7 justify-center">
               <InputField
@@ -393,7 +393,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
             <div
               className={`mt-auto text-${
                 theme === "dark" ? "white" : "gray-700"
-              } text-4xl`}
+              } text-4xl text-right`}
             >
               {totalPrice
                 ? `${totalPrice.toLocaleString()} 원`
@@ -403,7 +403,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
         </aside>
       </main>
 
-      <footer className="mt-6 flex justify-center">
+      <footer className="w-full mt-6 flex justify-center">
         <button
           onClick={builded ? undefined : () => handleEstimate(0)}
           className={`w-full ml-20 mr-1 h-16 p-[1px] bg-gradient-to-r rounded-full ${
@@ -441,7 +441,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
           </div>
         </button>
       </footer>
-    </div>
+    </>
   );
 }
 

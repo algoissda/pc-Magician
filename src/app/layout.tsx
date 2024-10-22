@@ -17,14 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <head>
-        <link
-          rel="preload"
-          href="/path/to/Mona-Sans.woff2"
-          as="font"
-          type="font/woff2"
-        ></link>
-      </head>
+      <head></head>
       <body className={"antialiased bg-black"}>
         {children}
         <div id="global-modal"></div>

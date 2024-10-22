@@ -1,12 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useActiveStore } from "@/store/useActiveTab";
 import { useThemeStore } from "@/store/useStore";
-import { useEffect, useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Build from "./_components/main_functions/build/Build";
 import CommunityBuilds from "./_components/main_functions/community_builds/page";
 import ViewBuildsByPrice from "./_components/main_functions/view_builds_by_price/page";
+import { useActiveStore } from "@/store/useActiveTab";
 
 // 버튼 컴포넌트화
 const ThemeButton = ({ isActive, onClick, text, size }: any) => {
@@ -106,7 +106,8 @@ const ThemeImage = ({ theme, mouseX, mouseY }: any) => {
 
 function MainPage() {
   const theme = useThemeStore((state) => state.theme);
-  const {activeTab, setActiveTab} =  useActiveStore();
+  const activeTab = useActiveStore((state) => state.activeTab);
+  const setActiveTab = useActiveStore((state) => state.setActiveTab);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -124,7 +125,7 @@ function MainPage() {
     return (
       <>
         <div
-          className={`absolute transition-all duration-700 top-0 ${
+          className={`absolute transition-all duration-700 top-0 w-[95%] ${
             activeTab === "Build a PC" ? "left-0" : "left-[400%]"
           }`}
         >
