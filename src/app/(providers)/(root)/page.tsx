@@ -4,7 +4,7 @@
 import { useThemeStore } from "@/store/useStore";
 import { useState, useEffect, useRef } from "react";
 import Build from "./_components/main_functions/build/Build";
-import CommunityBuilds from "./_components/main_functions/community_builds/page";
+import CommunityBuilds from "./_components/main_functions/community_builds/CommunityBuilds";
 import ViewBuildsByPrice from "./_components/main_functions/view_builds_by_price/page";
 import { useActiveStore } from "@/store/useActiveTab";
 

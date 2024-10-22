@@ -9,7 +9,7 @@ import {
   HeaderButton,
   AuthButtons,
   ThemeToggleButton,
-} from "./headerComponents";
+} from "./header_components/headerComponents";
 
 function Header() {
   const theme = useThemeStore((state) => state.theme);
@@ -42,9 +42,11 @@ function Header() {
           : "bg-white border-b-gray-300 shadow-gray-200"
       }`}
     >
-      <HeaderButton href="/" onClick={() => setActiveTab("")}>
-        PC Magician
-      </HeaderButton>
+      <button onClick={() => setActiveTab("")}>
+        <HeaderButton href="/" theme={theme}>
+          PC Magician
+        </HeaderButton>
+      </button>
       <nav className="ml-5"></nav>
       <div className="ml-auto flex items-center gap-x-4">
         {isInitalizedAuth && (

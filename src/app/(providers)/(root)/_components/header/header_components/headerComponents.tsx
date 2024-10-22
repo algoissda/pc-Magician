@@ -2,17 +2,16 @@
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMoon, faSun } from "@fortawesome/free-regular-svg-icons";
-import Modal from "../modal/modal"; // 모달 페이지 가져오기
-import { useState } from "react";
+import Modal from "../../modal/modal";
 
-export const HeaderButton = ({ children, href, onClick }: any) => (
-  <Link href={href}>
-    <button
-      onClick={onClick}
-      className="main-text text-[40px] font-extrabold font-serif"
-    >
-      {children}
-    </button>
+export const HeaderButton = ({ children, href, theme }: any) => (
+  <Link
+    href={href}
+    className={`main-text text-[40px] font-extrabold font-serif text-${
+      theme === "dark" ? "white" : "black"
+    }`}
+  >
+    {children}
   </Link>
 );
 
@@ -76,7 +75,7 @@ export const ThemeToggleButton = ({ theme, toggleTheme }: any) => {
       } w-10 h-10 rounded-full flex justify-center items-center p-[1px]`}
     >
       <FontAwesomeIcon
-        className={`bg-${
+        className={`text-${
           theme === "dark" ? "black" : "white"
         } w-9 h-9 rounded-full text-3xl`}
         icon={theme === "dark" ? faSun : faMoon}
