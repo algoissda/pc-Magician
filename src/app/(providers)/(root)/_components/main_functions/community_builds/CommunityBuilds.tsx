@@ -1,7 +1,9 @@
+"use client";
+
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useActiveStore } from "@/store/useActiveTab";
 import { useThemeStore } from "@/store/useStore";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "../../../../../../../supabase/client";
 import { BuildCard, BuildDetailsPanel } from "./CommunityBuilds/asdf";
 
@@ -13,22 +15,30 @@ const CommunityBuilds = () => {
   const theme = useThemeStore((state) => state.theme);
   const activeTab = useActiveStore((state) => state.activeTab);
 
+  const tabChange = useRef(true); // useRef로 tabChange 상태 관리
+
   const fetchBuilds = async () => {
     try {
       // 사용자 정보를 가져와서 userId 추출
       const { data: userData, error: userError } =
-        await supabase.auth.getUser();
+        await supabase.auth.getSession();
+      console.log("user::", userData);
       let userId = null;
 
-      if (!userError && userData?.user) {
-        userId = userData.user.id;
+      if (!userError && userData?.session?.user.id) {
+        userId = userData.session?.user.id;
       }
 
       // saved_builds와 builds를 조인하여 빌드 데이터를 가져옴 (userId 제외)
-      const { data: buildsData, error: buildsError } = await supabase
+      let query = supabase
         .from("saved_builds")
-        .select(`builds:build_id(*), uid`)
-        .neq("uid", userId); // 로그인한 사용자의 빌드를 제외
+        .select(`builds:build_id(*), uid`);
+
+      if (userId !== null) {
+        query = query.neq("uid", userId); // 로그인한 사용자의 빌드를 제외
+      }
+
+      const { data: buildsData, error: buildsError } = await query;
 
       if (buildsError) {
         throw new Error("Error fetching builds: " + buildsError.message);
@@ -46,12 +56,11 @@ const CommunityBuilds = () => {
       );
 
       setBuilds(buildsWithPrices); // 빌드 상태 업데이트
+      console.log("1111111111111", builds);
     } catch (error) {
       console.error(error.message);
     }
-    console.log("1111111111111",builds);
   };
-
 
   const fetchProductPrices = async (buildsData: any[]) => {
     const productNames = buildsData
@@ -138,10 +147,14 @@ const CommunityBuilds = () => {
   };
 
   useEffect(() => {
-    if (activeTab === "Community Builds") {
+    // activeTab이 "Community Builds"로 변경되고 tabChange.current가 true일 때만 fetchBuilds 실행
+    if (activeTab === "Community Builds" && tabChange.current) {
       fetchBuilds();
+      tabChange.current = false; // 실행 후 한번만 실행되도록 변경
+    } else if (activeTab !== "Community Builds" && !tabChange.current) {
+      tabChange.current = true; // activeTab이 다른 탭으로 변경되면 다시 true로 변경
     }
-  }, [activeTab, fetchBuilds]);
+  }, [activeTab]);
 
   const nextPage = () => setPage((prev) => prev + 1);
   const prevPage = () => setPage((prev) => Math.max(prev - 1, 1));
