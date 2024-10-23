@@ -12,6 +12,7 @@ import {
 import { PartList } from "./BuildComponents/PartList";
 import { InputField } from "./BuildComponents/InputField";
 import { SelectBox } from "./BuildComponents/SelectBox";
+import { rule } from "postcss";
 
 // Part 타입 정의
 type Part = {
@@ -40,7 +41,9 @@ function Build() {
   const [selectVgaType, setVgaType] = useState<string>(""); // 선호 GPU
   const [build, setBuild] = useState<Part[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0); // 총합을 위한 상태 추가
+  const [confirmedPrice, setConfirmedPrice] = useState<number>(0); // 총합을 위한 상태 추가
   const [builded, setBuilded] = useState<boolean>(false);
+  const [saved, setSaved] = useState<boolean>(false);
   const apiKeys = [
     process.env.NEXT_PUBLIC_GOOGLE_API_KEY_1,
     process.env.NEXT_PUBLIC_GOOGLE_API_KEY_2,
@@ -60,13 +63,6 @@ function Build() {
   ];
 
   let currentApiKeyIndex = 0;
-
-  // 동적으로 API 키를 교체하는 함수
-  const getApiKey = () => {
-    const apiKey = apiKeys[currentApiKeyIndex];
-    currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.length; // 다음 API 키로 순환
-    return apiKey;
-  };
 
   const switchApiKeyOnExhaustion = (error: any) => {
     if (error.response && error.response.status === 429) {
@@ -89,28 +85,44 @@ function Build() {
     }));
   };
 
-  const initializeGoogleAI = (apiKey: string) => {
+  // 동적으로 API 키를 교체하는 함수
+  const getApiKey = (): string => {
+    const apiKey = apiKeys[currentApiKeyIndex];
+    currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.length;
+    return apiKey || ""; // undefined일 경우 빈 문자열 반환
+  };
+
+  const initializeGoogleAI = (
+    apiKey: string | (() => string | undefined)
+  ): unknown => {
     try {
-      const genAI = new GoogleGenerativeAI(apiKey);
+      const apiKeyValue = typeof apiKey === "function" ? apiKey() : apiKey;
+      if (!apiKeyValue) {
+        throw new Error("API 키가 없습니다.");
+      }
+
+      // GoogleGenerativeAI의 올바른 초기화 방식 확인 필요
+      const genAI = new GoogleGenerativeAI(apiKeyValue);
+
+      // 모델을 직접 반환하지 않고 필요한 동작을 명확히 설정
       const model = genAI.getGenerativeModel({
         model: "gemini-1.5-flash",
       });
-      return model;
+      return model; // 여기가 에러 발생 지점
     } catch (error) {
       console.error("Google AI 초기화 실패:", error);
       return null;
     }
   };
 
-  const geminiModel = initializeGoogleAI(() => getApiKey());
-
-  const handleEstimate = async (
+  /**견적을 생성하고 저장하는 함수 */
+  const createBuild = async (
     feedback: number,
     limit: number = 250,
     budgetIssues: number = 1
   ) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    geminiModel;
+    initializeGoogleAI(getApiKey);
     setBuilded(true);
     const googleApiKey = getApiKey();
 
@@ -168,7 +180,7 @@ function Build() {
 
           if (error) {
             console.error(`Error fetching products for type ${type}:`, error);
-            handleEstimate(0);
+            createBuild(0);
             return;
           }
 
@@ -241,7 +253,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
         } else {
           // 견적 다시짜게하기
           productStrings = "";
-          handleEstimate(
+          createBuild(
             price - Number(budget + "0000"),
             limit,
             budgetIssues + 0.01
@@ -253,7 +265,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
     } catch (error) {
       console.error("Error:", error);
       switchApiKeyOnExhaustion(error); // 할당량 초과 시 API 키 교체
-      handleEstimate(0, limit - 10 > 0 ? limit - 10 : 10);
+      createBuild(0, limit - 10 > 0 ? limit - 10 : 10);
     }
   };
 
@@ -271,7 +283,10 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
     return parsedParts;
   };
 
+  /**견적을 DB에 저장하는 함수 */
   const insertBuildData = async () => {
+    if (saved) return;
+    setSaved(true);
     const {
       data: { user },
       error: authError,
@@ -282,6 +297,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
         "사용자를 가져오는 중 오류 발생:",
         authError || "사용자가 로그인하지 않았습니다."
       );
+      setSaved(false);
       return;
     }
 
@@ -299,17 +315,49 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
       explanation: build.find((part) => part.type === "설명")?.name,
     };
 
-    const { data: insertedBuild, error: buildError } = await supabase
+    // 먼저 동일한 견적이 있는지 확인
+    const { data: existingBuild, error: buildCheckError } = await supabase
       .from("builds")
-      .insert([buildData])
-      .select();
+      .select("id")
+      .eq("CPU", buildData.CPU)
+      .eq("Cooler", buildData.Cooler)
+      .eq("MBoard", buildData.MBoard)
+      .eq("RAM", buildData.RAM)
+      .eq("VGA", buildData.VGA)
+      .eq("SSD", buildData.SSD)
+      .eq("HDD", buildData.HDD)
+      .eq("Case", buildData.Case)
+      .eq("Power", buildData.Power)
+      .maybeSingle(); // maybeSingle()로 수정하여 결과가 없을 때를 처리
 
-    if (buildError) {
-      console.error("Error inserting build data:", buildError);
+    if (buildCheckError) {
+      console.error("Error checking existing build:", buildCheckError);
+      setSaved(false); // 에러가 발생하면 저장 상태 초기화
       return;
     }
 
-    const build_id = insertedBuild[0].id;
+    let build_id;
+
+    if (existingBuild) {
+      // 동일한 견적이 존재하면 해당 build_id 사용
+      build_id = existingBuild.id;
+      console.log("동일한 견적을 찾았습니다. 기존 build_id를 사용합니다.");
+    } else {
+      // 동일한 견적이 없으면 새로 삽입
+      const { data: insertedBuild, error: buildInsertError } = await supabase
+        .from("builds")
+        .insert([buildData])
+        .select();
+
+      if (buildInsertError) {
+        console.error("Error inserting build data:", buildInsertError);
+        setSaved(false); // 에러가 발생하면 저장 상태 초기화
+        return;
+      }
+
+      build_id = insertedBuild[0].id;
+      console.log("새로운 build를 삽입했습니다.");
+    }
 
     const { error: savedBuildsError } = await supabase
       .from("saved_builds")
@@ -317,8 +365,10 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
 
     if (savedBuildsError) {
       console.error("Error inserting into saved_builds:", savedBuildsError);
+      setSaved(false); // 저장 실패 시 저장 상태 초기화
     } else {
       console.log("Build data and saved_builds entry inserted successfully");
+      setSaved(true); // 저장 성공 후 상태 초기화
     }
   };
 
@@ -344,12 +394,19 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
       : builded
       ? "bg-gray-400"
       : "bg-white";
-
+  const blockdePanelBuildedStyle = builded
+    ? "opacity-100 pointer-events-auto"
+    : "opacity-0 pointer-events-none";
   return (
     <>
       <main
-        className={`${backgroundThemeStyle} border-[1px] flex flex-row rounded-[40px] bg-opacity-40 mt-8 mx-20 h-[66vh]`}
+        className={`${backgroundThemeStyle} relative border-[1px] flex flex-row rounded-[40px] bg-opacity-40 mt-8 mx-20 h-[66vh] overflow-hidden`}
       >
+        <div
+          className={`${blockdePanelBuildedStyle} absolute flex justify-center items-center h-full inset-0 bg-black bg-opacity-50 z-40 text-white text-6xl`}
+        >
+          Building...
+        </div>
         <article className="w-3/5 mr-0 lg:mr-4 p-4">
           <section
             className={`${backgroundThemeStyle} border-[1px]  p-[1px] rounded-[40px] bg-opacity-40 px-2 h-full`}
@@ -414,7 +471,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
 
       <footer className="w-full mt-6 flex justify-center">
         <button
-          onClick={builded ? undefined : () => handleEstimate(0)}
+          onClick={builded ? undefined : () => createBuild(0)}
           className={`${textThemeLeftButtonPriceStyle} w-full ml-20 mr-1 h-16 p-[1px] bg-gradient-to-r rounded-full text-xl`}
         >
           <div
@@ -424,13 +481,13 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
           </div>
         </button>
         <button
-          onClick={() => (builded ? undefined : insertBuildData())}
+          onClick={() => (builded || saved ? undefined : insertBuildData())}
           className={`${textThemeRightButtonPriceStyle} w-full ml-1 mr-20 h-16 p-[1px] bg-gradient-to-r rounded-full text-xl`}
         >
           <div
             className={`${backgroundBuildedStyle} ${textThemeItemStyle} w-full h-full rounded-full flex items-center justify-center`}
           >
-            SAVE
+            {saved ? "SAVED" : "SAVE"}
           </div>
         </button>
       </footer>
