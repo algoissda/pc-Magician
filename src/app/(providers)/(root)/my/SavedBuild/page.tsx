@@ -1,18 +1,16 @@
-"use client";
+'use client';
 
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useActiveStore } from "@/store/useActiveTab";
 import { useThemeStore } from "@/store/useStore";
 import { useEffect, useState } from "react";
 import { supabase } from "../../../../../../supabase/client";
-import {
-  BuildCard,
-  BuildDetailsPanel,
-} from "../../_components/main_functions/community_builds/CommunityBuilds/BuildDetailsPanel";
+import { BuildCard, BuildDetailsPanel } from "../../_components/main_functions/community_builds/CommunityBuilds/BuildDetailsPanel";
 
 const CommunityBuilds = () => {
   const [builds, setBuilds] = useState<any[]>([]);
   const [selectedBuild, setSelectedBuild] = useState<any | null>(null);
+
 
   const theme = useThemeStore((state) => state.theme);
   const activeTab = useActiveStore((state) => state.activeTab);
@@ -20,8 +18,7 @@ const CommunityBuilds = () => {
   const fetchBuilds = async () => {
     try {
       // 사용자 정보를 가져와서 userId 추출
-      const { data: userData, error: userError } =
-        await supabase.auth.getUser();
+      const { data: userData, error: userError } = await supabase.auth.getUser();
       let userId = null;
 
       if (!userError && userData?.user) {
@@ -50,6 +47,7 @@ const CommunityBuilds = () => {
         return;
       }
 
+
       console.log("User ID:", userId);
       console.log("Builds Data:", buildsData);
       console.log("Builds Error:", buildsError);
@@ -60,12 +58,15 @@ const CommunityBuilds = () => {
       const buildsWithPrices = builds.map((build) =>
         calculateBuildPrice(build, products)
       );
-
+  
       setBuilds(buildsWithPrices); // 빌드 상태 업데이트
     } catch (error) {
       console.error(error.message);
     }
+
   };
+
+
 
   const fetchProductPrices = async (buildsData: any[]) => {
     const productNames = buildsData
@@ -152,51 +153,51 @@ const CommunityBuilds = () => {
   };
 
   useEffect(() => {
-    fetchBuilds();
+      fetchBuilds();
+
   }, [activeTab, fetchBuilds]);
 
   console.log("builds", builds);
 
+
+
   return (
-    <main className="text-white">
-      <h2 className="mt-10 text-3xl font-bold ml-20">저장된 견적</h2>
-      <section className="max-h-max">
-        <div className="flex flex-wrap justify-start mt-8 mx-20">
+    <div className="relative w-full h-full pb-8">
+      <section className="relative h-full border-t border-b border-gray-300 py-4 bg-gray-600 bg-opacity-30 px-2">
+        <div className="w-full h-full overflow-hidden max-h-[100%]">
+        {/* <div className="p-4 m-2 w-full max-w-xs flex flex-col justify-between border rounded-2xl custom-border">
+          {/* RGB 색상을 만들기 위해 커스텀 보더를 따로 만들었음 */}
+          <style jsx>{`
+            .custom-border {
+              border-width: 4px;
+              border-image: linear-gradient(260deg, violet, skyblue, white) 1;
+            }
+          `}</style> */}
           <BuildDetailsPanel
             selectedBuild={selectedBuild}
             theme={theme}
             onClose={() => setSelectedBuild(null)}
           />
-          <div className="grid grid-cols-4 gap-4 max-h-[100%]">
-            {builds.map((build) => (
-              <>
-                <div className="p-4 m-2 w-full max-w-xs flex flex-col justify-between border-double rounded-2xl custom-border">
-                  {/* RGB 색상을 만들기 위해 커스텀 보더를 따로 만들었음 */}
-                  <style jsx>{`
-                    .custom-border {
-                      border-width: 4px;
-                      border-image: linear-gradient(
-                          260deg,
-                          violet,
-                          skyblue,
-                          white
-                        )
-                        1;
-                    }
-                  `}</style>
+          <div className="grid grid-cols-4 gap-4 overflow-y-scroll max-h-[100%]">
+            {builds
+              .map((build) => (
+                <>
                   <BuildCard
                     key={build.id}
                     build={build}
                     theme={theme}
                     onClick={() => fetchBuildDetails(build.id)}
                   />
-                </div>
-              </>
-            ))}
+                  <div className="text-white">
+                    {build.id};
+                  </div>
+                </>
+              ))}
           </div>
         </div>
       </section>
-    </main>
+
+    </div>
   );
 };
 

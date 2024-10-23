@@ -1,42 +1,6 @@
-export const BuildCard = ({ build, theme, onClick }) => {
-  return (
-    <article
-      key={build.id}
-      className="flex h-80 flex-col border p-4 rounded-lg shadow-md bg-gray-50 bg-opacity-40 cursor-pointer"
-      onClick={onClick}
-    >
-      <div className="h-[100%] flex flex-wrap content-between">
-        <section className="h-1/3">
-          <h4 className="font-semibold">CPU</h4>
-          <small className="mt-0 line-clamp-none">{build.CPU}</small>
-        </section>
-        <section className="h-1/3">
-          <h4 className="font-semibold">VGA</h4>
-          <small className="mt-0 line-clamp-none">{build.VGA}</small>
-        </section>
-        <section className="h-1/3">
-          <h4 className="font-semibold">RAM</h4>
-          <small className="mt-0 line-clamp-none">{build.RAM}</small>
-        </section>
-      </div>
-      <hr
-        className="h-[2px] opacity-60"
-        style={{
-          background:
-            theme === "dark"
-              ? "linear-gradient(to right, #0ea5e9, #3730a3, #c026d3, #e11d48)"
-              : "linear-gradient(to right, #a855f7 , #6b21a8 , #3b0764 , #000000)",
-        }}
-      />
-      <footer className="text-right font-bold text-xl ">
-        {build.totalPrice.toLocaleString()} 원
-      </footer>
-    </article>
-  );
-};
-
-const createPartDetails = (build) => {
-  // build 객체에서 사용할 필드와 레이블을 정의
+// Helper function to create part details for a build
+const createPartDetails = (build, productPriceMap) => {
+  // Define the fields and labels for the parts
   const fields = [
     { key: "CPU", label: "CPU" },
     { key: "VGA", label: "VGA" },
@@ -49,18 +13,29 @@ const createPartDetails = (build) => {
     { key: "Case", label: "Case" },
   ];
 
-  // 필드 배열을 기반으로 value와 price를 동적으로 생성하여 배열 반환
-  return fields.map(({ key, label }) => ({
-    label,
-    value: build?.[key] || "N/A",
-    price: build?.[`${key}Price`] || "N/A",
-  }));
+  // Dynamically generate the value and price based on productPriceMap
+  return fields.map(({ key, label }) => {
+    const partName = build?.[key]; // 해당 부품 이름을 안전하게 추출
+    const price =
+      partName && productPriceMap ? productPriceMap[partName] : "N/A"; // productPriceMap에서 가격 조회
+
+    return {
+      label,
+      value: partName || "N/A", // 부품 이름이 없으면 "N/A"
+      price: price || "N/A", // 가격이 없으면 "N/A"
+    };
+  });
 };
 
 // BuildDetailsPanel 컴포넌트 안에서 사용
-export const BuildDetailsPanel = ({ selectedBuild, theme, onClose }) => {
-  // selectedBuild를 기반으로 partDetails 배열을 생성
-  const partDetails = createPartDetails(selectedBuild);
+export const BuildDetailsPanel = ({
+  selectedBuild,
+  theme,
+  productPriceMap,
+  onClose,
+}) => {
+  // Generate partDetails array based on selectedBuild and productPriceMap
+  const partDetails = createPartDetails(selectedBuild, productPriceMap);
 
   return (
     <div
@@ -77,7 +52,13 @@ export const BuildDetailsPanel = ({ selectedBuild, theme, onClose }) => {
         } p-6 z-50 transition-transform transform translate-x-0`}
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="font-bold text-lg mb-4">Build Details</h3>
+        <h3
+          className={`text-right font-bold mb-8 text-3xl text-${
+            theme === "dark" ? "white" : "gray-500"
+          }`}
+        >
+          Build Details
+        </h3>
         {selectedBuild && (
           <ul
             className={`text-${
@@ -129,15 +110,13 @@ export const BuildDetailsPanel = ({ selectedBuild, theme, onClose }) => {
             ))}
           </ul>
         )}
-        <div className="text-right font-bold mt-4">
+        <div
+          className={`text-right font-bold mt-4 text-3xl text-${
+            theme === "dark" ? "white" : "gray-500"
+          }`}
+        >
           {selectedBuild?.totalPrice?.toLocaleString()} 원
         </div>
-        <button
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg"
-          onClick={onClose}
-        >
-          닫기
-        </button>
       </div>
     </div>
   );

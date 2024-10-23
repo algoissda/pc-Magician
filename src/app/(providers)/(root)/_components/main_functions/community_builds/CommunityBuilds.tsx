@@ -5,11 +5,15 @@ import { useActiveStore } from "@/store/useActiveTab";
 import { useThemeStore } from "@/store/useStore";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "../../../../../../../supabase/client";
-import { BuildCard, BuildDetailsPanel } from "./CommunityBuilds/asdf";
+import { BuildCard } from "./CommunityBuilds/BuildCard";
+import { BuildDetailsPanel } from "./CommunityBuilds/BuildDetailsPanel";
 
 const CommunityBuilds = () => {
   const [builds, setBuilds] = useState<any[]>([]);
   const [selectedBuild, setSelectedBuild] = useState<any | null>(null);
+  const [selectedBuildPriceMap, setSelectedBuildPriceMap] = useState<
+    any | null
+  >(null); // 가격 정보 저장
   const [page, setPage] = useState(1);
   const buildsPerPage = 100;
   const theme = useThemeStore((state) => state.theme);
@@ -141,6 +145,7 @@ const CommunityBuilds = () => {
       const buildWithPrices = calculateBuildPrice(buildDetails, productsData);
 
       setSelectedBuild(buildWithPrices);
+      setSelectedBuildPriceMap(productsData); // 가격 정보 저장
     } catch (error) {
       console.error(error.message);
     }
@@ -165,6 +170,7 @@ const CommunityBuilds = () => {
         <div className="w-full h-full overflow-hidden max-h-[100%]">
           <BuildDetailsPanel
             selectedBuild={selectedBuild}
+            productPriceMap={selectedBuildPriceMap} // 가격 정보 전달
             theme={theme}
             onClose={() => setSelectedBuild(null)}
           />
