@@ -5,8 +5,8 @@ import { useActiveStore } from "@/store/useActiveTab";
 import { useThemeStore } from "@/store/useStore";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "../../../../../../../supabase/client";
-import { BuildCard } from "./CommunityBuilds/BuildCard";
-import { BuildDetailsPanel } from "./CommunityBuilds/BuildDetailsPanel";
+import { BuildCard } from "./CommunityBuildsComponents/BuildCard";
+import { BuildDetailsPanel } from "./CommunityBuildsComponents/BuildDetailsPanel";
 
 const CommunityBuilds = () => {
   const [builds, setBuilds] = useState<any[]>([]);
