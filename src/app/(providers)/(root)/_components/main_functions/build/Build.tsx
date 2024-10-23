@@ -9,7 +9,7 @@ import {
   HarmBlockThreshold,
   HarmCategory,
 } from "@google/generative-ai";
-import { PartList } from "./BuildComponents/BuildComponents copy";
+import { PartList } from "./BuildComponents/PartList";
 import { InputField } from "./BuildComponents/InputField";
 import { SelectBox } from "./BuildComponents/SelectBox";
 
@@ -336,10 +336,14 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
     theme === "dark"
       ? "bg-[#0d1117] border-sky-400"
       : "bg-white border-pink-500";
-  const lineThemeStyle =
+  const backgroundBuildedStyle =
     theme === "dark"
-      ? "linear-gradient(to right, #0ea5e9, #3730a3, #c026d3, #e11d48)"
-      : "linear-gradient(to right, #a855f7 , #6b21a8 , #3b0764 , #000000)";
+      ? builded
+        ? "bg-[#3d4043]"
+        : "bg-[#0d1117]"
+      : builded
+      ? "bg-gray-400"
+      : "bg-white";
 
   return (
     <>
@@ -414,21 +418,17 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
           className={`${textThemeLeftButtonPriceStyle} w-full ml-20 mr-1 h-16 p-[1px] bg-gradient-to-r rounded-full text-xl`}
         >
           <div
-            className={`w-full h-full bg-${
-              theme === "dark" ? "[#0d1117]" : "white"
-            } rounded-full flex items-center justify-center text-${
-              theme === "dark" ? "white" : "black"
-            }`}
+            className={`${backgroundBuildedStyle} ${textThemeItemStyle} w-full h-full rounded-full flex items-center justify-center`}
           >
             {builded ? "Building..." : "Build"}
           </div>
         </button>
         <button
-          onClick={() => insertBuildData()}
+          onClick={() => (builded ? undefined : insertBuildData())}
           className={`${textThemeRightButtonPriceStyle} w-full ml-1 mr-20 h-16 p-[1px] bg-gradient-to-r rounded-full text-xl`}
         >
           <div
-            className={`${backgroundThemeStyle} ${textThemeItemStyle} w-full h-full rounded-full flex items-center justify-center`}
+            className={`${backgroundBuildedStyle} ${textThemeItemStyle} w-full h-full rounded-full flex items-center justify-center`}
           >
             SAVE
           </div>
