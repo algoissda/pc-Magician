@@ -5,9 +5,9 @@ import { supabase } from "../../../../../../supabase/client";
 import { useAuthStore } from "../../../../../../zustand/auth.store";
 import { useThemeStore } from "@/store/useStore";
 import { useActiveStore } from "@/store/useActiveTab";
-import { HeaderButton } from "./header_components/HeaderButton";
-import { ThemeToggleButton } from "./header_components/ThemeToggleButton";
-import { AuthButtons } from "./header_components/AuthButtons";
+import { AuthButtons } from "./headerComponents/AuthButtons";
+import { HeaderButton } from "./headerComponents/HeaderButton";
+import { ThemeToggleButton } from "./headerComponents/ThemeToggleButton";
 
 function Header() {
   const theme = useThemeStore((state) => state.theme);

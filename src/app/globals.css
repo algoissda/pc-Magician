@@ -13,6 +13,10 @@
   transition: opacity 0.8s;
 }
 
+.theme-color {
+  transition: background-color 1s;
+}
+
 .main-text {
   transition: background 0.5s ease-in-out, opacity 0.8s, color 0.5s ease-in-out;
 }
