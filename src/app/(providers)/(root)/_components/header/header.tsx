@@ -5,11 +5,9 @@ import { supabase } from "../../../../../../supabase/client";
 import { useAuthStore } from "../../../../../../zustand/auth.store";
 import { useThemeStore } from "@/store/useStore";
 import { useActiveStore } from "@/store/useActiveTab";
-import {
-  HeaderButton,
-  AuthButtons,
-  ThemeToggleButton,
-} from "./header_components/headerComponents";
+import { HeaderButton } from "./header_components/HeaderButton";
+import { ThemeToggleButton } from "./header_components/ThemeToggleButton";
+import { AuthButtons } from "./header_components/AuthButtons";
 
 function Header() {
   const theme = useThemeStore((state) => state.theme);
@@ -56,6 +54,7 @@ function Header() {
               handleLogOut={handleClickLogOutButton}
               isModalOpen={isModalOpen}
               setIsModalOpen={setIsModalOpen}
+              theme={theme}
             />
             <ThemeToggleButton theme={theme} toggleTheme={toggleTheme} />
           </>
