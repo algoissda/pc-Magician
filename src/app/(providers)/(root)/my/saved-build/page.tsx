@@ -8,7 +8,7 @@ import { supabase } from "../../../../../../supabase/client";
 import {
   BuildCard,
   BuildDetailsPanel,
-} from "../../_components/main_functions/community_builds/CommunityBuilds/BuildDetailsPanel";
+} from "../../_components/main_functions/community_builds/CommunityBuildsComponents/BuildDetailsPanel";
 
 const CommunityBuilds = () => {
   const [builds, setBuilds] = useState<any[]>([]);

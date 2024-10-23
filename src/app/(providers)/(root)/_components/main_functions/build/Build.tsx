@@ -9,11 +9,9 @@ import {
   HarmBlockThreshold,
   HarmCategory,
 } from "@google/generative-ai";
-import {
-  PartList,
-  InputField,
-  SelectBox,
-} from "./build_components/BuildComponents";
+import { PartList } from "./BuildComponents/BuildComponents copy";
+import { InputField } from "./BuildComponents/InputField";
+import { SelectBox } from "./BuildComponents/SelectBox";
 
 // Part 타입 정의
 type Part = {
@@ -324,22 +322,33 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
     }
   };
 
+  const textThemeItemStyle = theme === "dark" ? "text-white" : "text-black";
+  const textThemeTotalPriceStyle = theme === "dark" ? "text-white" : "gray-700";
+  const textThemeLeftButtonPriceStyle =
+    theme === "dark"
+      ? "from-sky-400 to-purple-300"
+      : "from-purple-500 to-sky-300";
+  const textThemeRightButtonPriceStyle =
+    theme === "dark"
+      ? "from-purple-300 to-sky-400"
+      : "from-sky-300 to-purple-500";
+  const backgroundThemeStyle =
+    theme === "dark"
+      ? "bg-[#0d1117] border-sky-400"
+      : "bg-white border-pink-500";
+  const lineThemeStyle =
+    theme === "dark"
+      ? "linear-gradient(to right, #0ea5e9, #3730a3, #c026d3, #e11d48)"
+      : "linear-gradient(to right, #a855f7 , #6b21a8 , #3b0764 , #000000)";
+
   return (
     <>
       <main
-        className={`border-[1px] flex flex-row bg-${
-          theme === "dark"
-            ? "[#0d1117] border-sky-400 "
-            : "white border-pink-500 "
-        } rounded-[40px] bg-opacity-40 mt-8 mx-20 h-[66vh]`}
+        className={`${backgroundThemeStyle} border-[1px] flex flex-row rounded-[40px] bg-opacity-40 mt-8 mx-20 h-[66vh]`}
       >
         <article className="w-3/5 mr-0 lg:mr-4 p-4">
           <section
-            className={`border-[1px]  p-[1px] rounded-[40px] bg-[180deg] h-full bg-${
-              theme === "dark"
-                ? "[#0d1117] border-sky-400"
-                : "white border-pink-500"
-            } rounded-[40px] bg-opacity-40 px-2 h-full`}
+            className={`${backgroundThemeStyle} border-[1px]  p-[1px] rounded-[40px] bg-opacity-40 px-2 h-full`}
           >
             <PartList
               partTypes={partTypes}
@@ -382,18 +391,14 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
               />
 
               <div
-                className={`w-full h-[22vh] text-base text-left text-${
-                  theme === "dark" ? "white" : "black"
-                } max-h-56 overflow-y-auto`}
+                className={`${textThemeItemStyle} w-full h-[22vh] text-base text-left max-h-56 overflow-y-auto`}
               >
                 {build.find((item) => item.type === "설명")?.name}
               </div>
             </div>
 
             <div
-              className={`mt-auto text-${
-                theme === "dark" ? "white" : "gray-700"
-              } text-4xl text-right`}
+              className={`${textThemeTotalPriceStyle} mt-auto text-4xl text-right`}
             >
               {totalPrice
                 ? `${totalPrice.toLocaleString()} 원`
@@ -406,11 +411,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
       <footer className="w-full mt-6 flex justify-center">
         <button
           onClick={builded ? undefined : () => handleEstimate(0)}
-          className={`w-full ml-20 mr-1 h-16 p-[1px] bg-gradient-to-r rounded-full ${
-            theme === "dark"
-              ? "from-sky-400 to-purple-300"
-              : "from-purple-500 to-sky-300"
-          } text-xl`}
+          className={`${textThemeLeftButtonPriceStyle} w-full ml-20 mr-1 h-16 p-[1px] bg-gradient-to-r rounded-full text-xl`}
         >
           <div
             className={`w-full h-full bg-${
@@ -424,18 +425,10 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
         </button>
         <button
           onClick={() => insertBuildData()}
-          className={`w-full ml-1 mr-20 h-16 p-[1px] bg-gradient-to-r rounded-full ${
-            theme === "dark"
-              ? "from-purple-300 to-sky-400"
-              : "from-sky-300 to-purple-500"
-          } text-xl`}
+          className={`${textThemeRightButtonPriceStyle} w-full ml-1 mr-20 h-16 p-[1px] bg-gradient-to-r rounded-full text-xl`}
         >
           <div
-            className={`w-full h-full bg-${
-              theme === "dark" ? "[#0d1117]" : "white"
-            } rounded-full flex items-center justify-center text-${
-              theme === "dark" ? "white" : "black"
-            }`}
+            className={`${backgroundThemeStyle} ${textThemeItemStyle} w-full h-full rounded-full flex items-center justify-center`}
           >
             SAVE
           </div>

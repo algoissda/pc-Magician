@@ -54,7 +54,7 @@ export const BuildDetailsPanel = ({
       onClick={onClose}
     >
       <div
-        className={`${backgroundThemeStyle} theme-opacity absolute right-0 top-0 w-1/2 h-full p-6 z-50 transition-all transform translate-x-0`}
+        className={`${backgroundThemeStyle} theme-color absolute right-0 top-0 w-1/2 h-full p-6 z-50  transform translate-x-0`}
         onClick={(e) => e.stopPropagation()}
       >
         <h3
