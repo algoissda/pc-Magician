@@ -5,8 +5,10 @@ import { useActiveStore } from "@/store/useActiveTab";
 import { useThemeStore } from "@/store/useStore";
 import { useEffect, useState } from "react";
 import { supabase } from "../../../../../../supabase/client";
-import { BuildCard } from "../../_components/main_functions/community_builds/CommunityBuildsComponents/BuildCard";
-import { BuildDetailsPanel } from "../../_components/main_functions/community_builds/CommunityBuildsComponents/BuildDetailsPanel";
+import {
+  BuildCard,
+  BuildDetailsPanel,
+} from "./SavedBuildComponents/SavedBuildComponents";
 
 const CommunityBuilds = () => {
   const [builds, setBuilds] = useState<any[]>([]);

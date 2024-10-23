@@ -53,8 +53,8 @@ export const BuildDetailsPanel = ({
       }`}
       onClick={onClose}
     >
-      <div
-        className={`${backgroundThemeStyle} theme-color absolute right-0 top-0 w-1/2 h-full p-6 z-50  transform translate-x-0`}
+      <main
+        className={`${backgroundThemeStyle} theme-color absolute right-0 top-[10.6%] w-1/2 h-[90%] p-6 z-50 mr-[25%]  transform translate-x-0`}
         onClick={(e) => e.stopPropagation()}
       >
         <h3
@@ -62,46 +62,54 @@ export const BuildDetailsPanel = ({
         >
           Build Details
         </h3>
-        {selectedBuild && (
-          <ul
-            className={`h-[80%] flex flex-col overflow-y-auto overflow-x-clip`}
-          >
-            {partDetails.map((part) => (
-              <li
-                key={part.label}
-                className="relative text-lg flex flex-row py-3 pt-2 items-center flex-grow min-h-0"
-              >
-                <div className="flex flex-col w-full pr-5">
-                  <div className="w-full flex flex-grow justify-between items-center">
-                    <span
-                      className={`${textThemeStyle} pb-[2px] text-[0.95vw]`}
-                    >
-                      {part.label}
-                    </span>
-                    <span
-                      className={`${textThemeStyle} pb-[2px] text-[0.75vw]`}
-                    >
-                      {part.price ? part.price.toLocaleString() + " 원" : "N/A"}
+        {/* Build Details 요소 담는곳  */}
+        <div className="여기에 요소 다담음">
+          {selectedBuild && (
+            <ul
+              className={`h-[80%] flex flex-col overflow-y-auto overflow-x-clip`}
+            >
+              {partDetails.map((part) => (
+                <li
+                  key={part.label}
+                  className="relative text-lg flex flex-row py-3 pt-2 items-center flex-grow min-h-0"
+                >
+                  <div className="flex flex-col w-full pr-5">
+                    <div className="w-full flex flex-grow justify-between items-center">
+                      <span
+                        className={`${textThemeStyle} pb-[2px] text-[0.95vw]`}
+                      >
+                        {part.label}
+                      </span>
+                      <span
+                        className={`${textThemeStyle} pb-[2px] text-[0.75vw]`}
+                      >
+                        {part.price
+                          ? part.price.toLocaleString() + " 원"
+                          : "N/A"}
+                      </span>
+                    </div>
+                    <span className={`${textThemeStyle} text-[0.65vw] pl-1`}>
+                      {part.value || "N/A"}
                     </span>
                   </div>
-                  <span className={`${textThemeStyle} text-[0.65vw] pl-1`}>
-                    {part.value || "N/A"}
-                  </span>
-                </div>
-                <span
-                  className="absolute bottom-0 left-0 w-[101%] h-[3px] opacity-60"
-                  style={{
-                    background: lineThemeStyle,
-                  }}
-                ></span>
-              </li>
-            ))}
-          </ul>
-        )}
-        <div className={`text-right font-bold mt-4 text-3xl ${textThemeStyle}`}>
-          {selectedBuild?.totalPrice?.toLocaleString()} 원
+                  <span
+                    className="absolute bottom-0 left-0 w-[101%] h-[3px] opacity-60"
+                    style={{
+                      background: lineThemeStyle,
+                    }}
+                  ></span>
+                </li>
+              ))}
+            </ul>
+          )}
+          <div
+            className={`text-right font-bold mt-4 text-3xl ${textThemeStyle}`}
+          >
+            {selectedBuild?.totalPrice?.toLocaleString()} 원
+          </div>
+          {/* 여기에서 요소 담는곳 끝남 */}
         </div>
-      </div>
+      </main>
     </div>
   );
 };

@@ -23,7 +23,7 @@ export const BuildCard = ({ build, theme, onClick }) => {
   return (
     <article
       key={build.id}
-      className={`${backgroundThemeStyle} flex h-80 flex-col border p-4 rounded-lg shadow-md bg-opacity-40 cursor-pointer `}
+      className={`${backgroundThemeStyle} flex h-80 flex-col border p-4 rounded-lg shadow-md bg-opacity-40 cursor-pointer`}
       onClick={onClick}
     >
       <div className="h-[100%] flex flex-wrap content-between">
