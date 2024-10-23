@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Modal from "../../modal/modal";
+import Modal from "../../modal/Loginmodal";
 
 export const AuthButtons = ({
   isLoggedIn,
@@ -17,8 +17,14 @@ export const AuthButtons = ({
   return isLoggedIn ? (
     <ul>
       <li className="text-[18px] font-medium">
-        <Link href="/my/SavedBuild">
-          <button className="mr-8">My Saved Builds</button>
+        <Link href="/my/saved-build">
+          <button
+            className={`mr-8 font-serif font-semibold text-${
+              theme === "dark" ? "white" : "black"
+            }`}
+          >
+            My Saved Builds
+          </button>
         </Link>
         <button
           className={`border font-serif font-bold text-[20px] border-b-white ${buttonClass} rounded-3xl p-2 px-3`}

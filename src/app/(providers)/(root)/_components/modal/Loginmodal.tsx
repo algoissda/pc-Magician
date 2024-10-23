@@ -8,7 +8,6 @@ interface ModalProps {
   onClose: () => void;
   children: ReactNode;
 }
-//모달 페이지임!!
 
 const Modal = ({ open, onClose, children }: ModalProps) => {
   const router = useRouter();
