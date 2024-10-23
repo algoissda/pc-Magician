@@ -158,32 +158,39 @@ const CommunityBuilds = () => {
   console.log("builds", builds);
 
   return (
-    <main className="relative w-full h-full pb-8">
-      <section className="relative h-full border-t border-b border-gray-300 py-4 bg-gray-600 bg-opacity-30 px-2">
-        <div className="w-full h-full overflow-hidden max-h-[100%]">
-          {/* <div className="p-4 m-2 w-full max-w-xs flex flex-col justify-between border rounded-2xl custom-border">
-          {/* RGB 색상을 만들기 위해 커스텀 보더를 따로 만들었음 */}
-          {/* <style jsx>{`
-            .custom-border {
-              border-width: 4px;
-              border-image: linear-gradient(260deg, violet, skyblue, white) 1;
-            }
-          `}</style> */}
+    <main className="text-white">
+      <h2 className="mt-10 text-3xl font-bold ml-20">저장된 견적</h2>
+      <section className="max-h-max">
+        <div className="flex flex-wrap justify-start mt-8 mx-20">
           <BuildDetailsPanel
             selectedBuild={selectedBuild}
             theme={theme}
             onClose={() => setSelectedBuild(null)}
           />
-          <div className="grid grid-cols-4 gap-4 overflow-y-scroll max-h-[100%]">
+          <div className="grid grid-cols-4 gap-4 max-h-[100%]">
             {builds.map((build) => (
               <>
-                <BuildCard
-                  key={build.id}
-                  build={build}
-                  theme={theme}
-                  onClick={() => fetchBuildDetails(build.id)}
-                />
-                <div className="text-white">{build.id};</div>
+                <div className="p-4 m-2 w-full max-w-xs flex flex-col justify-between border-double rounded-2xl custom-border">
+                  {/* RGB 색상을 만들기 위해 커스텀 보더를 따로 만들었음 */}
+                  <style jsx>{`
+                    .custom-border {
+                      border-width: 4px;
+                      border-image: linear-gradient(
+                          260deg,
+                          violet,
+                          skyblue,
+                          white
+                        )
+                        1;
+                    }
+                  `}</style>
+                  <BuildCard
+                    key={build.id}
+                    build={build}
+                    theme={theme}
+                    onClick={() => fetchBuildDetails(build.id)}
+                  />
+                </div>
               </>
             ))}
           </div>
