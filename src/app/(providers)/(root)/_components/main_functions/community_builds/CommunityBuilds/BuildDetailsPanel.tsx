@@ -37,6 +37,13 @@ export const BuildDetailsPanel = ({
   // Generate partDetails array based on selectedBuild and productPriceMap
   const partDetails = createPartDetails(selectedBuild, productPriceMap);
 
+  const textThemeStyle = theme === "dark" ? "text-white" : "text-gray-800";
+  const backgroundThemeStyle = theme === "dark" ? "bg-[#0d1117]" : "bg-white";
+  const lineThemeStyle =
+    theme === "dark"
+      ? "linear-gradient(to right, #0ea5e9, #3730a3, #c026d3, #e11d48)"
+      : "linear-gradient(to right, #a855f7 , #6b21a8 , #3b0764 , #000000)";
+
   return (
     <div
       className={`absolute h-full inset-0 bg-black bg-opacity-50 z-40 ${
@@ -47,25 +54,19 @@ export const BuildDetailsPanel = ({
       onClick={onClose}
     >
       <div
-        className={`theme-opacity absolute right-0 top-0 w-1/2 h-full bg-${
-          theme === "dark" ? "[#0d1117]" : "white"
-        } p-6 z-50 transition-transform transform translate-x-0`}
+        className={`${backgroundThemeStyle} theme-opacity absolute right-0 top-0 w-1/2 h-full p-6 z-50 transition-all transform translate-x-0`}
         onClick={(e) => e.stopPropagation()}
       >
         <h3
-          className={`text-right font-bold mb-8 text-3xl text-${
-            theme === "dark" ? "white" : "gray-500"
-          }`}
+          className={`text-right font-bold mb-8 text-3xl ${textThemeStyle} transition-all`}
         >
           Build Details
         </h3>
         {selectedBuild && (
           <ul
-            className={`text-${
-              theme === "dark" ? "gray-100" : "gray-900"
-            } h-[80%] flex flex-col overflow-y-auto`}
+            className={`h-[80%] flex flex-col overflow-y-auto overflow-x-clip`}
           >
-            {partDetails.map((part, index) => (
+            {partDetails.map((part) => (
               <li
                 key={part.label}
                 className="relative text-lg flex flex-row py-3 pt-2 items-center flex-grow min-h-0"
@@ -73,48 +74,31 @@ export const BuildDetailsPanel = ({
                 <div className="flex flex-col w-full pr-5">
                   <div className="w-full flex flex-grow justify-between items-center">
                     <span
-                      className={`text-${
-                        theme === "dark" ? "white" : "gray-700"
-                      } pb-[2px] text-[0.95vw]`}
+                      className={`${textThemeStyle} pb-[2px] text-[0.95vw]`}
                     >
                       {part.label}
                     </span>
                     <span
-                      className={`text-${
-                        theme === "dark" ? "white" : "gray-700"
-                      } pb-[2px] text-[0.7vw]`}
+                      className={`${textThemeStyle} pb-[2px] text-[0.75vw]`}
                     >
                       {part.price ? part.price.toLocaleString() + " 원" : "N/A"}
                     </span>
                   </div>
-                  <span
-                    className={`text-${
-                      theme === "dark" ? "white" : "gray-500"
-                    } text-[0.6vw] pl-1`}
-                  >
+                  <span className={`${textThemeStyle} text-[0.65vw] pl-1`}>
                     {part.value || "N/A"}
                   </span>
                 </div>
-                {index !== partDetails.length - 1 && (
-                  <span
-                    className="absolute bottom-0 left-0 w-full h-[2px] opacity-60"
-                    style={{
-                      background:
-                        theme === "dark"
-                          ? "linear-gradient(to right, #0ea5e9, #3730a3, #c026d3, #e11d48)"
-                          : "linear-gradient(to right, #a855f7 , #6b21a8 , #3b0764 , #000000)",
-                    }}
-                  ></span>
-                )}
+                <span
+                  className="absolute bottom-0 left-0 w-[101%] h-[3px] opacity-60"
+                  style={{
+                    background: lineThemeStyle,
+                  }}
+                ></span>
               </li>
             ))}
           </ul>
         )}
-        <div
-          className={`text-right font-bold mt-4 text-3xl text-${
-            theme === "dark" ? "white" : "gray-500"
-          }`}
-        >
+        <div className={`text-right font-bold mt-4 text-3xl ${textThemeStyle}`}>
           {selectedBuild?.totalPrice?.toLocaleString()} 원
         </div>
       </div>
