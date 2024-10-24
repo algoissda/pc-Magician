@@ -34,7 +34,7 @@ function SignUpForm() {
       alert("회원가입에 성공했습니다,홈페이지로 이동합니다.");
     }
 
-    
+
     router.push("/");
   };
   return (

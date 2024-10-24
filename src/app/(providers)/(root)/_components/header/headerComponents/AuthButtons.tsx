@@ -46,10 +46,11 @@ export const AuthButtons = ({
               <p>
                 아이디가 없으신가요?&emsp;
                 <Link
+                className="text-blue-500"
                   href="/auth/sign_up"
                   onClick={() => setIsModalOpen(false)}
                 >
-                  회원가입 하러 가기
+                    회원가입 하러 가기
                 </Link>
               </p>
             </Modal>
