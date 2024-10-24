@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+import { useThemeStore } from "@/store/useStore";
 import { useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 import ReactDOM from "react-dom";
@@ -10,6 +12,9 @@ interface ModalProps {
 }
 
 const Modal = ({ open, onClose, children }: ModalProps) => {
+
+  const theme = useThemeStore((state) => state.theme)
+
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -52,6 +57,8 @@ const Modal = ({ open, onClose, children }: ModalProps) => {
     handleClickLogInButton();
   };
 
+  
+
   return ReactDOM.createPortal(
     <>
       <div
@@ -60,14 +67,20 @@ const Modal = ({ open, onClose, children }: ModalProps) => {
       >
         <div
           onClick={handleClickModalBody}
-          className="modal_body bg-white rounded-md w-full max-w-[400px] px-5 py-8"
+          className={`modal_body ${
+            theme === "dark" ? "bg-[#0d1117]" : "bg-white"
+          } rounded-md w-full max-w-[400px] px-5 py-8`}
         >
-          <h2 className="font-bold text-3xl text-center my-12">Log-In</h2>
+          <h2 className={`font-bold text-3xl text-center my-12 ${
+            theme === "dark" ? "text-white" : "text-[#0d1117]"
+          } `}>Log-In</h2>
           <form onSubmit={handleSubmit} className="flex flex-col items-center gap-y-4 max-w-sm mx-auto w-full">
             <div className="grid gap-y-1.5 w-full">
               <label
                 htmlFor="email"
-                className="text-sm font-medium text-gray-800"
+                className={`text-sm font-medium ${
+                  theme === "dark" ? "text-white" : "text-[#0d1117]"
+                } `}
               >
                 Email
               </label>
@@ -76,13 +89,17 @@ const Modal = ({ open, onClose, children }: ModalProps) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 type="email"
-                className="block border w-full px-6 py-3 rounded focus:border-black outline:none transition"
+                className={`block border w-full px-6 py-3 rounded focus:border-black outline:none transition  ${
+                  theme === "dark" ? " bg-[#0d1117] text-white" : " bg-white text-black "
+                }`}
               />
             </div>
             <div className="grid gap-y-1.5 w-full">
               <label
                 htmlFor="password"
-                className="text-sm font-medium text-gray-800"
+                className={`text-sm font-medium ${
+                  theme === "dark" ? "text-white" : "text-[#0d1117]"
+                } `}
               >
                 Password
               </label>
@@ -91,12 +108,16 @@ const Modal = ({ open, onClose, children }: ModalProps) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"
-                className="block border w-full px-6 py-3 rounded focus:border-black outline:none transition"
+                className= {`block border w-full px-6 py-3 rounded focus:border-black outline:none transition  ${
+                  theme === "dark" ? " bg-[#0d1117] text-white" : " bg-white text-black "
+                } `}
               />
             </div>
             <button
               type="submit"
-              className="border-slate-700 py-4 px-12 text-[15px] w-full font-semibold bg-black text-white"
+              className={`border-slate-700 py-4 px-12 text-[15px] w-full font-semibold ${
+                theme === "dark" ? " text-[#0d1117] bg-white" : " text-white bg-[#0d1117] "
+              } `}
             >
               Log in
             </button>
