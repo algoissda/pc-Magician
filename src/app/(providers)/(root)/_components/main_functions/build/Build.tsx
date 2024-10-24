@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useThemeStore } from "@/store/useStore";
@@ -50,6 +51,7 @@ function Build() {
     process.env.NEXT_PUBLIC_GOOGLE_API_KEY_3,
     // 더 추가 가능
   ];
+
   const partTypes: string[] = [
     "CPU",
     "Cooler",
@@ -63,6 +65,12 @@ function Build() {
   ];
 
   let currentApiKeyIndex = 0;
+  const [switchStates, setSwitchStates] = useState<Record<string, boolean>>(
+    partTypes.reduce((acc: Record<string, boolean>, partType: string) => {
+      acc[partType] = true;
+      return acc;
+    }, {})
+  );
 
   const switchApiKeyOnExhaustion = (error: any) => {
     if (error.response && error.response.status === 429) {
@@ -70,13 +78,6 @@ function Build() {
       currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.length;
     }
   };
-
-  const [switchStates, setSwitchStates] = useState<Record<string, boolean>>(
-    partTypes.reduce((acc: Record<string, boolean>, partType: string) => {
-      acc[partType] = true;
-      return acc;
-    }, {})
-  );
 
   const toggleSwitch = (partType: string): void => {
     setSwitchStates((prev) => ({
@@ -373,7 +374,8 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
   };
 
   const textThemeItemStyle = theme === "dark" ? "text-white" : "text-black";
-  const textThemeTotalPriceStyle = theme === "dark" ? "text-white" : "gray-700";
+  const textThemeTotalPriceStyle =
+    theme === "dark" ? "text-white" : "text-gray-700";
   const textThemeLeftButtonPriceStyle =
     theme === "dark"
       ? "from-sky-400 to-purple-300"
@@ -382,7 +384,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
     theme === "dark"
       ? "from-purple-300 to-sky-400"
       : "from-sky-300 to-purple-500";
-  const backgroundThemeStyle =
+  const backgroundBorderThemeStyle =
     theme === "dark"
       ? "bg-[#0d1117] border-sky-400"
       : "bg-white border-pink-500";
@@ -394,22 +396,37 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
       : builded
       ? "bg-gray-400"
       : "bg-white";
-  const blockdePanelBuildedStyle = builded
-    ? "opacity-100 pointer-events-auto"
-    : "opacity-0 pointer-events-none";
+  const blockedPanelBuildedStyle = builded
+    ? "opacity-100 pointer-events-auto "
+    : "opacity-0 pointer-events-none ";
+  const panelThemeStyle = theme === "dark" ? "bg-[#0d1117]" : "bg-white";
+  const panelOpacityThemeStyle = theme === "dark" ? "opacity-50" : "opacity-0";
+  const panelOpacityThemeStyleReverse =
+    theme !== "dark" ? "opacity-70" : "opacity-0";
+
   return (
     <>
       <main
-        className={`${backgroundThemeStyle} relative border-[1px] flex flex-row rounded-[40px] bg-opacity-40 mt-8 mx-20 h-[66vh] overflow-hidden`}
+        className={`${backgroundBorderThemeStyle} relative border-[1px] flex flex-row rounded-[40px] bg-opacity-40 mt-8 mx-20 h-[66vh] overflow-hidden`}
       >
         <div
-          className={`${blockdePanelBuildedStyle} absolute flex justify-center items-center h-full inset-0 bg-black bg-opacity-50 z-40 text-white text-6xl`}
+          className={`${blockedPanelBuildedStyle} ${panelThemeStyle} absolute flex justify-center items-center h-full inset-0 bg-opacity-50 z-40 text-white text-6xl`}
         >
-          Building...
+          <span className="z-10">Building...</span>
+
+          {/* 첫 번째 배경 이미지 */}
+          <div
+            className={`${panelOpacityThemeStyle} absolute theme-opacity top-0 inset-0 bg-cover bg-center bg-[url('https://embed.pixiv.net/spotlight.php?id=9496&lang=ko')] transition-opacity duration-800`}
+          ></div>
+
+          {/* 두 번째 배경 이미지 */}
+          <div
+            className={`${panelOpacityThemeStyleReverse} absolute theme-opacity top-0 inset-0 bg-cover transition-opacity duration-800 bg-[url('https://dengekionline.com/images/ajke/JiwT/KDLS/5KrW/9e4rP0EtSOysUm6ygoYKCuQUfT8ZK3eBEpPWpkVvoZ4n2ovhquo86m2TwCfbDRWS7nTcDzcnO8lyJ3fs_main.webp')]`}
+          ></div>
         </div>
         <article className="w-3/5 mr-0 lg:mr-4 p-4">
           <section
-            className={`${backgroundThemeStyle} border-[1px]  p-[1px] rounded-[40px] bg-opacity-40 px-2 h-full`}
+            className={`${backgroundBorderThemeStyle} border-[1px]  p-[1px] rounded-[40px] bg-opacity-40 px-2 h-full`}
           >
             <PartList
               partTypes={partTypes}
@@ -487,7 +504,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
           <div
             className={`${backgroundBuildedStyle} ${textThemeItemStyle} w-full h-full rounded-full flex items-center justify-center`}
           >
-            {saved ? "SAVED" : "SAVE"}
+            {saved ? "SAVED ✓" : "SAVE"}
           </div>
         </button>
       </footer>

@@ -46,13 +46,18 @@ export const BuildDetailsPanel = ({
 
   return (
     <div
-      className={`absolute h-full inset-0 bg-black bg-opacity-50 z-40 ${
+      className={`${backgroundThemeStyle} absolute h-full inset-0 bg-opacity-50 z-40 ${
         selectedBuild
           ? "opacity-100 pointer-events-auto"
           : "opacity-0 pointer-events-none"
       }`}
       onClick={onClose}
     >
+      <section className="absolute left-0 top-0 w-1/2 h-full">
+        <article></article>
+        <article></article>
+        <article></article>
+      </section>
       <div
         className={`${backgroundThemeStyle} theme-color absolute right-0 top-0 w-1/2 h-full p-6 z-50  transform translate-x-0`}
         onClick={(e) => e.stopPropagation()}
