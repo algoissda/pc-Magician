@@ -14,6 +14,7 @@ const CommunityBuilds = () => {
   const [selectedBuildPriceMap, setSelectedBuildPriceMap] = useState<
     any | null
   >(null); // 가격 정보 저장
+  const [visibleCards, setVisibleCards] = useState<boolean[]>([]); // BuildCard의 표시 상태 관리
   const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState<boolean>(false); // 다음 페이지가 있는지 확인
@@ -87,8 +88,24 @@ const CommunityBuilds = () => {
       // saved_builds 테이블의 데이터를 builds 테이블 형식으로 변환
       const builds = buildsData.map((entry) => entry.builds);
 
+      // 이전 데이터를 유지하지 않고 새로운 데이터를 세팅
+      setBuilds(builds);
+
+      // visibleCards를 초기화하고 애니메이션 시작
+      setVisibleCards(new Array(builds.length).fill(false));
+
+      // 지연을 주면서 하나씩 카드를 표시
+      builds.forEach((_, index) => {
+        setTimeout(() => {
+          setVisibleCards((prev) => {
+            const newState = [...prev];
+            newState[index] = true;
+            return newState;
+          });
+        }, index * 100); // 카드가 100ms 간격으로 나타나도록 설정
+      });
+
       setLoading(false);
-      setBuilds(builds); // 빌드 상태 업데이트
     } catch (error) {
       setLoading(false);
       console.error("Error fetching builds:", error.message);
@@ -152,6 +169,7 @@ const CommunityBuilds = () => {
   const handleBuildClick = async (buildId: any) => {
     try {
       setLoading(true);
+      console.log("Fetching details for buildId:", buildId); // 로그 추가
       // 선택된 빌드의 상세 정보를 가져옴
       const { data: buildDetails, error: buildDetailsError } = await supabase
         .from("builds")
@@ -159,7 +177,13 @@ const CommunityBuilds = () => {
         .eq("id", buildId)
         .single();
 
-      if (buildDetailsError) throw new Error("Error fetching build details");
+      if (buildDetailsError) {
+        throw new Error(
+          "Error fetching build details: " + buildDetailsError.message
+        );
+      }
+
+      console.log("Build details fetched:", buildDetails); // 로그 추가
 
       const productsData = await fetchProductPrices([buildDetails]);
       const buildWithPrices = calculateBuildPrice(buildDetails, productsData);
@@ -167,6 +191,7 @@ const CommunityBuilds = () => {
       setSelectedBuild(buildWithPrices); // 선택된 빌드 설정
       setSelectedBuildPriceMap(productsData); // 가격 정보 저장
       setLoading(false);
+      console.log("Selected build:", buildWithPrices); // 로그 추가
     } catch (error) {
       setLoading(false);
       console.error("Error fetching build details:", error.message);
@@ -185,11 +210,17 @@ const CommunityBuilds = () => {
 
   const nextPage = () => {
     if (hasNextPage) {
+      tabChange.current = true; //
       setPage((prev) => prev + 1);
     }
   };
 
-  const prevPage = () => setPage((prev) => Math.max(prev - 1, 1));
+  const prevPage = () => {
+    if (page > 1) {
+      tabChange.current = true; //
+      setPage((prev) => prev - 1);
+    }
+  };
 
   const textThemeStyle = theme === "dark" ? "text-white" : "text-black"; // dark 모드일 때 흰색, 아니면 검은색
   const backgroundThemeStyle = theme === "dark" ? "bg-[#0d1117]" : "bg-white";
@@ -207,8 +238,7 @@ const CommunityBuilds = () => {
           <div
             className={`${blockedPanelBuildedStyle} ${panelThemeStyle} absolute flex justify-center items-center h-full inset-0 bg-opacity-50 z-40 text-6xl`}
           >
-            <span className={`${textThemeStyle}`}>Loading...</span>{" "}
-            {/* 텍스트 색을 별도 span으로 적용 */}
+            <span className={`${textThemeStyle}`}>Loading...</span>
           </div>
           {/* BuildDetailsPanel */}
           {selectedBuild && (
@@ -221,13 +251,21 @@ const CommunityBuilds = () => {
           )}
 
           <div className="grid grid-cols-4 gap-4 overflow-y-scroll max-h-[100%] pr-2">
-            {builds.map((build) => (
-              <BuildCard
+            {builds.map((build, index) => (
+              <div
                 key={build.id}
-                build={build}
-                theme={theme}
-                onClick={() => handleBuildClick(build.id)} // 빌드 클릭 시 상세 정보 조회
-              />
+                className={`transition-all duration-500 ease-out transform ${
+                  visibleCards[index]
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-10"
+                }`}
+              >
+                <BuildCard
+                  build={build}
+                  theme={theme}
+                  onClick={() => handleBuildClick(build.id)} // 클릭 시 handleBuildClick 호출
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -236,7 +274,7 @@ const CommunityBuilds = () => {
         <button
           onClick={prevPage}
           className="px-4 py-2 bg-gray-200 rounded-lg"
-          disabled={page === 1} // 첫 페이지일 경우 비활성화
+          disabled={page === 1}
         >
           {"<"}
         </button>
@@ -248,7 +286,7 @@ const CommunityBuilds = () => {
         <button
           onClick={nextPage}
           className="px-4 py-2 bg-gray-200 rounded-lg"
-          disabled={!hasNextPage} // 다음 페이지가 없으면 비활성화
+          disabled={!hasNextPage}
         >
           {">"}
         </button>
