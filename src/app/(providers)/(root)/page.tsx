@@ -14,7 +14,7 @@ const ThemeButton = ({ isActive, onClick, text, size }: any) => {
     <section className="font-serif w-full lg:w-60 mb-4 p-[1px] bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400 rounded-full">
       <button
         onClick={onClick}
-        className={`w-full p-2 ${size} h-[50px] ${
+        className={`w-full flex items-center justify-center ${size} h-[50px] ${
           isActive ? "bg-[#ffffff]" : "bg-[#0f1113]"
         } rounded-full`}
       >
@@ -198,13 +198,13 @@ function MainPage() {
             isActive={activeTab === "Community Builds"}
             onClick={() => setActiveTab("Community Builds")}
             text="Community Builds"
-            size="text-lg sm:text-xl md:text-2xl"
+            size="text-lg sm:text-xl"
           />
           <ThemeButton
             isActive={activeTab === "Donate"}
             onClick={() => setActiveTab("Donate")}
             text="Donate"
-            size="text-base sm:text-lg md:text-xl"
+            size="text-base sm:text-lg md:text-4xl"
           />
         </header>
       </nav>
