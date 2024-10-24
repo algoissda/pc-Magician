@@ -157,17 +157,39 @@ const CommunityBuilds = () => {
 
   console.log("builds", builds);
 
+  // // 스크롤 할때 그림자 추가하는 코드임
+  // const scrollable = document.getElementById("scrollable");
+  // const shadowBottom = scrollable?.querySelector(".shadow-bottom");
+
+  // scrollable?.addEventListener("scroll", () => {
+  //   if (scrollable.scrollHeight > scrollable.clientHeight) {
+  //     // 스크롤 가능한 높이가 있는 경우에만 그림자 추가
+  //     if (
+  //       scrollable.scrollTop + scrollable.clientHeight <
+  //       scrollable.scrollHeight
+  //     ) {
+  //       shadowBottom?.classList.remove("hidden");
+  //     } else {
+  //       shadowBottom?.classList.add("hidden");
+  //     }
+  //   }
+  // });
+  // // 끝
+
   return (
-    <main className="text-white">
-      <h2 className="mt-10 text-3xl font-bold ml-20">저장된 견적</h2>
-      <section className="max-h-max">
-        <div className="flex flex-wrap justify-start mt-8 mx-20">
+    <main className="text-white ml-[3%] h-[98%] ">
+      <h2 className="mt-5 text-3xl font-bold ml-20">
+        저장된 견적 - 각 견적을 클릭하면 상세정보를 보실수 있습니다!!
+      </h2>
+      <section className="h-[90%]">
+        <div className="flex flex-wrap justify-start mt-4 ml-24 overflow-hidden hover:overflow-y-scroll transition-all ">
           <BuildDetailsPanel
             selectedBuild={selectedBuild}
             theme={theme}
             onClose={() => setSelectedBuild(null)}
+            productPriceMap={undefined}
           />
-          <div className="grid grid-cols-4 gap-4 max-h-[100%]">
+          <div className="grid grid-cols-4 gap-4 box-content h-[770px]">
             {builds.map((build) => (
               <>
                 <div className="p-4 m-2 w-full max-w-xs flex flex-col justify-between border-double rounded-2xl custom-border">
