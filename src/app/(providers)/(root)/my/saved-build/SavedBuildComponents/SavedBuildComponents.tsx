@@ -54,7 +54,7 @@ export const BuildDetailsPanel = ({
       onClick={onClose}
     >
       <main
-        className={`${backgroundThemeStyle} theme-color absolute right-0 top-[10.6%] w-1/2 h-[90%] p-6 z-50 mr-[25%]  transform translate-x-0`}
+        className={`${backgroundThemeStyle}  theme-color absolute right-0 top-[10.6%] w-1/2 h-[90%] p-5 z-50 mr-[25%]  transform translate-x-0`}
         onClick={(e) => e.stopPropagation()}
       >
         <h3
@@ -66,7 +66,7 @@ export const BuildDetailsPanel = ({
         <div className="여기에 요소 다담음">
           {selectedBuild && (
             <ul
-              className={`h-[80%] flex flex-col overflow-y-auto overflow-x-clip`}
+              className={`h-[50%] flex flex-col overflow-y-auto overflow-x-clip`}
             >
               {partDetails.map((part) => (
                 <li
@@ -163,6 +163,7 @@ export const BuildCard = ({ build, theme, onClick }) => {
           theme === "dark" ? "white" : "black"
         }`}
       >
+        <p className="text-sm">생성한 날짜 : {build.created_at}</p>
         {build.totalPrice.toLocaleString()} 원
       </footer>
     </article>
