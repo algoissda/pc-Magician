@@ -24,6 +24,21 @@ const CommunityBuilds = () => {
 
   const tabChange = useRef(true); // useRef로 tabChange 상태 관리
 
+  // 로그인/로그아웃 상태를 감지하는 함수
+  const listenForAuthChanges = () => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+          tabChange.current = true;
+          console.log(`Auth state changed: ${event}`); // 로그인/로그아웃 감지 시 로그 추가
+        }
+      }
+    );
+
+    // authListener 대신 직접 반환된 함수 사용
+    return authListener?.subscription; // 구독 취소 함수 반환
+  };
+
   // 빌드를 가져오는 함수
   const fetchBuilds = async (pageNumber: number) => {
     try {
@@ -208,16 +223,26 @@ const CommunityBuilds = () => {
     }
   }, [activeTab, page]);
 
+  useEffect(() => {
+    // 컴포넌트가 마운트될 때 로그인/로그아웃 상태 감지
+    const unsubscribeAuthListener = listenForAuthChanges();
+
+    // 컴포넌트가 언마운트될 때 리스너 정리
+    return () => {
+      unsubscribeAuthListener?.unsubscribe?.(); // 구독 취소
+    };
+  }, []);
+
   const nextPage = () => {
     if (hasNextPage) {
-      tabChange.current = true; //
+      tabChange.current = true;
       setPage((prev) => prev + 1);
     }
   };
 
   const prevPage = () => {
     if (page > 1) {
-      tabChange.current = true; //
+      tabChange.current = true;
       setPage((prev) => prev - 1);
     }
   };
