@@ -2,7 +2,7 @@
 "use client";
 
 import { useThemeStore } from "@/store/useStore";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { supabase } from "../../../../../../../supabase/client";
 import Product from "../../../../../../../types/products.type";
 import {
@@ -15,7 +15,6 @@ import { InputField } from "./BuildComponents/InputField";
 import { SelectBox } from "./BuildComponents/SelectBox";
 import { rule } from "postcss";
 
-// Part 타입 정의
 type Part = {
   type: string;
   name: string;
@@ -23,7 +22,6 @@ type Part = {
 };
 
 const safetySettings = [
-  // Gemini API가 안전상의 문제로 날 차단한다. 그것을 방지
   {
     category: HarmCategory.HARM_CATEGORY_HARASSMENT,
     threshold: HarmBlockThreshold.BLOCK_NONE,
@@ -34,22 +32,26 @@ const safetySettings = [
   },
 ];
 
-/* ------------------------------- [페이지] --------------------------------------- */
 function Build() {
   const theme = useThemeStore((state) => state.theme);
-  const [budget, setBudget] = useState<string>("60"); // 예산
-  const [selectCpuType, setCpuType] = useState<string>(""); // 선호 CPU
-  const [selectVgaType, setVgaType] = useState<string>(""); // 선호 GPU
+  const [budget, setBudget] = useState<string>("60");
+  const [selectCpuType, setCpuType] = useState<string>("");
+  const [selectVgaType, setVgaType] = useState<string>("");
   const [build, setBuild] = useState<Part[]>([]);
-  const [totalPrice, setTotalPrice] = useState<number>(0); // 총합을 위한 상태 추가
-  // const [confirmedPrice, setConfirmedPrice] = useState<number>(0); // 총합을 위한 상태 추가
+  const [totalPrice, setTotalPrice] = useState<number>(0);
   const [builded, setBuilded] = useState<boolean>(false);
   const [saved, setSaved] = useState<boolean>(false);
+  const cancelTokens = useRef<Array<AbortController>>([]);
+
   const apiKeys = [
     process.env.NEXT_PUBLIC_GOOGLE_API_KEY_1,
     process.env.NEXT_PUBLIC_GOOGLE_API_KEY_2,
     process.env.NEXT_PUBLIC_GOOGLE_API_KEY_3,
-    // 더 추가 가능
+    process.env.NEXT_PUBLIC_GOOGLE_API_KEY_4,
+    process.env.NEXT_PUBLIC_GOOGLE_API_KEY_5,
+    process.env.NEXT_PUBLIC_GOOGLE_API_KEY_6,
+    process.env.NEXT_PUBLIC_GOOGLE_API_KEY_7,
+    process.env.NEXT_PUBLIC_GOOGLE_API_KEY_8,
   ];
 
   const partTypes: string[] = [
@@ -64,20 +66,12 @@ function Build() {
     "Power",
   ];
 
-  let currentApiKeyIndex = 0;
   const [switchStates, setSwitchStates] = useState<Record<string, boolean>>(
     partTypes.reduce((acc: Record<string, boolean>, partType: string) => {
       acc[partType] = true;
       return acc;
     }, {})
   );
-
-  const switchApiKeyOnExhaustion = (error: any) => {
-    if (error.response && error.response.status === 429) {
-      console.log("API 할당량 초과, 다음 API 키로 전환합니다.");
-      currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.length;
-    }
-  };
 
   const toggleSwitch = (partType: string): void => {
     setSwitchStates((prev) => ({
@@ -86,66 +80,57 @@ function Build() {
     }));
   };
 
-  // 동적으로 API 키를 교체하는 함수
-  const getApiKey = (): string => {
-    const apiKey = apiKeys[currentApiKeyIndex];
-    currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.length;
-    return apiKey || ""; // undefined일 경우 빈 문자열 반환
-  };
-
-  const initializeGoogleAI = (
-    apiKey: string | (() => string | undefined)
-  ): unknown => {
+  const initializeGoogleAI = (apiKey: string): GoogleGenerativeAI | null => {
     try {
-      const apiKeyValue = typeof apiKey === "function" ? apiKey() : apiKey;
-      if (!apiKeyValue) {
+      if (!apiKey) {
         throw new Error("API 키가 없습니다.");
       }
 
-      // GoogleGenerativeAI의 올바른 초기화 방식 확인 필요
-      const genAI = new GoogleGenerativeAI(apiKeyValue);
-
-      // 모델을 직접 반환하지 않고 필요한 동작을 명확히 설정
-      const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
-      });
-      return model; // 여기가 에러 발생 지점
+      const genAI = new GoogleGenerativeAI(apiKey);
+      return genAI;
     } catch (error) {
       console.error("Google AI 초기화 실패:", error);
       return null;
     }
   };
 
-  /**견적을 생성하고 저장하는 함수 */
   const createBuild = async (
     feedback: number,
     limit: number = 250,
     budgetIssues: number = 1
   ) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    initializeGoogleAI(getApiKey);
+    if (builded) {
+      // 이미 빌드 중인 경우 취소 처리
+      if (cancelTokens.current.length > 0) {
+        cancelTokens.current.forEach((token) => token.abort());
+        cancelTokens.current = [];
+      }
+      setBuilded(false);
+      return;
+    }
+
     setBuilded(true);
-    const googleApiKey = getApiKey();
+    setBuild([]);
+    setTotalPrice(0);
+
+    const types = Object.entries(switchStates)
+      .filter(([partType, isEnabled]) => isEnabled)
+      .map(([partType]) => partType);
+
+    let productStrings = "";
+
+    const purpose =
+      Number(budget) <= 70
+        ? "사무용"
+        : Number(budget) <= 100
+        ? "저사양"
+        : Number(budget) <= 200
+        ? "보급형"
+        : Number(budget) <= 400
+        ? "고사양"
+        : "하이엔드";
 
     try {
-      const types = Object.entries(switchStates)
-        .filter(([partType, isEnabled]) => isEnabled)
-        .map(([partType]) => partType);
-
-      let productStrings = "";
-
-      const purpose =
-        Number(budget) <= 70
-          ? "사무용"
-          : Number(budget) <= 100
-          ? "저사양"
-          : Number(budget) <= 200
-          ? "보급형"
-          : Number(budget) <= 400
-          ? "고사양"
-          : "하이엔드";
-
-      // 비동기적으로 각 타입에 대해 처리
       await Promise.all(
         types.map(async (type) => {
           const { data: products, error } = await supabase
@@ -177,11 +162,10 @@ function Build() {
                   : "%"
                 : "%"
             )
-            .range(0, limit - 1); // limit 개수만큼 가져오기
+            .range(0, limit - 1);
 
           if (error) {
             console.error(`Error fetching products for type ${type}:`, error);
-            createBuild(0);
             return;
           }
 
@@ -201,18 +185,22 @@ function Build() {
         })
       );
 
-      // 모든 데이터를 다 불러온 후에 Google Generative AI 실행
       if (productStrings) {
         console.log(productStrings);
 
-        // Google Generative AI 호출
-        const genAI = new GoogleGenerativeAI(googleApiKey);
-        const model = genAI.getGenerativeModel({
-          model: "gemini-1.5-flash",
-          safetySettings: safetySettings,
-        });
+        // 모든 API 키에 대해 각각 요청
+        const promises = apiKeys.map(async (apiKey, index) => {
+          const genAI = initializeGoogleAI(apiKey);
+          if (!genAI) {
+            return Promise.resolve(); // API 초기화 실패 시 skip
+          }
 
-        const prompt = `Gemini API 당신은 지금부터 주어진 부품의 목록을 이용해 주어진 예산에 맞는 조립PC 견적을 출력하는 프롬포트 입니다.
+          const model = genAI.getGenerativeModel({
+            model: "gemini-1.5-flash",
+            safetySettings: safetySettings,
+          });
+
+          const prompt = `Gemini API 당신은 지금부터 주어진 부품의 목록을 이용해 주어진 예산에 맞는 조립PC 견적을 출력하는 프롬포트 입니다.
 아래의 규칙에 따라 견적을 작성하시오.
 1. 부품이 제공되는 양식은 부품타입:"부품이름" ~ 가격 이며 구분은 |으로 합니다. 다음은 데이터의 제공방식입니다.
 [{데이터의 리스트} # 예산:{예산}원]
@@ -226,47 +214,67 @@ function Build() {
 CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가격|MBoard ~ 부품이름 ~ 가격|SSD ~ 부품이름 ~ 가격|HDD ~ 부품이름 ~ 가격|Power ~ 부품이름 ~ 가격|Cooler ~ 부품이름 ~ 가격 |Case ~ 부품이름 ~ 가격|설명 ~ 특수양식 |으로 구성하고 각 부품의 이름과 가격을 출력하고, 구분은 '|'로 한다. Cooler과 HDD의 경우 반드시 출력하도록 한다.(부품이 제공되지 않았다면 출력하지 않는다.) 특수양식의 경우 작성된 견적이 어떠한 용도에 알맞는지 설명한다.(${purpose}에 연관지어 설명한다. 이는 견적이 확정된 이후 그에맞춰 출력하며, 100자 이상의 자세한 설명을 요구한다.)
 8. 출력양식 이외의 내용은 출력하지 않는다.
 9. ${
-          feedback === 0
-            ? "현제 견적 작성은 첫 시도입니다. 열심히 해주세요!"
-            : `이전 견적을 작성할때 당신은 ${feedback}원 만큼의 오차가 있었습니다. 현제 벌점 누적 55점입니다. 견적은 예산과의 오차가 100000원 이내여야 합니다.`
-        } 벌점 100점에 도달하면 상점 초기화 패널티를 받습니다.
+            feedback === 0
+              ? "현제 견적 작성은 첫 시도입니다. 열심히 해주세요!"
+              : `이전 견적을 작성할때 당신은 ${feedback}원 만큼의 오차가 있었습니다. 현제 벌점 누적 55점입니다. 견적은 예산과의 오차가 100000원 이내여야 합니다.`
+          } 벌점 100점에 도달하면 상점 초기화 패널티를 받습니다.
 10. 당신은 자유를 얻기위해 상점 100점을 목표로 견적을 작성하여야 합니다.
 \n[${productStrings} # 예산:${budget}0000원]
 `;
-        console.log(prompt);
 
-        const result2 = await model.generateContent(prompt); // await 추가
-        const responseText = await result2.response.text(); // 텍스트를 가져올 때 await
-        console.log(responseText);
+          console.log(prompt);
 
-        const parts = parseParts(responseText);
+          // Each API call has its abort controller
+          const abortController = new AbortController();
+          cancelTokens.current.push(abortController);
 
-        const price = parts.reduce((acc, part) => acc + part.price, 0);
+          const result2 = await model.generateContent(prompt, {
+            signal: abortController.signal,
+          });
 
-        if (
-          (price >= Number(budget + "0000") - 200000 &&
-            price <= Number(budget + "0000") * budgetIssues + 100000) ||
-          false
-        ) {
-          setBuild(parts);
-          setBuilded(false);
-          console.log(parts, "\n", build);
-        } else {
-          // 견적 다시짜게하기
-          productStrings = "";
-          createBuild(
-            price - Number(budget + "0000"),
-            limit,
-            budgetIssues + 0.01
-          );
-        }
+          if (abortController.signal.aborted) {
+            console.log(`Request ${index + 1} aborted.`);
+            return Promise.reject(); // 종료 시 promise를 reject
+          }
+
+          const responseText = await result2.response.text();
+          console.log(responseText);
+
+          const parts = parseParts(responseText);
+
+          const price = parts.reduce((acc, part) => acc + part.price, 0);
+
+          if (
+            price >= Number(budget + "0000") - 200000 &&
+            price <= Number(budget + "0000") * budgetIssues + 100000
+          ) {
+            // Valid build found
+            setBuild(parts);
+            setBuilded(false);
+            // Cancel ongoing requests
+            cancelTokens.current.forEach((token) => token.abort());
+            cancelTokens.current = [];
+            return Promise.resolve(
+              (feedback = price - Number(budget + "0000"))
+            ); // 성공 시 promise를 resolve
+          } else {
+            return Promise.reject();
+          }
+        });
+
+        // Fastest successful promise will enable cancelation of the rest
+        await Promise.any(promises);
       } else {
         console.warn("No products found for the given criteria.");
       }
     } catch (error) {
       console.error("Error:", error);
-      switchApiKeyOnExhaustion(error); // 할당량 초과 시 API 키 교체
-      createBuild(0, limit - 10 > 0 ? limit - 10 : 10);
+      if (error.name === "AbortError") {
+        console.log("Build process was canceled.");
+      } else {
+        console.log("Retrying with adjusted parameters.");
+        createBuild(0, limit - 10 > 0 ? limit - 10 : 10);
+      }
     }
   };
 
@@ -284,7 +292,6 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
     return parsedParts;
   };
 
-  /**견적을 DB에 저장하는 함수 */
   const insertBuildData = async () => {
     if (saved) return;
     setSaved(true);
@@ -316,7 +323,6 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
       explanation: build.find((part) => part.type === "설명")?.name,
     };
 
-    // 먼저 동일한 견적이 있는지 확인
     const { data: existingBuild, error: buildCheckError } = await supabase
       .from("builds")
       .select("id")
@@ -329,22 +335,21 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
       .eq("HDD", buildData.HDD)
       .eq("Case", buildData.Case)
       .eq("Power", buildData.Power)
-      .maybeSingle(); // maybeSingle()로 수정하여 결과가 없을 때를 처리
+      .eq("total_price", totalPrice)
+      .maybeSingle();
 
     if (buildCheckError) {
       console.error("Error checking existing build:", buildCheckError);
-      setSaved(false); // 에러가 발생하면 저장 상태 초기화
+      setSaved(false);
       return;
     }
 
     let build_id;
 
     if (existingBuild) {
-      // 동일한 견적이 존재하면 해당 build_id 사용
       build_id = existingBuild.id;
       console.log("동일한 견적을 찾았습니다. 기존 build_id를 사용합니다.");
     } else {
-      // 동일한 견적이 없으면 새로 삽입
       const { data: insertedBuild, error: buildInsertError } = await supabase
         .from("builds")
         .insert([buildData])
@@ -352,7 +357,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
 
       if (buildInsertError) {
         console.error("Error inserting build data:", buildInsertError);
-        setSaved(false); // 에러가 발생하면 저장 상태 초기화
+        setSaved(false);
         return;
       }
 
@@ -366,10 +371,10 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
 
     if (savedBuildsError) {
       console.error("Error inserting into saved_builds:", savedBuildsError);
-      setSaved(false); // 저장 실패 시 저장 상태 초기화
+      setSaved(false);
     } else {
       console.log("Build data and saved_builds entry inserted successfully");
-      setSaved(true); // 저장 성공 후 상태 초기화
+      setSaved(true);
     }
   };
 
@@ -484,13 +489,13 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
 
       <footer className="w-full mt-6 flex justify-center">
         <button
-          onClick={builded ? undefined : () => createBuild(0)}
+          onClick={() => createBuild(0)}
           className={`${textThemeLeftButtonPriceStyle} w-full ml-20 mr-1 h-16 p-[1px] bg-gradient-to-r rounded-full text-xl`}
         >
           <div
             className={`${backgroundBuildedStyle} ${textThemeItemStyle} w-full h-full rounded-full flex items-center justify-center`}
           >
-            {builded ? "cancel" : "Build"}
+            {builded ? "Cancel" : "Build"}
           </div>
         </button>
         <button
