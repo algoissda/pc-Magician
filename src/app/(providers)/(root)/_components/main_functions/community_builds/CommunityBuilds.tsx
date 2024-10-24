@@ -23,14 +23,21 @@ const CommunityBuilds = () => {
 
   const fetchBuilds = async () => {
     try {
-      // 사용자 정보를 가져와서 userId 추출
-      const { data: userData, error: userError } =
-        await supabase.auth.getSession();
-      console.log("user::", userData);
+      // 세션 정보를 가져옴
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        throw new Error("Error fetching session: " + sessionError.message);
+      }
+
       let userId = null;
 
-      if (!userError && userData?.session?.user.id) {
-        userId = userData.session?.user.id;
+      // 세션이 있을 경우 사용자 ID 추출
+      if (session != null) {
+        userId = session.user.id;
       }
 
       // saved_builds와 builds를 조인하여 빌드 데이터를 가져옴 (userId 제외)
@@ -38,6 +45,7 @@ const CommunityBuilds = () => {
         .from("saved_builds")
         .select(`builds:build_id(*), uid`);
 
+      // 로그인된 사용자의 빌드를 제외하는 조건 추가 (userId가 존재할 때만)
       if (userId !== null) {
         query = query.neq("uid", userId); // 로그인한 사용자의 빌드를 제외
       }
@@ -48,7 +56,7 @@ const CommunityBuilds = () => {
         throw new Error("Error fetching builds: " + buildsError.message);
       }
 
-      if (!buildsData?.length) {
+      if (!buildsData.length) {
         return;
       }
 
@@ -60,9 +68,8 @@ const CommunityBuilds = () => {
       );
 
       setBuilds(buildsWithPrices); // 빌드 상태 업데이트
-      console.log("1111111111111", builds);
     } catch (error) {
-      console.error(error.message);
+      console.error("Error fetching builds:", error.message);
     }
   };
 
@@ -164,9 +171,14 @@ const CommunityBuilds = () => {
   const nextPage = () => setPage((prev) => prev + 1);
   const prevPage = () => setPage((prev) => Math.max(prev - 1, 1));
 
+  const textThemeStyle = theme ? "text-white" : "text-black";
+  const backgroundThemeStyle = theme === "dark" ? "bg-[#0d1117]" : "bg-white";
+
   return (
     <div className="relative w-full h-full pb-8">
-      <section className="relative h-full border-t border-b border-gray-300 py-4 bg-gray-600 bg-opacity-30 px-2">
+      <section
+        className={`${backgroundThemeStyle} relative h-full border-t border-b border-gray-300 py-4 bg-opacity-30 px-2`}
+      >
         <div className="w-full h-full overflow-hidden max-h-[100%]">
           <BuildDetailsPanel
             selectedBuild={selectedBuild}
@@ -174,7 +186,7 @@ const CommunityBuilds = () => {
             theme={theme}
             onClose={() => setSelectedBuild(null)}
           />
-          <div className="grid grid-cols-4 gap-4 overflow-y-scroll max-h-[100%]">
+          <div className="grid grid-cols-4 gap-4 overflow-y-scroll max-h-[100%] pr-2">
             {builds
               .slice((page - 1) * buildsPerPage, page * buildsPerPage)
               .map((build) => (
@@ -188,18 +200,17 @@ const CommunityBuilds = () => {
           </div>
         </div>
       </section>
-      <nav className="flex justify-center mt-4">
-        <button
-          onClick={prevPage}
-          className="px-4 py-2 bg-gray-200 rounded-l-lg"
-        >
-          이전 페이지
+      <nav className="flex justify-between mt-4 w-[20%] mx-auto">
+        <button onClick={prevPage} className="px-4 py-2 bg-gray-200 rounded-lg">
+          {"<"}
         </button>
-        <button
-          onClick={nextPage}
-          className="px-4 py-2 bg-gray-200 rounded-r-lg"
+        <span
+          className={`${textThemeStyle} w-3 flex justify-center items-center`}
         >
-          다음 페이지
+          {page}
+        </span>
+        <button onClick={nextPage} className="px-4 py-2 bg-gray-200 rounded-lg">
+          {">"}
         </button>
       </nav>
     </div>

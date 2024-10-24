@@ -93,7 +93,9 @@ const ThemeImage = ({ theme, mouseX, mouseY }: any) => {
         alt=""
         style={{ transform: `translate(${moveX}px, ${moveY}px)` }}
         className={`absolute inset-0 h-full transform transition-transform duration-500 ease-in-out ${
-          theme !== "dark" ? "left-[-5%] opacity-100" : "left-[-100%] opacity-0"
+          theme !== "dark"
+            ? "left-[-5%] opacity-100 "
+            : "left-[-100%] opacity-0 "
         } pointer-events-none blur-mask`}
       />
       <img
@@ -103,7 +105,7 @@ const ThemeImage = ({ theme, mouseX, mouseY }: any) => {
         style={{ transform: `translate(${moveX}px, ${moveY}px)` }}
         className={`absolute inset-0 h-full transform transition-transform duration-500 ease-in-out ${
           theme === "dark"
-            ? "left-[-20%] opacity-70 "
+            ? "left-[-20%] opacity-100 "
             : "left-[-100%] opacity-0 "
         } pointer-events-none blur-mask`}
       />
