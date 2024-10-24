@@ -1,12 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { useActiveStore } from "@/store/useActiveTab";
 import { useThemeStore } from "@/store/useStore";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import Build from "./_components/main_functions/build/Build";
 import CommunityBuilds from "./_components/main_functions/community_builds/CommunityBuilds";
 import ViewBuildsByPrice from "./_components/main_functions/view_builds_by_price/page";
-import { useActiveStore } from "@/store/useActiveTab";
 
 // 버튼 컴포넌트화
 const ThemeButton = ({ isActive, onClick, text, size }: any) => {
@@ -209,7 +209,10 @@ function MainPage() {
         </header>
       </nav>
       <main className="relative flex-grow p-5 h-[90%] z-10 overflow-hidden">
-        {renderFormContent()}
+        <div className="flex w-full">
+          {renderFormContent()}
+        </div>
+
       </main>
     </div>
   );
