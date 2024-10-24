@@ -42,7 +42,7 @@ function Build() {
   const [selectVgaType, setVgaType] = useState<string>(""); // 선호 GPU
   const [build, setBuild] = useState<Part[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0); // 총합을 위한 상태 추가
-  const [confirmedPrice, setConfirmedPrice] = useState<number>(0); // 총합을 위한 상태 추가
+  // const [confirmedPrice, setConfirmedPrice] = useState<number>(0); // 총합을 위한 상태 추가
   const [builded, setBuilded] = useState<boolean>(false);
   const [saved, setSaved] = useState<boolean>(false);
   const apiKeys = [
@@ -135,7 +135,7 @@ function Build() {
       let productStrings = "";
 
       const purpose =
-        Number(budget) <= 90
+        Number(budget) <= 70
           ? "사무용"
           : Number(budget) <= 100
           ? "저사양"
@@ -159,7 +159,7 @@ function Build() {
                 ? selectCpuType === "Intel"
                   ? "%소켓1700%"
                   : selectCpuType === "AMD"
-                  ? "%소켓AM5%"
+                  ? "%소켓AM%"
                   : purpose === "사무용" || purpose === "보급형"
                   ? "%소켓1700%"
                   : "%"
@@ -216,7 +216,7 @@ function Build() {
 아래의 규칙에 따라 견적을 작성하시오.
 1. 부품이 제공되는 양식은 부품타입:"부품이름" ~ 가격 이며 구분은 |으로 합니다. 다음은 데이터의 제공방식입니다.
 [{데이터의 리스트} # 예산:{예산}원]
-2. 최대한 좋은 부품을 선택하되 예산에 맞게 선택하시오.
+2. 최대한 좋은 부품을 선택하되 예산에 맞게 선택하시오. (라이젠 4세대도 좀 써라)
 예를들어 AMD의 경우 7900X보단 7800X3D를 선택 GPU의 경우 예산이 충분할때 4060보단 4060Ti를, 4070보단 4070SUPPER을 4070Ti보단 4070TiSUPPER과 같은 방식이다. 하지만 이 선택지는 모두 예산을 초과하지 않는 선에서의 선택지이다.
 3. 부품을 출력할때는 무작위성을 부여합니다. CPU를 선택할때는 인텔CPU는 60% AMD CPU는 40%입니다. VGA를 선택할때도 NVIDIA는 70% AMD는 30%로 설정합니다.
 4. 출력하는 각 부품의 이름과 가격은 제공된 부품의 이름과 가격이 동일해야 합니다.
@@ -413,13 +413,9 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
           className={`${blockedPanelBuildedStyle} ${panelThemeStyle} absolute flex justify-center items-center h-full inset-0 bg-opacity-50 z-40 text-white text-6xl`}
         >
           <span className="z-10">Building...</span>
-
-          {/* 첫 번째 배경 이미지 */}
           <div
             className={`${panelOpacityThemeStyle} absolute theme-opacity top-0 inset-0 bg-cover bg-center bg-[url('https://embed.pixiv.net/spotlight.php?id=9496&lang=ko')] transition-opacity duration-800`}
           ></div>
-
-          {/* 두 번째 배경 이미지 */}
           <div
             className={`${panelOpacityThemeStyleReverse} absolute theme-opacity top-0 inset-0 bg-cover transition-opacity duration-800 bg-[url('https://dengekionline.com/images/ajke/JiwT/KDLS/5KrW/9e4rP0EtSOysUm6ygoYKCuQUfT8ZK3eBEpPWpkVvoZ4n2ovhquo86m2TwCfbDRWS7nTcDzcnO8lyJ3fs_main.webp')]`}
           ></div>
@@ -478,7 +474,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
             <div
               className={`${textThemeTotalPriceStyle} mt-auto text-4xl text-right`}
             >
-              {totalPrice
+              {!builded && totalPrice
                 ? `${totalPrice.toLocaleString()} 원`
                 : "XXX,XXX,XXX 원"}
             </div>
@@ -494,7 +490,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
           <div
             className={`${backgroundBuildedStyle} ${textThemeItemStyle} w-full h-full rounded-full flex items-center justify-center`}
           >
-            {builded ? "Building..." : "Build"}
+            {builded ? "cancel" : "Build"}
           </div>
         </button>
         <button

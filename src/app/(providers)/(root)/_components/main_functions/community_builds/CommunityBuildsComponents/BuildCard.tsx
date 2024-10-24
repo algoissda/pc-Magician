@@ -1,13 +1,3 @@
-/*
-
-
-
-
-
-
-
-*/
-
 export const BuildCard = ({ build, theme, onClick }) => {
   const textThemeH4Style = theme === "dark" ? "text-white" : "text-black";
   const textThemeStyle = theme === "dark" ? "text-gray-200" : "text-gray-900";
@@ -57,7 +47,7 @@ export const BuildCard = ({ build, theme, onClick }) => {
           theme === "dark" ? "white" : "black"
         }`}
       >
-        {build.totalPrice.toLocaleString()} 원
+        {build.total_price.toLocaleString()} 원
       </footer>
     </article>
   );
