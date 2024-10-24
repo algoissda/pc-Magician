@@ -142,7 +142,7 @@ function MainPage() {
         </div>
         <div
           className={`absolute transition-all duration-700 top-0 ${
-            activeTab === "View Builds by Price" ? "left-0" : "left-[400%]"
+            activeTab === "Donate" ? "left-0" : "left-[400%]"
           }`}
         >
           <ViewBuildsByPrice />
@@ -195,24 +195,21 @@ function MainPage() {
             size="text-lg sm:text-xl md:text-2xl lg:text-3xl"
           />
           <ThemeButton
-            isActive={activeTab === "View Builds by Price"}
-            onClick={() => setActiveTab("View Builds by Price")}
-            text="View Builds by Price"
-            size="text-base sm:text-lg md:text-xl"
-          />
-          <ThemeButton
             isActive={activeTab === "Community Builds"}
             onClick={() => setActiveTab("Community Builds")}
             text="Community Builds"
             size="text-lg sm:text-xl md:text-2xl"
           />
+          <ThemeButton
+            isActive={activeTab === "Donate"}
+            onClick={() => setActiveTab("Donate")}
+            text="Donate"
+            size="text-base sm:text-lg md:text-xl"
+          />
         </header>
       </nav>
       <main className="relative flex-grow p-5 h-[90%] z-10 overflow-hidden">
-        <div className="flex w-full">
-          {renderFormContent()}
-        </div>
-
+        <div className="flex w-full">{renderFormContent()}</div>
       </main>
     </div>
   );
