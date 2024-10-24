@@ -10,20 +10,25 @@ import { BuildDetailsPanel } from "./CommunityBuildsComponents/BuildDetailsPanel
 
 const CommunityBuilds = () => {
   const [builds, setBuilds] = useState<any[]>([]);
-  const [selectedBuild, setSelectedBuild] = useState<any | null>(null);
+  const [selectedBuild, setSelectedBuild] = useState<any | null>(null); // 선택된 빌드를 저장
   const [selectedBuildPriceMap, setSelectedBuildPriceMap] = useState<
     any | null
   >(null); // 가격 정보 저장
+  const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState(1);
-  const buildsPerPage = 100;
+  const [hasNextPage, setHasNextPage] = useState<boolean>(false); // 다음 페이지가 있는지 확인
+  const buildsPerPage = 24; // 한 페이지에 표시할 빌드 수
   const theme = useThemeStore((state) => state.theme);
   const activeTab = useActiveStore((state) => state.activeTab);
 
   const tabChange = useRef(true); // useRef로 tabChange 상태 관리
 
-  const fetchBuilds = async () => {
+  // 빌드를 가져오는 함수
+  const fetchBuilds = async (pageNumber: number) => {
     try {
-      // 세션 정보를 가져옴
+      setLoading(true);
+
+      // 세션에서 사용자 정보를 가져옴
       const {
         data: { session },
         error: sessionError,
@@ -35,17 +40,21 @@ const CommunityBuilds = () => {
 
       let userId = null;
 
-      // 세션이 있을 경우 사용자 ID 추출
-      if (session != null) {
+      // 로그인된 사용자 ID 추출
+      if (session && session.user) {
         userId = session.user.id;
       }
 
-      // saved_builds와 builds를 조인하여 빌드 데이터를 가져옴 (userId 제외)
       let query = supabase
         .from("saved_builds")
-        .select(`builds:build_id(*), uid`);
+        .select("builds:build_id(*), uid")
+        .order("created_at", { ascending: false }) // 최신순으로 정렬
+        .range(
+          (pageNumber - 1) * buildsPerPage,
+          pageNumber * buildsPerPage - 1
+        ); // 페이지 범위 지정 (24개씩)
 
-      // 로그인된 사용자의 빌드를 제외하는 조건 추가 (userId가 존재할 때만)
+      // 로그인된 사용자의 빌드를 제외하는 조건 추가
       if (userId !== null) {
         query = query.neq("uid", userId); // 로그인한 사용자의 빌드를 제외
       }
@@ -57,22 +66,36 @@ const CommunityBuilds = () => {
       }
 
       if (!buildsData.length) {
+        setLoading(false);
         return;
       }
 
-      // products 테이블에서 필요한 부품 가격 정보를 조회
-      const builds = buildsData.map((entry) => entry.builds); // 조인된 빌드 정보만 추출
-      const products = await fetchProductPrices(builds); // 부품 가격 조회
-      const buildsWithPrices = builds.map((build) =>
-        calculateBuildPrice(build, products)
-      );
+      // 다음 페이지 데이터 확인을 위한 추가 요청 (다음 페이지 데이터가 있는지 확인)
+      const nextPageQuery = supabase
+        .from("saved_builds")
+        .select("builds:build_id(*), uid")
+        .order("created_at", { ascending: false })
+        .range(pageNumber * buildsPerPage, pageNumber * buildsPerPage); // 다음 페이지의 첫 번째 데이터만 확인
 
-      setBuilds(buildsWithPrices); // 빌드 상태 업데이트
+      if (userId !== null) {
+        nextPageQuery.neq("uid", userId);
+      }
+
+      const { data: nextPageData } = await nextPageQuery;
+      setHasNextPage(nextPageData && nextPageData.length > 0);
+
+      // saved_builds 테이블의 데이터를 builds 테이블 형식으로 변환
+      const builds = buildsData.map((entry) => entry.builds);
+
+      setLoading(false);
+      setBuilds(builds); // 빌드 상태 업데이트
     } catch (error) {
+      setLoading(false);
       console.error("Error fetching builds:", error.message);
     }
   };
 
+  // 제품 가격 정보를 조회하는 함수
   const fetchProductPrices = async (buildsData: any[]) => {
     const productNames = buildsData
       .flatMap((build) => [
@@ -105,23 +128,9 @@ const CommunityBuilds = () => {
     }, {});
   };
 
+  // 빌드의 가격을 계산하는 함수
   const calculateBuildPrice = (
-    build:
-      | {}[]
-      | {
-          Case: string | null;
-          Cooler: string;
-          CPU: string;
-          created_at: string;
-          explanation: string | null;
-          HDD: string | null;
-          id: number;
-          MBoard: string;
-          Power: string;
-          RAM: string;
-          SSD: string | null;
-          VGA: string;
-        },
+    build,
     productPriceMap: { [x: string]: any }
   ) => {
     const totalPrice = [
@@ -139,40 +148,55 @@ const CommunityBuilds = () => {
     return { ...build, totalPrice };
   };
 
-  const fetchBuildDetails = async (buildId: any) => {
+  // 상세 정보를 클릭했을 때 빌드 상세 정보를 가져오는 함수
+  const handleBuildClick = async (buildId: any) => {
     try {
+      setLoading(true);
+      // 선택된 빌드의 상세 정보를 가져옴
       const { data: buildDetails, error: buildDetailsError } = await supabase
         .from("builds")
         .select("*")
         .eq("id", buildId)
         .single();
+
       if (buildDetailsError) throw new Error("Error fetching build details");
 
       const productsData = await fetchProductPrices([buildDetails]);
       const buildWithPrices = calculateBuildPrice(buildDetails, productsData);
 
-      setSelectedBuild(buildWithPrices);
+      setSelectedBuild(buildWithPrices); // 선택된 빌드 설정
       setSelectedBuildPriceMap(productsData); // 가격 정보 저장
+      setLoading(false);
     } catch (error) {
-      console.error(error.message);
+      setLoading(false);
+      console.error("Error fetching build details:", error.message);
     }
   };
 
   useEffect(() => {
     // activeTab이 "Community Builds"로 변경되고 tabChange.current가 true일 때만 fetchBuilds 실행
     if (activeTab === "Community Builds" && tabChange.current) {
-      fetchBuilds();
+      fetchBuilds(page);
       tabChange.current = false; // 실행 후 한번만 실행되도록 변경
     } else if (activeTab !== "Community Builds" && !tabChange.current) {
       tabChange.current = true; // activeTab이 다른 탭으로 변경되면 다시 true로 변경
     }
-  }, [activeTab]);
+  }, [activeTab, page]);
 
-  const nextPage = () => setPage((prev) => prev + 1);
+  const nextPage = () => {
+    if (hasNextPage) {
+      setPage((prev) => prev + 1);
+    }
+  };
+
   const prevPage = () => setPage((prev) => Math.max(prev - 1, 1));
 
-  const textThemeStyle = theme ? "text-white" : "text-black";
+  const textThemeStyle = theme === "dark" ? "text-white" : "text-black"; // dark 모드일 때 흰색, 아니면 검은색
   const backgroundThemeStyle = theme === "dark" ? "bg-[#0d1117]" : "bg-white";
+  const blockedPanelBuildedStyle = loading
+    ? "opacity-100 pointer-events-auto "
+    : "opacity-0 pointer-events-none ";
+  const panelThemeStyle = theme === "dark" ? "bg-[#0d1117]" : "bg-white";
 
   return (
     <div className="relative w-full h-full pb-8">
@@ -180,28 +204,40 @@ const CommunityBuilds = () => {
         className={`${backgroundThemeStyle} relative h-full border-t border-b border-gray-300 py-4 bg-opacity-30 px-2`}
       >
         <div className="w-full h-full overflow-hidden max-h-[100%]">
-          <BuildDetailsPanel
-            selectedBuild={selectedBuild}
-            productPriceMap={selectedBuildPriceMap} // 가격 정보 전달
-            theme={theme}
-            onClose={() => setSelectedBuild(null)}
-          />
+          <div
+            className={`${blockedPanelBuildedStyle} ${panelThemeStyle} absolute flex justify-center items-center h-full inset-0 bg-opacity-50 z-40 text-6xl`}
+          >
+            <span className={`${textThemeStyle}`}>Loading...</span>{" "}
+            {/* 텍스트 색을 별도 span으로 적용 */}
+          </div>
+          {/* BuildDetailsPanel */}
+          {selectedBuild && (
+            <BuildDetailsPanel
+              selectedBuild={selectedBuild}
+              productPriceMap={selectedBuildPriceMap} // 가격 정보 전달
+              theme={theme}
+              onClose={() => setSelectedBuild(null)} // 패널 닫기 기능
+            />
+          )}
+
           <div className="grid grid-cols-4 gap-4 overflow-y-scroll max-h-[100%] pr-2">
-            {builds
-              .slice((page - 1) * buildsPerPage, page * buildsPerPage)
-              .map((build) => (
-                <BuildCard
-                  key={build.id}
-                  build={build}
-                  theme={theme}
-                  onClick={() => fetchBuildDetails(build.id)}
-                />
-              ))}
+            {builds.map((build) => (
+              <BuildCard
+                key={build.id}
+                build={build}
+                theme={theme}
+                onClick={() => handleBuildClick(build.id)} // 빌드 클릭 시 상세 정보 조회
+              />
+            ))}
           </div>
         </div>
       </section>
       <nav className="flex justify-between mt-4 w-[20%] mx-auto">
-        <button onClick={prevPage} className="px-4 py-2 bg-gray-200 rounded-lg">
+        <button
+          onClick={prevPage}
+          className="px-4 py-2 bg-gray-200 rounded-lg"
+          disabled={page === 1} // 첫 페이지일 경우 비활성화
+        >
           {"<"}
         </button>
         <span
@@ -209,7 +245,11 @@ const CommunityBuilds = () => {
         >
           {page}
         </span>
-        <button onClick={nextPage} className="px-4 py-2 bg-gray-200 rounded-lg">
+        <button
+          onClick={nextPage}
+          className="px-4 py-2 bg-gray-200 rounded-lg"
+          disabled={!hasNextPage} // 다음 페이지가 없으면 비활성화
+        >
           {">"}
         </button>
       </nav>
