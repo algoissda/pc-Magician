@@ -286,64 +286,93 @@ const CommunityBuilds = () => {
   };
 
   const textThemeStyle = theme === "dark" ? "text-white" : "text-black"; // dark 모드일 때 흰색, 아니면 검은색
+  const selectTextThemeStyle = theme === "dark" ? "text-black" : "text-white"; // 위에거 반대
+
   const backgroundThemeStyle = theme === "dark" ? "bg-[#0d1117]" : "bg-white";
+  const selectBackgroundThemeStyle =
+    theme === "dark" ? "bg-white" : "bg-[#0d1117]"; // 위에거 반대
+
   const blockedPanelBuildedStyle = loading
     ? "opacity-100 pointer-events-auto "
     : "opacity-0 pointer-events-none ";
-  const panelThemeStyle = theme === "dark" ? "bg-[#0d1117]" : "bg-white";
   const borderColorThemeStyle =
     theme === "dark" ? "border-gray-300" : "border-[#0d1117]";
 
-  const priceRangeTotalStyle = `${backgroundThemeStyle} ${textThemeStyle} border border-white rounded-xl px-2 flex justify-center items-center`;
+  const priceRangeTotalStyle = `${backgroundThemeStyle} ${textThemeStyle} max-w-32 h-8 border border-white rounded-xl px-2 flex justify-center items-center`;
+  const selectPriceRangeTotalStyle = `${selectBackgroundThemeStyle} ${selectTextThemeStyle} max-w-32 h-8 border border-black rounded-xl px-2 flex justify-center items-center`;
 
   return (
     <div className="relative w-full h-full pb-[4%] mt-[-4%]">
       <div className="mb-3 flex flex-row justify-between">
-        <ul className="flex flex-row text-white gap-2">
+        <ul className="flex flex-row gap-2">
           {/*이ul안에 있는 것들은 실시간으로 적용 하기*/}
-          <li
-            className={`${priceRangeTotalStyle}`}
+          <button
+            className={`${
+              selectedCategory !== "All"
+                ? priceRangeTotalStyle
+                : selectPriceRangeTotalStyle
+            }`}
             onClick={() => handleCategorySelect("All")}
           >
-            <button>All</button> {/*모두 조회*/}
-          </li>
-          <li
-            className={`${priceRangeTotalStyle}`}
+            All {/*모두 조회*/}
+          </button>
+          <button
+            className={`${
+              selectedCategory !== "사무용"
+                ? priceRangeTotalStyle
+                : selectPriceRangeTotalStyle
+            }`}
             onClick={() => handleCategorySelect("사무용")}
           >
-            <button>사무용</button> {/*70만원 이하*/}
-          </li>
-          <li
-            className={`${priceRangeTotalStyle}`}
+            사무용 {/*70만원 이하*/}
+          </button>
+          <button
+            className={`${
+              selectedCategory !== "저사양"
+                ? priceRangeTotalStyle
+                : selectPriceRangeTotalStyle
+            }`}
             onClick={() => handleCategorySelect("저사양")}
           >
-            <button>저사양</button> {/*70만원 초과 100만원 이하*/}
-          </li>
-          <li
-            className={`${priceRangeTotalStyle}`}
+            저사양 {/*70만원 초과 100만원 이하*/}
+          </button>
+          <button
+            className={`${
+              selectedCategory !== "보급형"
+                ? priceRangeTotalStyle
+                : selectPriceRangeTotalStyle
+            }`}
             onClick={() => handleCategorySelect("보급형")}
           >
-            <button>보급형</button> {/*100만원 초과 200만원 이하*/}
-          </li>
-          <li
-            className={`${priceRangeTotalStyle}`}
+            보급형 {/*100만원 초과 200만원 이하*/}
+          </button>
+          <button
+            className={`${
+              selectedCategory !== "고사양"
+                ? priceRangeTotalStyle
+                : selectPriceRangeTotalStyle
+            }`}
             onClick={() => handleCategorySelect("고사양")}
           >
-            <button>고사양</button> {/*200만원 초과 400만원 이하*/}
-          </li>
-          <li
-            className={`${priceRangeTotalStyle}`}
+            고사양 {/*200만원 초과 400만원 이하*/}
+          </button>
+          <button
+            className={`${
+              selectedCategory !== "하이엔드"
+                ? priceRangeTotalStyle
+                : selectPriceRangeTotalStyle
+            }`}
             onClick={() => handleCategorySelect("하이엔드")}
           >
-            <button>하이엔드</button> {/*400만원 초과*/}
-          </li>
+            하이엔드 {/*400만원 초과*/}
+          </button>
         </ul>
 
         <ul className="flex flex-row text-white gap-2">
           {/*이 ul안에 있는 것들은 조회버튼을 눌러야 조회*/}
           <SelectBox
             id="sortBy"
-            label="정렬기준"
+            label="정렬기준┃"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
             options={["최근견적순", "낮은가격순", "높은가격순"]}
@@ -351,7 +380,7 @@ const CommunityBuilds = () => {
           />
           <li className="flex justify-center items-center">
             <input
-              className="w-20"
+              className={`${priceRangeTotalStyle}`}
               type="number"
               placeholder="최소"
               value={minPrice !== null ? minPrice : ""}
@@ -364,7 +393,7 @@ const CommunityBuilds = () => {
           ~
           <li className="flex justify-center items-center">
             <input
-              className="w-20"
+              className={`${priceRangeTotalStyle}`}
               type="number"
               placeholder="최대"
               value={maxPrice !== null ? maxPrice : ""}
@@ -374,10 +403,6 @@ const CommunityBuilds = () => {
             />
             만원
           </li>
-          <li className={`${priceRangeTotalStyle}`}>
-            <button onClick={handlePriceRangeSearch}>조회</button>{" "}
-            {/*해당 ul의 정보 입력후 누르면 조회*/}
-          </li>
         </ul>
       </div>
       <section
@@ -385,7 +410,7 @@ const CommunityBuilds = () => {
       >
         <div className="w-full h-full overflow-hidden max-h-[100%]">
           <div
-            className={`${blockedPanelBuildedStyle} ${panelThemeStyle} absolute flex justify-center items-center h-full inset-0 bg-opacity-50 z-40 text-6xl`}
+            className={`${blockedPanelBuildedStyle} ${backgroundThemeStyle} absolute flex justify-center items-center h-full inset-0 bg-opacity-50 z-40 text-6xl`}
           >
             <span className={`${textThemeStyle}`}>Loading...</span>
           </div>

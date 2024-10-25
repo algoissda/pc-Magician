@@ -43,35 +43,8 @@ export const AuthButtons = ({
           >
             <button onClick={() => setIsModalOpen(true)}>log-in</button>
             <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
-              <div className="flex items-center justify-between">
-                <p className={` ${
-                theme === "dark" ? " text-white" : " text-[#0d1117] "
-              }`}>
-                  아이디가 없으신가요? &emsp;
-                </p>
-                <Link
-                  href="/auth/sign_up"
-                  className="text-blue-500"
-                  onClick={() => setIsModalOpen(false)}
-                >
-                  회원가입 하러 가기
-                </Link>
-              </div>
+              {undefined}
             </Modal>
-          </li>
-        </ul>
-      </nav>
-      <nav className="ml-5">
-        <ul>
-          <li
-            className={`border font-serif font-bold text-[20px] border-b-white ${buttonClass} rounded-3xl p-2 px-3`}
-          >
-            <Link
-              href="/auth/sign_up"
-              className={`text-${theme === "dark" ? "black" : "white"}`}
-            >
-              sign-up
-            </Link>
           </li>
         </ul>
       </nav>

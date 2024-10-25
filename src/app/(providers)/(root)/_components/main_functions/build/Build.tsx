@@ -148,7 +148,7 @@ function Build() {
                   : selectCpuType === "AMD"
                   ? "%소켓AM%"
                   : purpose === "사무용" || purpose === "보급형"
-                  ? "%"
+                  ? "%소켓1700%"
                   : "%"
                 : "%"
             )

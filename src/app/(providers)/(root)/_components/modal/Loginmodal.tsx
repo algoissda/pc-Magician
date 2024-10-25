@@ -11,7 +11,7 @@ interface ModalProps {
   children: ReactNode;
 }
 
-const Modal = ({ open, onClose, children }: ModalProps) => {
+const Modal = ({ open, onClose }: ModalProps) => {
   const theme = useThemeStore((state) => state.theme);
 
   const router = useRouter();
@@ -56,9 +56,15 @@ const Modal = ({ open, onClose, children }: ModalProps) => {
     handleClickLogInButton();
   };
 
+  async function signInWithKakao() {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "kakao",
+    });
+  }
+
   const lineThemeStyle =
     theme === "dark"
-      ? ""
+      ? "linear-gradient(to right, #0ea5e9, #3730a3, #c026d3, #e11d48)"
       : "linear-gradient(to right, #a855f7 , #6b21a8 , #3b0764 , #000000)";
 
   return ReactDOM.createPortal(
@@ -68,42 +74,16 @@ const Modal = ({ open, onClose, children }: ModalProps) => {
         className="bg-black/50 flex items-center justify-center fixed top-0 left-0 right-0 bottom-0 z-20"
       >
         <div
-          className="border-8 custom-border-black"
+          className="w-96 h-[650px] p-[2px] rounded-lg"
           style={{
             background: lineThemeStyle,
           }}
         >
-          <style jsx>{`
-            .custom-border-black {
-              border-width: 4px;
-              border-image: linear-gradient(
-                  to right,
-                  #0ea5e9,
-                  #3730a3,
-                  #c026d3,
-                  #e11d48
-                )
-                1;
-            }
-          `}</style>
-          {/* <style jsx>{`
-            .custom-border-white {
-              border-width: 4px;
-              border-image: linear-gradient(
-                  to right,
-                  #a855f7,
-                  #6b21a8,
-                  #3b0764,
-                  #e11d48
-                )
-                1;
-            }
-          `}</style> */}
           <div
             onClick={handleClickModalBody}
             className={`modal_body ${
               theme === "dark" ? "bg-[#0d1117]" : "bg-white"
-            } rounded-md w-full max-w-[400px] px-5 py-8`}
+            } rounded-md w-full px-5 py-8 h-full`}
           >
             <h2
               className={`font-bold text-3xl text-center my-12 ${
@@ -112,9 +92,35 @@ const Modal = ({ open, onClose, children }: ModalProps) => {
             >
               Log-In
             </h2>
+
+            <span
+              className="w-[100%] h-[2px] opacity-100 block my-7"
+              style={{
+                background: lineThemeStyle,
+              }}
+            ></span>
+
+            <button
+              className="w-full h-11 bg-[#fee500] flex justify-center items-center px-5 rounded-md"
+              onClick={signInWithKakao}
+            >
+              <img
+                className="w-5 inset-0"
+                src="https://cdn-icons-png.flaticon.com/512/2111/2111466.png"
+              />
+              <h3 className="mx-auto">Login with Kakao</h3>
+            </button>
+
+            <span
+              className="w-[100%] h-[2px] opacity-100 block my-7"
+              style={{
+                background: lineThemeStyle,
+              }}
+            ></span>
+
             <form
               onSubmit={handleSubmit}
-              className="flex flex-col items-center gap-y-4 max-w-sm mx-auto w-full"
+              className="flex flex-col items-center gap-y-4 mx-auto w-full"
             >
               <div className="grid gap-y-1.5 w-full">
                 <label
@@ -168,7 +174,6 @@ const Modal = ({ open, onClose, children }: ModalProps) => {
               >
                 Log in
               </button>
-              {children}
             </form>
           </div>
         </div>
