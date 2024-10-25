@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "../../../../../../../supabase/client";
 import { BuildCard } from "./CommunityBuildsComponents/BuildCard";
 import { BuildDetailsPanel } from "./CommunityBuildsComponents/BuildDetailsPanel";
+import { SelectBox } from "./CommunityBuildsComponents/SelectBox";
 
 const CommunityBuilds = () => {
   const [builds, setBuilds] = useState<any[]>([]);
@@ -18,6 +19,10 @@ const CommunityBuilds = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState<boolean>(false); // 다음 페이지가 있는지 확인
+  const [minPrice, setMinPrice] = useState<number | null>(null); // 최소 가격
+  const [maxPrice, setMaxPrice] = useState<number | null>(null); // 최대 가격
+  const [selectedCategory, setSelectedCategory] = useState<string>("All"); // 선택된 카테고리 필터
+  const [sortBy, setSortBy] = useState<string>("최근견적순"); // 정렬 기준
   const buildsPerPage = 24; // 한 페이지에 표시할 빌드 수
   const theme = useThemeStore((state) => state.theme);
   const activeTab = useActiveStore((state) => state.activeTab);
@@ -29,76 +34,107 @@ const CommunityBuilds = () => {
     try {
       setLoading(true);
 
-      // 세션에서 사용자 정보를 가져옴
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
-
-      if (sessionError) {
-        throw new Error("Error fetching session: " + sessionError.message);
-      }
-
-      let userId = null;
-
-      // 로그인된 사용자 ID 추출
-      if (session && session.user) {
-        userId = session.user.id;
-      }
-
       let query = supabase
         .from("saved_builds")
-        .select("builds:build_id(*), uid")
-        .order("created_at", { ascending: false }) // 최신순으로 정렬
+        .select("builds(*), uid")
         .range(
           (pageNumber - 1) * buildsPerPage,
           pageNumber * buildsPerPage - 1
-        ); // 페이지 범위 지정 (24개씩)
+        );
 
-      // 로그인된 사용자의 빌드를 제외하는 조건 추가
-      if (userId !== null) {
-        query = query.neq("uid", userId); // 로그인한 사용자의 빌드를 제외
+      // 가격 필터 적용
+      switch (selectedCategory) {
+        case "사무용":
+          query = query.lte("builds.total_price", 70 * 10000);
+          break;
+        case "저사양":
+          query = query.gte("builds.total_price", 70 * 10000);
+          query = query.lte("builds.total_price", 100 * 10000);
+          break;
+        case "보급형":
+          query = query.gte("builds.total_price", 100 * 10000);
+          query = query.lte("builds.total_price", 200 * 10000);
+          break;
+        case "고사양":
+          query = query.gte("builds.total_price", 200 * 10000);
+          query = query.lte("builds.total_price", 400 * 10000);
+          break;
+        case "하이엔드":
+          query = query.gte("builds.total_price", 400 * 10000);
+          break;
+      }
+
+      // 가격 필터 적용
+      if (minPrice !== null) {
+        query = query.gte("builds.total_price", minPrice * 10000); // 최소 가격 필터
+      }
+      if (maxPrice !== null) {
+        query = query.lte("builds.total_price", maxPrice * 10000); // 최대 가격 필터
       }
 
       const { data: buildsData, error: buildsError } = await query;
 
       if (buildsError) {
-        throw new Error("Error fetching builds: " + buildsError.message);
-      }
-
-      if (!buildsData.length) {
+        console.error("Error fetching builds:", buildsError.message);
         setLoading(false);
         return;
+      }
+
+      if (!buildsData || buildsData.length === 0) {
+        console.log("No builds found.");
+        setLoading(false);
+        return;
+      }
+
+      // 클라이언트 측에서 정렬 적용 (낮은가격순, 높은가격순, 생성일 순)
+      if (sortBy === "낮은가격순") {
+        buildsData.sort(
+          (a, b) => a.builds?.total_price - b.builds?.total_price
+        );
+      } else if (sortBy === "높은가격순") {
+        buildsData.sort(
+          (a, b) => b.builds?.total_price - a.builds?.total_price
+        );
+      } else {
+        buildsData.sort((a, b) => {
+          // created_at 필드가 null인지 확인 후 비교
+          const dateA = a.builds?.created_at
+            ? new Date(a.builds.created_at).getTime()
+            : 0;
+          const dateB = b.builds?.created_at
+            ? new Date(b.builds.created_at).getTime()
+            : 0;
+          return dateB - dateA; // 최신순으로 정렬
+        });
       }
 
       // 다음 페이지 데이터 확인을 위한 추가 요청 (다음 페이지 데이터가 있는지 확인)
       const nextPageQuery = supabase
         .from("saved_builds")
         .select("builds:build_id(*), uid")
-        .order("created_at", { ascending: false })
-        .range(pageNumber * buildsPerPage, pageNumber * buildsPerPage); // 다음 페이지의 첫 번째 데이터만 확인
-
-      if (userId !== null) {
-        nextPageQuery.neq("uid", userId);
-      }
+        .range(pageNumber * buildsPerPage, pageNumber * buildsPerPage);
 
       const { data: nextPageData } = await nextPageQuery;
       setHasNextPage(nextPageData && nextPageData.length > 0);
 
       // saved_builds 테이블의 데이터를 builds 테이블 형식으로 변환 및 날짜 변환
-      const builds = buildsData.map((entry) => {
-        const build = entry.builds;
-        const createdAt = new Date(build.created_at);
-        const formattedDate = `${createdAt.getFullYear()}.${(
-          createdAt.getMonth() + 1
-        )
-          .toString()
-          .padStart(2, "0")}.${createdAt
-          .getDate()
-          .toString()
-          .padStart(2, "0")}`;
-        return { ...build, creationDate: formattedDate };
-      });
+      const builds = buildsData
+        .map((entry) => {
+          const build = entry.builds;
+          if (!build) return null; // build가 없는 경우 null 처리
+
+          const createdAt = new Date(build.created_at);
+          const formattedDate = `${createdAt.getFullYear()}.${(
+            createdAt.getMonth() + 1
+          )
+            .toString()
+            .padStart(2, "0")}.${createdAt
+            .getDate()
+            .toString()
+            .padStart(2, "0")}`;
+          return { ...build, creationDate: formattedDate };
+        })
+        .filter((build) => build !== null); // null 값 필터링
 
       // 이전 데이터를 유지하지 않고 새로운 데이터를 세팅
       setBuilds(builds);
@@ -119,8 +155,8 @@ const CommunityBuilds = () => {
 
       setLoading(false);
     } catch (error) {
-      setLoading(false);
       console.error("Error fetching builds:", error.message);
+      setLoading(false);
     }
   };
 
@@ -220,6 +256,21 @@ const CommunityBuilds = () => {
     }
   }, [activeTab, page]);
 
+  // 가격 범위와 카테고리 필터 적용 함수
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category);
+    setPage(1); // 페이지를 1로 초기화
+  };
+
+  useEffect(() => {
+    fetchBuilds(page); // 페이지, 필터, 가격 등이 변경될 때 빌드를 가져옴
+  }, [page, minPrice, maxPrice, selectedCategory, sortBy]);
+
+  const handlePriceRangeSearch = () => {
+    // 페이지를 1로 초기화하고 useEffect에서 자동으로 빌드를 가져오도록 설정
+    setPage(1);
+  };
+
   const nextPage = () => {
     if (hasNextPage) {
       tabChange.current = true; //
@@ -243,50 +294,89 @@ const CommunityBuilds = () => {
   const borderColorThemeStyle =
     theme === "dark" ? "border-gray-300" : "border-[#0d1117]";
 
-  const priceRangeTotalStyle = `${backgroundThemeStyle} ${textThemeStyle} border border-white rounded-xl w-20 flex justify-center items-center`;
+  const priceRangeTotalStyle = `${backgroundThemeStyle} ${textThemeStyle} border border-white rounded-xl px-2 flex justify-center items-center`;
 
   return (
     <div className="relative w-full h-full pb-[4%] mt-[-4%]">
-      <div className="mb-3 flex flex-row">
+      <div className="mb-3 flex flex-row justify-between">
         <ul className="flex flex-row text-white gap-2">
-          <li className={`${priceRangeTotalStyle}`}>
-            <button>All</button> {/**/}
+          {/*이ul안에 있는 것들은 실시간으로 적용 하기*/}
+          <li
+            className={`${priceRangeTotalStyle}`}
+            onClick={() => handleCategorySelect("All")}
+          >
+            <button>All</button> {/*모두 조회*/}
           </li>
-          <li className={`${priceRangeTotalStyle}`}>
-            <button>사무용</button> {/**/}
+          <li
+            className={`${priceRangeTotalStyle}`}
+            onClick={() => handleCategorySelect("사무용")}
+          >
+            <button>사무용</button> {/*70만원 이하*/}
           </li>
-          <li>
-            <button>저사양</button> {/**/}
+          <li
+            className={`${priceRangeTotalStyle}`}
+            onClick={() => handleCategorySelect("저사양")}
+          >
+            <button>저사양</button> {/*70만원 초과 100만원 이하*/}
           </li>
-          <li>
-            <button>보급형</button> {/**/}
+          <li
+            className={`${priceRangeTotalStyle}`}
+            onClick={() => handleCategorySelect("보급형")}
+          >
+            <button>보급형</button> {/*100만원 초과 200만원 이하*/}
           </li>
-          <li>
-            <button>고사양</button> {/**/}
+          <li
+            className={`${priceRangeTotalStyle}`}
+            onClick={() => handleCategorySelect("고사양")}
+          >
+            <button>고사양</button> {/*200만원 초과 400만원 이하*/}
           </li>
-          <li>
-            <button>하이엔드</button> {/**/}
+          <li
+            className={`${priceRangeTotalStyle}`}
+            onClick={() => handleCategorySelect("하이엔드")}
+          >
+            <button>하이엔드</button> {/*400만원 초과*/}
           </li>
         </ul>
 
         <ul className="flex flex-row text-white gap-2">
-          <li className={`${priceRangeTotalStyle}`}>
-            <button>사무용</button> {/**/}
+          {/*이 ul안에 있는 것들은 조회버튼을 눌러야 조회*/}
+          <SelectBox
+            id="sortBy"
+            label="정렬기준"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            options={["최근견적순", "낮은가격순", "높은가격순"]}
+            theme={theme}
+          />
+          <li className="flex justify-center items-center">
+            <input
+              className="w-20"
+              type="number"
+              placeholder="최소"
+              value={minPrice !== null ? minPrice : ""}
+              onChange={(e) =>
+                setMinPrice(e.target.value ? Number(e.target.value) : null)
+              }
+            />
+            만원
+          </li>
+          ~
+          <li className="flex justify-center items-center">
+            <input
+              className="w-20"
+              type="number"
+              placeholder="최대"
+              value={maxPrice !== null ? maxPrice : ""}
+              onChange={(e) =>
+                setMaxPrice(e.target.value ? Number(e.target.value) : null)
+              }
+            />
+            만원
           </li>
           <li className={`${priceRangeTotalStyle}`}>
-            <button>사무용</button> {/**/}
-          </li>
-          <li>
-            <button>저사양</button> {/**/}
-          </li>
-          <li>
-            <button>보급형</button> {/**/}
-          </li>
-          <li>
-            <button>고사양</button> {/**/}
-          </li>
-          <li>
-            <button>하이엔드</button> {/**/}
+            <button onClick={handlePriceRangeSearch}>조회</button>{" "}
+            {/*해당 ul의 정보 입력후 누르면 조회*/}
           </li>
         </ul>
       </div>

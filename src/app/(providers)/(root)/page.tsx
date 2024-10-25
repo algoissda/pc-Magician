@@ -5,8 +5,8 @@ import { useActiveStore } from "@/store/useActiveTab";
 import { useThemeStore } from "@/store/useStore";
 import { useEffect, useState } from "react";
 import Build from "./_components/main_functions/build/Build";
-import ViewBuildsByPrice from "./_components/main_functions/question-answer/page";
-import QuestionAndAnswer from "./_components/main_functions/question-answer/page";
+import QuestionAndAnswer from "./_components/main_functions/QuestionAnswer/page";
+import CommunityBuilds from "./_components/main_functions/community_builds/CommunityBuilds";
 
 // 버튼 컴포넌트화
 const ThemeButton = ({ isActive, onClick, text, size }: any) => {
@@ -145,14 +145,14 @@ function MainPage() {
             activeTab === "Donate" ? "left-0" : "left-[400%]"
           }`}
         >
-          <ViewBuildsByPrice />
+          <QuestionAndAnswer />
         </div>
         <div
           className={`absolute w-full py-14 pl-20 pr-24 block h-full transition-all duration-700 top-0 ${
             activeTab === "Community Builds" ? "left-0" : "left-[400%]"
           }`}
         >
-          <QuestionAndAnswer />
+          <CommunityBuilds />
         </div>
         <div
           className={`absolute transition-all duration-700 top-0 h-[100%] w-[100%]  ${
