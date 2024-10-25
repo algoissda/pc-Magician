@@ -42,7 +42,7 @@ export const SelectBox = ({
         : "border-gray-400 text-black bg-white"
     }`}
   >
-    {label + " "}
+    {label}
     <select
       id={id}
       value={value}
