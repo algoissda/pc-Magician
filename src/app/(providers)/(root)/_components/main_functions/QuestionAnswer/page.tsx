@@ -12,8 +12,8 @@ function QuestionAndAnswer() {
         Notice Board
       </h2>
       <section className="w-full mt-10 ml-[26rem]">
-        <article>
-          <section className="bg-black bg-opacity-20 h-full">
+        <article className="flex-grow">
+          <section className="bg-black bg-opacity-20 min-h-[500px]  ">
             <div
               className={`flex justify-between p-2 border-b font-bold  ${
                 theme === "dark"
@@ -76,6 +76,17 @@ function QuestionAndAnswer() {
           </section>
         </article>
       </section>
+      <div className="flex justify-between items-center w-[80%] ml-80 pl-60">
+        <div className="flex items-center space-x-4">
+          <button className="px-4 py-2 bg-gray-200 rounded-lg">{"<"}</button>
+          <span className="w-3 flex justify-center items-center"></span>
+          <button className="px-4 py-2 bg-gray-200 rounded-lg">{">"}</button>
+        </div>
+
+        <button className="bg-white font-bold text-black rounded-lg px-6 py-3 ml-au w-[70%]">
+          글 작성하기
+        </button>
+      </div>
     </main>
   );
 }
