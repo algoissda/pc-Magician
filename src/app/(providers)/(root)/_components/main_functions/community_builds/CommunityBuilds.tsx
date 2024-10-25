@@ -85,8 +85,20 @@ const CommunityBuilds = () => {
       const { data: nextPageData } = await nextPageQuery;
       setHasNextPage(nextPageData && nextPageData.length > 0);
 
-      // saved_builds 테이블의 데이터를 builds 테이블 형식으로 변환
-      const builds = buildsData.map((entry) => entry.builds);
+      // saved_builds 테이블의 데이터를 builds 테이블 형식으로 변환 및 날짜 변환
+      const builds = buildsData.map((entry) => {
+        const build = entry.builds;
+        const createdAt = new Date(build.created_at);
+        const formattedDate = `${createdAt.getFullYear()}.${(
+          createdAt.getMonth() + 1
+        )
+          .toString()
+          .padStart(2, "0")}.${createdAt
+          .getDate()
+          .toString()
+          .padStart(2, "0")}`;
+        return { ...build, creationDate: formattedDate };
+      });
 
       // 이전 데이터를 유지하지 않고 새로운 데이터를 세팅
       setBuilds(builds);
@@ -263,6 +275,7 @@ const CommunityBuilds = () => {
                 <BuildCard
                   build={build}
                   theme={theme}
+                  creationDate={build.creationDate} // 생성 날짜 전달
                   onClick={() => handleBuildClick(build.id)} // 클릭 시 handleBuildClick 호출
                 />
               </div>
