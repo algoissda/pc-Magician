@@ -240,11 +240,58 @@ const CommunityBuilds = () => {
     ? "opacity-100 pointer-events-auto "
     : "opacity-0 pointer-events-none ";
   const panelThemeStyle = theme === "dark" ? "bg-[#0d1117]" : "bg-white";
+  const borderColorThemeStyle =
+    theme === "dark" ? "border-gray-300" : "border-[#0d1117]";
+
+  const priceRangeTotalStyle = `${backgroundThemeStyle} ${textThemeStyle} border border-white rounded-xl w-20 flex justify-center items-center`;
 
   return (
-    <div className="relative w-full h-full pb-8">
+    <div className="relative w-full h-full pb-[4%] mt-[-4%]">
+      <div className="mb-3 flex flex-row">
+        <ul className="flex flex-row text-white gap-2">
+          <li className={`${priceRangeTotalStyle}`}>
+            <button>All</button> {/**/}
+          </li>
+          <li className={`${priceRangeTotalStyle}`}>
+            <button>사무용</button> {/**/}
+          </li>
+          <li>
+            <button>저사양</button> {/**/}
+          </li>
+          <li>
+            <button>보급형</button> {/**/}
+          </li>
+          <li>
+            <button>고사양</button> {/**/}
+          </li>
+          <li>
+            <button>하이엔드</button> {/**/}
+          </li>
+        </ul>
+
+        <ul className="flex flex-row text-white gap-2">
+          <li className={`${priceRangeTotalStyle}`}>
+            <button>사무용</button> {/**/}
+          </li>
+          <li className={`${priceRangeTotalStyle}`}>
+            <button>사무용</button> {/**/}
+          </li>
+          <li>
+            <button>저사양</button> {/**/}
+          </li>
+          <li>
+            <button>보급형</button> {/**/}
+          </li>
+          <li>
+            <button>고사양</button> {/**/}
+          </li>
+          <li>
+            <button>하이엔드</button> {/**/}
+          </li>
+        </ul>
+      </div>
       <section
-        className={`${backgroundThemeStyle} relative h-full border-t border-b border-gray-300 py-4 bg-opacity-30 px-2`}
+        className={`${backgroundThemeStyle} ${borderColorThemeStyle} relative h-full border-t border-b py-4 bg-opacity-30 px-2`}
       >
         <div className="w-full h-full overflow-hidden max-h-[100%]">
           <div

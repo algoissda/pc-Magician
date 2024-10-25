@@ -46,7 +46,7 @@ export const BuildCard = ({ build, theme, onClick, creationDate }) => {
         <span
           className={`${textThemeH4Style} text-right font-bold text-xl flex flex-col`}
         >
-          {build.total_price} 원
+          {build.total_price.toLocaleString()} 원
         </span>
         <span
           className={`${textThemeStyle} absolute text-left bottom-0 font-bold text-xs`}

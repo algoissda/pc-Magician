@@ -198,13 +198,13 @@ function MainPage() {
             isActive={activeTab === "Community Builds"}
             onClick={() => setActiveTab("Community Builds")}
             text="Community Builds"
-            size="text-lg sm:text-xl"
+            size="text-2xl"
           />
           <ThemeButton
             isActive={activeTab === "Donate"}
             onClick={() => setActiveTab("Donate")}
-            text="Donate"
-            size="text-base sm:text-lg md:text-4xl"
+            text="Q&A"
+            size="text-3xl"
           />
         </header>
       </nav>
