@@ -6,7 +6,7 @@ function RootLayout({ children }: PropsWithChildren) {
   return (
     <div
       id="root-layout"
-      className="bg-gradient-to-r from-[#0d1117] to-black h-screen flex flex-col overflow-hidden"
+      className="bg-black h-screen flex flex-col overflow-hidden"
     >
       <Header />
       <div className="flex-grow overflow-hidden">{children}</div>

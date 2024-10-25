@@ -424,7 +424,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
             className={`${panelOpacityThemeStyle} absolute theme-opacity top-0 inset-0 bg-cover bg-center bg-[url('https://embed.pixiv.net/spotlight.php?id=9496&lang=ko')] transition-opacity duration-800`}
           ></div>
           <div
-            className={`${panelOpacityThemeStyleReverse} absolute theme-opacity top-0 inset-0 bg-cover transition-opacity duration-800 bg-[url('https://dengekionline.com/images/ajke/JiwT/KDLS/5KrW/9e4rP0EtSOysUm6ygoYKCuQUfT8ZK3eBEpPWpkVvoZ4n2ovhquo86m2TwCfbDRWS7nTcDzcnO8lyJ3fs_main.webp')]`}
+            className={`${panelOpacityThemeStyleReverse} absolute theme-opacity top-0 inset-0 bg-cover transition-opacity duration-800 bg-[url('https://e0.pxfuel.com/wallpapers/885/274/desktop-wallpaper-shikimori-s-not-just-a-cutie-and-background.jpg')]`}
           ></div>
         </div>
         <article className="w-3/5 mr-0 lg:mr-4 p-4">
