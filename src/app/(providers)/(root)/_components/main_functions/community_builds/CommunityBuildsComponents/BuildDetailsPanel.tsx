@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "../../../../../../../../supabase/client";
 
 // Helper function to create part details for a build
 const createPartDetails = (build, productPriceMap) => {
@@ -20,6 +21,7 @@ const createPartDetails = (build, productPriceMap) => {
       partName && productPriceMap ? productPriceMap[partName] : "N/A";
 
     return {
+      key, // 고유 키 추가
       label,
       value: partName || "N/A",
       price: price || "N/A",
@@ -35,6 +37,7 @@ export const BuildDetailsPanel = ({
   onClose,
 }) => {
   const [visible, setVisible] = useState(false); // visibility 상태 관리
+  const [isSaving, setIsSaving] = useState(false); // 저장 상태 관리
   const partDetails = createPartDetails(selectedBuild, productPriceMap);
 
   const textThemeStyle = theme === "dark" ? "text-white" : "text-gray-800";
@@ -55,6 +58,119 @@ export const BuildDetailsPanel = ({
   const handleClose = () => {
     setVisible(false);
     setTimeout(() => onClose(), 300); // 300ms 후에 실제로 닫히도록 설정 (transition과 맞춤)
+  };
+
+  // 저장 버튼 클릭 시 빌드 저장 함수
+  const handleSaveBuild = async () => {
+    setIsSaving(true);
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      console.error(
+        "사용자를 가져오는 중 오류 발생:",
+        authError || "사용자가 로그인하지 않았습니다."
+      );
+      setIsSaving(false);
+      return;
+    }
+
+    const uid = user.id;
+    const buildData = {
+      CPU: selectedBuild.CPU,
+      Cooler: selectedBuild.Cooler,
+      MBoard: selectedBuild.MBoard,
+      RAM: selectedBuild.RAM,
+      VGA: selectedBuild.VGA,
+      SSD: selectedBuild.SSD,
+      HDD: selectedBuild.HDD,
+      Case: selectedBuild.Case,
+      Power: selectedBuild.Power,
+      explanation: selectedBuild.explanation,
+    };
+
+    // 동일한 견적이 있는지 확인
+    const { data: existingBuild, error: buildCheckError } = await supabase
+      .from("builds")
+      .select("id")
+      .eq("CPU", buildData.CPU)
+      .eq("Cooler", buildData.Cooler)
+      .eq("MBoard", buildData.MBoard)
+      .eq("RAM", buildData.RAM)
+      .eq("VGA", buildData.VGA)
+      .eq("SSD", buildData.SSD)
+      .eq("HDD", buildData.HDD)
+      .eq("Case", buildData.Case)
+      .eq("Power", buildData.Power)
+      .maybeSingle();
+
+    if (buildCheckError) {
+      console.error("Error checking existing build:", buildCheckError);
+      setIsSaving(false);
+      return;
+    }
+
+    let build_id;
+
+    if (existingBuild) {
+      build_id = existingBuild.id;
+    } else {
+      // 동일한 견적이 없으면 새로 삽입
+      const { data: insertedBuild, error: buildInsertError } = await supabase
+        .from("builds")
+        .insert([buildData])
+        .select();
+
+      if (buildInsertError) {
+        console.error("Error inserting build data:", buildInsertError);
+        setIsSaving(false);
+        return;
+      }
+
+      build_id = insertedBuild[0].id;
+      console.log("새로운 build를 삽입했습니다.");
+    }
+
+    // saved_builds 테이블에서 동일한 build_id가 있는지 확인
+    const { data: existingSavedBuild, error: savedBuildCheckError } =
+      await supabase
+        .from("saved_builds")
+        .select("id")
+        .eq("uid", uid)
+        .eq("build_id", build_id)
+        .maybeSingle();
+
+    if (savedBuildCheckError) {
+      console.error(
+        "Error checking existing saved build:",
+        savedBuildCheckError
+      );
+      setIsSaving(false);
+      return;
+    }
+
+    if (existingSavedBuild) {
+      // 동일한 build_id가 이미 저장되어 있으면 저장하지 않음
+      console.log("동일한 견적이 이미 저장되어 있습니다. 저장하지 않습니다.");
+      setIsSaving(true);
+      return;
+    }
+
+    // 동일한 build_id가 없는 경우 저장
+    const { error: savedBuildsError } = await supabase
+      .from("saved_builds")
+      .insert([{ uid, build_id }]);
+
+    if (savedBuildsError) {
+      console.error("Error inserting into saved_builds:", savedBuildsError);
+    } else {
+      console.log("Build data and saved_builds entry inserted successfully");
+    }
+
+    setIsSaving(false);
   };
 
   return (
@@ -78,7 +194,7 @@ export const BuildDetailsPanel = ({
         <ul className={`h-[80%] flex flex-col overflow-y-auto overflow-x-clip`}>
           {partDetails.map((part) => (
             <li
-              key={part.label}
+              key={`${part.key}-${part.label}`} // 고유한 key 설정
               className="relative text-lg flex flex-row py-3 pt-2 items-center flex-grow min-h-0"
             >
               <div className="flex flex-col w-full pr-5">
@@ -103,8 +219,19 @@ export const BuildDetailsPanel = ({
             </li>
           ))}
         </ul>
-        <div className={`text-right font-bold mt-4 text-3xl ${textThemeStyle}`}>
-          {selectedBuild?.totalPrice?.toLocaleString()} 원
+        <div className="flex-row-reverse mt-4 flex items-center w-full justify-between">
+          <div
+            className={`text-right font-bold text-3xl inline ${textThemeStyle}`}
+          >
+            {selectedBuild?.totalPrice?.toLocaleString()} 원
+          </div>
+          <button
+            onClick={handleSaveBuild}
+            disabled={isSaving}
+            className="w-auto mt-1 py-1 px-5 bg-lime-500 text-white font-semibold rounded-md transition-opacity duration-300 hover:bg-lime-600"
+          >
+            {!isSaving ? "SAVE" : "SAVED"}
+          </button>
         </div>
       </div>
     </div>
