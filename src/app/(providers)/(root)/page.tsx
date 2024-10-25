@@ -142,7 +142,7 @@ function MainPage() {
         </div>
         <div
           className={`absolute transition-all duration-700 top-0 ${
-            activeTab === "Donate" ? "left-0" : "left-[400%]"
+            activeTab === "Q&A" ? "left-0" : "left-[400%]"
           }`}
         >
           <QuestionAndAnswer />
