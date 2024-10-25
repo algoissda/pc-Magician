@@ -13,25 +13,26 @@ function QuestionAndAnswer() {
       </h2>
       <section className="w-full mt-10 ml-[26rem]">
         <article>
-          <div
-            className={`flex justify-between p-2 border-b font-bold  ${
-              theme === "dark"
-                ? "  border-white text-white"
-                : "  border-[#0d1117] text-[#0d1117] "
-            } `}
-          >
-            <span
-              className={`border-r pr-9 ${
-                theme === "dark" ? "  border-white" : "  border-[#0d1117] "
+          <section className="bg-black bg-opacity-20 h-full">
+            <div
+              className={`flex justify-between p-2 border-b font-bold  ${
+                theme === "dark"
+                  ? "  border-white text-white"
+                  : "  border-[#0d1117] text-[#0d1117] "
               } `}
             >
-              No.
-            </span>
-            <span className="w-1/2 pl-[212px] absolute ">Title</span>
-            <span className="ml-[175px]">작성 날짜</span>
-            <span>Action</span>
-          </div>
-          {/* <div
+              <span
+                className={`border-r pr-9 ${
+                  theme === "dark" ? "  border-white" : "  border-[#0d1117] "
+                } `}
+              >
+                No.
+              </span>
+              <span className="w-1/2 pl-[212px] absolute ">Title</span>
+              <span className="ml-[175px]">작성 날짜</span>
+              <span>Action</span>
+            </div>
+            {/* <div
             className={`flex justify-between p-2 border-b   ${
               theme === "dark"
                 ? "  border-white text-white"
@@ -51,27 +52,28 @@ function QuestionAndAnswer() {
               개추
             </span>
           </div> */}
-          {/* 반복 돌릴 때 이 아래 부분은 지우고, 위에 부분만 반복 시키면 됨 */}
-          <div
-            className={`flex justify-between p-2 border-b  ${
-              theme === "dark"
-                ? "  border-white text-white"
-                : "  border-[#0d1117] text-[#0d1117] opacity-70 "
-            }  `}
-          >
-            <span>2</span>
-            <span className="mx-1">제목2</span>
-            <span className="">작성 날짜2</span>
-            <span
-              className={` px-3 py-1 rounded ${
+            {/* 반복 돌릴 때 이 아래 부분은 지우고, 위에 부분만 반복 시키면 됨 */}
+            <div
+              className={`flex justify-between p-2 border-b  ${
                 theme === "dark"
                   ? "  border-white text-white"
                   : "  border-[#0d1117] text-[#0d1117] opacity-70 "
-              } `}
+              }  `}
             >
-              개추
-            </span>
-          </div>
+              <span>2</span>
+              <span className="mx-1">제목2</span>
+              <span className="">작성 날짜2</span>
+              <span
+                className={` px-3 py-1 rounded ${
+                  theme === "dark"
+                    ? "  border-white text-white"
+                    : "  border-[#0d1117] text-[#0d1117] opacity-70 "
+                } `}
+              >
+                개추
+              </span>
+            </div>
+          </section>
         </article>
       </section>
     </main>
