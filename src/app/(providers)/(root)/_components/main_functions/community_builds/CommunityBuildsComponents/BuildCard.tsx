@@ -1,6 +1,6 @@
-export const BuildCard = ({ build, theme, onClick }) => {
+export const BuildCard = ({ build, theme, onClick, creationDate }) => {
   const textThemeH4Style = theme === "dark" ? "text-white" : "text-black";
-  const textThemeStyle = theme === "dark" ? "text-gray-200" : "text-gray-900";
+  const textThemeStyle = theme === "dark" ? "text-gray-300" : "text-gray-900";
   const backgroundThemeStyle =
     theme === "dark"
       ? "bg-[#0d1117] border-sky-400"
@@ -42,12 +42,17 @@ export const BuildCard = ({ build, theme, onClick }) => {
           background: lineThemeStyle,
         }}
       ></span>
-      <footer
-        className={`text-right font-bold text-xl text-${
-          theme === "dark" ? "white" : "black"
-        }`}
-      >
-        {build.total_price.toLocaleString()} 원
+      <footer className={`relative`}>
+        <span
+          className={`${textThemeH4Style} text-right font-bold text-xl flex flex-col`}
+        >
+          {build.total_price.toLocaleString()} 원
+        </span>
+        <span
+          className={`${textThemeStyle} absolute text-left bottom-0 font-bold text-xs`}
+        >
+          {creationDate}
+        </span>
       </footer>
     </article>
   );
