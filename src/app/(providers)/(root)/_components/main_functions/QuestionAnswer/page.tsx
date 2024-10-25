@@ -6,7 +6,7 @@ function QuestionAndAnswer() {
     <main className="flex flex-col items-center justify-center h-full w-full">
       <h2
         className={`text-6xl  ml-[28rem] mt-16 font-serif ${
-          theme === "dark" ? "  text-white" : "  text-black "
+          theme === "dark" ? "  text-gray-300" : "  text-gray-800 "
         }`}
       >
         Notice Board

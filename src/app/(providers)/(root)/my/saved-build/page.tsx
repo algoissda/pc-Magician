@@ -10,7 +10,7 @@ import {
   BuildDetailsPanel,
 } from "./SavedBuildComponents/SavedBuildComponents";
 
-const SavedBuildComponents = () => {
+const CommunityBuilds = () => {
   const [builds, setBuilds] = useState<any[]>([]);
   const [selectedBuild, setSelectedBuild] = useState<any | null>(null);
 
@@ -222,4 +222,4 @@ const SavedBuildComponents = () => {
   );
 };
 
-export default SavedBuildComponents;
+export default CommunityBuilds;
