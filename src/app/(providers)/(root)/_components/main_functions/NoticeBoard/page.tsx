@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useThemeStore } from "@/store/useStore";
 import { useEffect, useState } from "react";
@@ -19,27 +19,25 @@ function NoticeBoard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<PostType | null>(null);
 
-
   useEffect(() => {
     const fetchPosts = async () => {
-      const {data, error} = await supabase.from("post").select("*");
-      if(error){
+      const { data, error } = await supabase.from("post").select("*");
+      if (error) {
         console.error(error);
-      }else{
+      } else {
         setPosts(data);
       }
-
     };
 
     fetchPosts();
   }, []);
 
-  const handlePostClick = (post:PostType) => {
+  const handlePostClick = (post: PostType) => {
     setSelectedPost(post);
-  }
+  };
   const handleCloseDetail = () => {
     setSelectedPost(null);
-  }
+  };
 
   return (
     <main>
@@ -73,46 +71,53 @@ function NoticeBoard() {
                 <span>Action</span>
               </div>
               {posts.map((post, index) => {
-
-                return(
-
-                  <div key={post.id}
-                  onClick={(e) => handlePostClick(post)}
-                className={`flex justify-between p-2 border-b  ${
-                  theme === "dark"
-                    ? "  border-white text-white"
-                    : "  border-[#0d1117] text-[#0d1117] opacity-70 "
-                }  `}
-                >
-                <span>{index + 1}</span>
-                <span className="">{post.title}</span>
-                <span className="">{new Date(post.created_at).toLocaleDateString()}</span>
-                <span
-                  className={` px-3 py-1 rounded ${
-                    theme === "dark"
-                      ? "  border-white text-white"
-                      : "  border-[#0d1117] text-[#0d1117] opacity-70 "
-                  } `}
-                >
-                  {post.like}
-                </span>
-                </div>
-
-                )
+                return (
+                  <div
+                    key={post.id}
+                    onClick={(e) => handlePostClick(post)}
+                    className={`flex justify-between p-2 border-b  ${
+                      theme === "dark"
+                        ? "  border-white text-white"
+                        : "  border-[#0d1117] text-[#0d1117] opacity-70 "
+                    }  `}
+                  >
+                    <span>{index + 1}</span>
+                    <span className="">{post.title}</span>
+                    <span className="">
+                      {new Date(post.created_at).toLocaleDateString()}
+                    </span>
+                    <span
+                      className={` px-3 py-1 rounded ${
+                        theme === "dark"
+                          ? "  border-white text-white"
+                          : "  border-[#0d1117] text-[#0d1117] opacity-70 "
+                      } `}
+                    >
+                      {post.like}
+                    </span>
+                  </div>
+                );
               })}
             </section>
           </article>
         </section>
         {selectedPost && (
-          <div className="absolute inset-0 bg-white bg-opacity-90 p-5">
+          <div className="absolute w-[784px] h-[650px] bg-white p-5 overflow-y-scroll ml-[37%] mt-[36%]">
             <h2 className="text-2xl font-bold">{selectedPost.title}</h2>
-            <p className="mt-2 text-gray-600">{new Date(selectedPost.created_at).toLocaleDateString()}</p>
+            <p className="mt-2 text-gray-600">
+              {new Date(selectedPost.created_at).toLocaleDateString()}
+            </p>
             <p className="mt-4">{selectedPost.content}</p>
-            <button onClick={handleCloseDetail} className="mt-4 px-4 py-2 bg-gray-300 rounded">Close</button>
+            <button
+              onClick={handleCloseDetail}
+              className="mt-4 px-4 py-2 bg-gray-300 rounded"
+            >
+              Close
+            </button>
           </div>
         )}
       </section>
-      <div className="flex mt-20 justify-between items-center w-[80%] ml-[300px] pl-48">
+      <div className="flex mt-20 justify-between items-center w-[80%] ml-[292px] pl-48">
         <div className="flex items-center space-x-4">
           <button className="ml-6 px-4 py-2 bg-gray-200 rounded-lg">
             {"<"}
@@ -121,11 +126,17 @@ function NoticeBoard() {
           <span className="w-3 flex justify-center items-center"></span>
           <button className="px-4 py-2 bg-gray-200 rounded-lg">{">"}</button>
         </div>
-        <button onClick={() => setIsModalOpen(true)} className="bg-white font-bold text-black rounded-lg px-5 py-3 w-auto ml-20">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-white font-bold text-black rounded-lg px-5 py-3 w-auto ml-20"
+        >
           글쓰기
         </button>
       </div>
-      <WritePostModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <WritePostModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </main>
   );
 }
