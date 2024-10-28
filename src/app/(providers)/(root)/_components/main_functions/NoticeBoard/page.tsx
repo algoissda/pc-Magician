@@ -1,6 +1,6 @@
 import { useThemeStore } from "@/store/useStore";
 
-function QuestionAndAnswer() {
+function NoticeBoard() {
   const theme = useThemeStore((state) => state.theme);
   return (
     <main>
@@ -95,4 +95,4 @@ function QuestionAndAnswer() {
   );
 }
 
-export default QuestionAndAnswer;
+export default NoticeBoard;

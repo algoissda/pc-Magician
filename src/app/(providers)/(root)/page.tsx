@@ -4,25 +4,38 @@
 import { useActiveStore } from "@/store/useActiveTab";
 import { useThemeStore } from "@/store/useStore";
 import { useEffect, useState } from "react";
-import Build from "./_components/main_functions/build/Build";
-import QuestionAndAnswer from "./_components/main_functions/QuestionAnswer/page";
-import CommunityBuilds from "./_components/main_functions/community_builds/CommunityBuilds";
+import Build from "./_components/main_functions/Build/Build";
+import CommunityBuilds from "./_components/main_functions/CommunityBuilds/CommunityBuilds";
+import NoticeBoard from "./_components/main_functions/NoticeBoard/page";
 
-// 버튼 컴포넌트화
-const ThemeButton = ({ isActive, onClick, text, size }: any) => {
+const ThemeButton = ({ isActive, onClick, text, size, theme }: any) => {
+  const backgroundActiveThemeStyle = isActive
+    ? theme === "dark"
+      ? "bg-white"
+      : "bg-gray-800"
+    : theme === "dark"
+    ? "bg-[#0f1113]"
+    : "bg-white";
+
+  const textActiveThemeStyle = isActive
+    ? theme === "dark"
+      ? "bg-gradient-to-r from-slate-900 to-violet-800"
+      : "bg-gradient-to-r from-white to-white"
+    : theme === "dark"
+    ? "text-white"
+    : "text-transparent bg-clip-text bg-gradient-to-r from-violet-700 to-blue-500";
+
   return (
     <section className="font-serif w-full lg:w-60 mb-4 p-[1px] bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400 rounded-full">
       <button
         onClick={onClick}
-        className={`w-full flex items-center justify-center ${size} h-[50px] ${
-          isActive ? "bg-[#ffffff]" : "bg-[#0f1113]"
-        } rounded-full`}
+        className={`w-full flex items-center justify-center ${size} h-[50px] ${backgroundActiveThemeStyle} rounded-full`}
       >
         <p
           className={`${
             isActive
-              ? "text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-violet-800 bg-[60deg]"
-              : "text-white"
+              ? `${textActiveThemeStyle} text-transparent bg-clip-text `
+              : textActiveThemeStyle
           }`}
         >
           {text}
@@ -142,10 +155,10 @@ function MainPage() {
         </div>
         <div
           className={`absolute transition-all duration-700 top-0 ${
-            activeTab === "Q&A" ? "left-0" : "left-[400%]"
+            activeTab === "Notice Board" ? "left-0" : "left-[400%]"
           }`}
         >
-          <QuestionAndAnswer />
+          <NoticeBoard />
         </div>
         <div
           className={`absolute w-full py-14 pl-20 pr-24 block h-full transition-all duration-700 top-0 ${
@@ -162,7 +175,7 @@ function MainPage() {
           }`}
         >
           <img
-            className="absolute top-[7%] left-[180px] w-full object-cover"
+            className="absolute top-[7%] right-[-15%] h-[90%] object-contain"
             src="https://i.ibb.co/vx1KXC8/image-720.png"
             alt="Custom PC"
           />
@@ -192,23 +205,26 @@ function MainPage() {
             isActive={activeTab === "Build a PC"}
             onClick={() => setActiveTab("Build a PC")}
             text="Build a PC"
-            size="text-lg sm:text-xl md:text-2xl lg:text-3xl"
+            size="text-2xl"
+            theme={theme}
           />
           <ThemeButton
             isActive={activeTab === "Community Builds"}
             onClick={() => setActiveTab("Community Builds")}
             text="Community Builds"
             size="text-2xl"
+            theme={theme}
           />
           <ThemeButton
-            isActive={activeTab === "Q&A"}
-            onClick={() => setActiveTab("Q&A")}
-            text="Q&A"
-            size="text-3xl"
+            isActive={activeTab === "Notice Board"}
+            onClick={() => setActiveTab("Notice Board")}
+            text="Notice Board"
+            size="text-2xl"
+            theme={theme}
           />
         </header>
       </nav>
-      <main className="relative flex-grow p-5 h-[90%] z-10 overflow-hidden">
+      <main className="relative flex-grow p-5 h-[90%] z-10 overflow-hidden ">
         <div className="flex w-full">{renderFormContent()}</div>
       </main>
     </div>

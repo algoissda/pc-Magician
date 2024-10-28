@@ -8,6 +8,7 @@ import { supabase } from "../../../../../../supabase/client";
 import { BuildCard } from "./SavedBuildComponents/BuildCard";
 import { BuildDetailsPanel } from "./SavedBuildComponents/BuildDetailsPanel";
 import build from "next/dist/build";
+import ThemeImage from "./SavedBuildComponents/ThemeImage";
 
 const CommunityBuilds = () => {
   const [builds, setBuilds] = useState<any[]>([]);
@@ -74,13 +75,13 @@ const CommunityBuilds = () => {
       const { data: buildsData, error: buildsError } = await query;
 
       if (buildsError) {
-        console.error("Error fetching builds:", buildsError.message);
+        // console.error("Error fetching builds:", buildsError.message);
         setLoading(false);
         return;
       }
 
       if (!buildsData || buildsData.length === 0) {
-        console.log("No builds found.");
+        // console.log("No builds found.");
         setLoading(false);
         return;
       }
@@ -154,7 +155,7 @@ const CommunityBuilds = () => {
 
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching builds:", error.message);
+      // console.error("Error fetching builds:", error.message);
       setLoading(false);
     }
   };
@@ -216,7 +217,7 @@ const CommunityBuilds = () => {
   const handleBuildClick = async (buildId: any) => {
     try {
       setLoading(true);
-      console.log("Fetching details for buildId:", buildId); // 로그 추가
+      // console.log("Fetching details for buildId:", buildId); // 로그 추가
       // 선택된 빌드의 상세 정보를 가져옴
       const { data: buildDetails, error: buildDetailsError } = await supabase
         .from("builds")
@@ -230,7 +231,7 @@ const CommunityBuilds = () => {
         );
       }
 
-      console.log("Build details fetched:", buildDetails); // 로그 추가
+      // console.log("Build details fetched:", buildDetails); // 로그 추가
 
       const productsData = await fetchProductPrices([buildDetails]);
       const buildWithPrices = calculateBuildPrice(buildDetails, productsData);
@@ -238,10 +239,10 @@ const CommunityBuilds = () => {
       setSelectedBuild(buildWithPrices); // 선택된 빌드 설정
       setSelectedBuildPriceMap(productsData); // 가격 정보 저장
       setLoading(false);
-      console.log("Selected build:", buildWithPrices); // 로그 추가
+      // console.log("Selected build:", buildWithPrices); // 로그 추가
     } catch (error) {
       setLoading(false);
-      console.error("Error fetching build details:", error.message);
+      // console.error("Error fetching build details:", error.message);
     }
   };
 
@@ -253,10 +254,10 @@ const CommunityBuilds = () => {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      console.error(
-        "사용자를 가져오는 중 오류 발생:",
-        authError || "사용자가 로그인하지 않았습니다."
-      );
+      // console.error(
+      //   "사용자를 가져오는 중 오류 발생:",
+      //   authError || "사용자가 로그인하지 않았습니다."
+      // );
       return;
     }
 
@@ -270,21 +271,21 @@ const CommunityBuilds = () => {
       .select();
 
     if (buildInsertError) {
-      console.error("Error inserting build data:", buildInsertError);
+      // console.error("Error inserting build data:", buildInsertError);
       return;
     }
 
     build_id = insertedBuild[0].id;
-    console.log("새로운 build를 삽입했습니다.");
+    // console.log("새로운 build를 삽입했습니다.");
 
     const { error: savedBuildsError } = await supabase
       .from("saved_builds")
       .insert([{ uid, build_id }]);
 
     if (savedBuildsError) {
-      console.error("Error inserting into saved_builds:", savedBuildsError);
+      // console.error("Error inserting into saved_builds:", savedBuildsError);
     } else {
-      console.log("Build data and saved_builds entry inserted successfully");
+      // console.log("Build data and saved_builds entry inserted successfully");
     }
   };
 
@@ -325,54 +326,6 @@ const CommunityBuilds = () => {
       tabChange.current = true; //
       setPage((prev) => prev - 1);
     }
-  };
-
-  // 이미지 컴포넌트화
-  const ThemeImage = ({ theme, mouseX, mouseY }: any) => {
-    // window 객체가 존재하는지 확인하여 클라이언트에서만 실행
-    const moveX =
-      typeof window !== "undefined"
-        ? (mouseX - window.innerWidth / 2) * -0.01
-        : 0;
-    const moveY =
-      typeof window !== "undefined"
-        ? (mouseY - window.innerHeight / 2) * -0.01
-        : 0;
-
-    return (
-      <>
-        <div
-          // 라이트 모드
-          className={`absolute inset-0 bg-gradient-to-r from-gray-400/0 to-gray-400 z-0 pointer-events-none theme-opacity ${
-            theme !== "dark" ? "opacity-100" : "opacity-0"
-          }`}
-        ></div>
-        <div
-          // 다크 모드
-          className={`absolute inset-0 bg-gradient-to-r from-pink-500/0 to-black z-0 pointer-events-none theme-opacity ${
-            theme === "dark" ? "opacity-100" : "opacity-0"
-          }`}
-        ></div>
-        <img
-          // 라이트 모드
-          src="https://image.tmdb.org/t/p/original/x5BwPpYXAEYDgh4RHFnaVSz2Ogi.jpg"
-          alt=""
-          style={{ transform: `translate(${moveX}px, ${moveY}px)` }}
-          className={`absolute inset-0 w-full transform transition-transform duration-500 ease-in-out ${
-            theme !== "dark" ? "opacity-100 " : "opacity-0 "
-          } pointer-events-none blur-mask`}
-        />
-        <img
-          // 다크 모드
-          src="https://i.ibb.co/GPRBP2d/miku.jpg"
-          alt=""
-          style={{ transform: `translate(${moveX}px, ${moveY}px)` }}
-          className={`absolute inset-0 w-full transform transition-transform duration-500 ease-in-out ${
-            theme === "dark" ? "opacity-100 " : "opacity-0 "
-          } pointer-events-none blur-mask`}
-        />
-      </>
-    );
   };
 
   const textThemeStyle = theme === "dark" ? "text-white" : "text-black"; // dark 모드일 때 흰색, 아니면 검은색

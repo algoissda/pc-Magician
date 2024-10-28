@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const HeaderButton = ({ children, href, theme }: any) => {
-  console.log("HeaderButton theme:", theme);
+  // console.log("HeaderButton theme:", theme);
   return (
     <Link
       href={href}
