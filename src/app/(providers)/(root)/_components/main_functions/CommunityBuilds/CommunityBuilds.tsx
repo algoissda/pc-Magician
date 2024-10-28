@@ -36,6 +36,7 @@ const CommunityBuilds = () => {
     try {
       setLoading(true);
 
+      // 사용자 정보를 가져와서 userId 추출
       const { data: userData, error: userError } =
         await supabase.auth.getUser();
       let userId: string | null = null;
@@ -45,6 +46,7 @@ const CommunityBuilds = () => {
 
       let savedBuildIds: string[] = [];
 
+      // 로그인이 되어 있을 때만 사용자가 저장한 build_id 목록을 조회
       if (userId) {
         const { data: userSavedBuilds, error: savedBuildsError } =
           await supabase
@@ -53,15 +55,21 @@ const CommunityBuilds = () => {
             .eq("uid", userId);
 
         if (savedBuildsError) {
+          // console.error(
+          //   "Error fetching user saved builds:",
+          //   savedBuildsError.message
+          // );
           setLoading(false);
           return;
         }
 
+        // 사용자가 저장한 build_id 목록을 배열로 변환
         savedBuildIds = userSavedBuilds
           ? userSavedBuilds.map((item) => item.build_id)
           : [];
       }
 
+      // 기본 빌드 조회 쿼리 설정 및 필터 적용
       let query = supabase
         .from("saved_builds")
         .select("builds(*), uid")
@@ -70,12 +78,14 @@ const CommunityBuilds = () => {
           pageNumber * buildsPerPage - 1
         );
 
+      // 로그인 상태일 때만 사용자 본인이 저장한 build_id 및 uid 제외 조건 추가
       if (userId) {
         query = query
           .neq("uid", userId)
           .not("build_id", "in", `(${savedBuildIds.join(",")})`);
       }
 
+      // 카테고리 필터 적용
       switch (selectedCategory) {
         case "사무용":
           query = query.lte("builds.total_price", 70 * 10000);
@@ -100,41 +110,48 @@ const CommunityBuilds = () => {
           break;
       }
 
+      // 가격 범위 필터 적용
       if (minPrice !== null)
         query = query.gte("builds.total_price", minPrice * 10000);
       if (maxPrice !== null)
         query = query.lte("builds.total_price", maxPrice * 10000);
 
+      // 빌드 데이터 가져오기
       const { data: buildsData, error: buildsError } = await query;
       if (buildsError) {
+        // console.error("Error fetching builds:", buildsError.message);
         setLoading(false);
         return;
       }
 
       if (!buildsData || buildsData.length === 0) {
+        // console.log("No builds found.");
         setLoading(false);
         return;
       }
 
-      // 중복 제거
-      const uniqueBuilds = Array.from(
-        new Map(
-          buildsData.map((entry) => [entry.builds.id, entry.builds])
-        ).values()
-      );
-
+      // 정렬 적용 (낮은가격순, 높은가격순, 생성일 순)
       if (sortBy === "낮은가격순") {
-        uniqueBuilds.sort((a, b) => a.total_price - b.total_price);
+        buildsData.sort(
+          (a, b) => a.builds?.total_price - b.builds?.total_price
+        );
       } else if (sortBy === "높은가격순") {
-        uniqueBuilds.sort((a, b) => b.total_price - a.total_price);
+        buildsData.sort(
+          (a, b) => b.builds?.total_price - a.builds?.total_price
+        );
       } else {
-        uniqueBuilds.sort((a, b) => {
-          const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
-          const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
-          return dateB - dateA;
+        buildsData.sort((a, b) => {
+          const dateA = a.builds?.created_at
+            ? new Date(a.builds.created_at).getTime()
+            : 0;
+          const dateB = b.builds?.created_at
+            ? new Date(b.builds.created_at).getTime()
+            : 0;
+          return dateB - dateA; // 최신순으로 정렬
         });
       }
 
+      // 다음 페이지 데이터 확인을 위한 추가 요청 (다음 페이지 데이터가 있는지 확인)
       const nextPageQuery = supabase
         .from("saved_builds")
         .select("builds:build_id(*), uid")
@@ -143,9 +160,11 @@ const CommunityBuilds = () => {
       const { data: nextPageData } = await nextPageQuery;
       setHasNextPage(nextPageData && nextPageData.length > 0);
 
-      const builds = uniqueBuilds
-        .map((build) => {
-          if (!build) return null;
+      // saved_builds 테이블의 데이터를 builds 테이블 형식으로 변환 및 날짜 변환
+      const builds = buildsData
+        .map((entry) => {
+          const build = entry.builds;
+          if (!build) return null; // build가 없는 경우 null 처리
           const createdAt = new Date(build.created_at);
           const formattedDate = `${createdAt.getFullYear()}.${(
             createdAt.getMonth() + 1
@@ -157,11 +176,12 @@ const CommunityBuilds = () => {
             .padStart(2, "0")}`;
           return { ...build, creationDate: formattedDate };
         })
-        .filter((build) => build !== null);
+        .filter((build) => build !== null); // null 값 필터링
 
       setBuilds(builds);
       setVisibleCards(new Array(builds.length).fill(false));
 
+      // 애니메이션을 통해 각 카드를 순차적으로 표시
       builds.forEach((_, index) => {
         setTimeout(() => {
           setVisibleCards((prev) => {
@@ -169,11 +189,12 @@ const CommunityBuilds = () => {
             newState[index] = true;
             return newState;
           });
-        }, index * 100);
+        }, index * 100); // 100ms 간격으로 카드를 순차적으로 표시
       });
 
       setLoading(false);
     } catch (error) {
+      // console.error("Error fetching builds:", error.message);
       setLoading(false);
     }
   };
@@ -330,7 +351,7 @@ const CommunityBuilds = () => {
     ? "opacity-100 pointer-events-auto "
     : "opacity-0 pointer-events-none ";
   const borderColorThemeStyle =
-    theme === "dark" ? "border-cyan-400" : "border-pink-500";
+    theme === "dark" ? "border-gray-300" : "border-[#0D1117]";
   const priceRangeTotalStyle = `${backgroundThemeStyle} ${textThemeStyle} max-w-32 h-8 border border-white rounded-xl px-2 flex justify-center items-center`;
   const selectPriceRangeTotalStyle = `${selectBackgroundThemeStyle} ${selectTextThemeStyle} max-w-32 h-8 border border-black rounded-xl px-2 flex justify-center items-center`;
 
