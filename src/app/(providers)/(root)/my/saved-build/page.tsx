@@ -16,6 +16,9 @@ const CommunityBuilds = () => {
   const [selectedBuildPriceMap, setSelectedBuildPriceMap] = useState<
     any | null
   >(null); // 가격 정보 저장
+  const [selectedBuildExplanations, setSelectedBuildExplanations] = useState<
+    any | null
+  >(null); // 부품 설명 정보 저장
   const [visibleCards, setVisibleCards] = useState<boolean[]>([]); // BuildCard의 표시 상태 관리
   const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState(1);
@@ -75,13 +78,11 @@ const CommunityBuilds = () => {
       const { data: buildsData, error: buildsError } = await query;
 
       if (buildsError) {
-        // console.error("Error fetching builds:", buildsError.message);
         setLoading(false);
         return;
       }
 
       if (!buildsData || buildsData.length === 0) {
-        // console.log("No builds found.");
         setLoading(false);
         return;
       }
@@ -155,7 +156,6 @@ const CommunityBuilds = () => {
 
       setLoading(false);
     } catch (error) {
-      // console.error("Error fetching builds:", error.message);
       setLoading(false);
     }
   };
@@ -178,7 +178,7 @@ const CommunityBuilds = () => {
 
     const { data: productsData, error: productsError } = await supabase
       .from("products")
-      .select("product_name, price")
+      .select("product_name, price, explanation") // 설명을 포함하여 불러옴
       .in("product_name", productNames);
 
     if (productsError || !productsData) {
@@ -187,16 +187,24 @@ const CommunityBuilds = () => {
       );
     }
 
-    return productsData.reduce((acc, product) => {
+    const priceMap = productsData.reduce((acc, product) => {
       acc[product.product_name] = product.price;
       return acc;
     }, {});
+
+    const explanationMap = productsData.reduce((acc, product) => {
+      acc[product.product_name] = product.explanation;
+      return acc;
+    }, {});
+
+    return { priceMap, explanationMap };
   };
 
   // 빌드의 가격을 계산하는 함수
-  const calculateBuildPrice = (
+  const calculateBuildDetails = (
     build,
-    productPriceMap: { [x: string]: any }
+    productPriceMap: { [x: string]: any },
+    productExplanationMap: { [x: string]: any }
   ) => {
     const totalPrice = [
       build.Case,
@@ -210,15 +218,28 @@ const CommunityBuilds = () => {
       build.VGA,
     ].reduce((sum, part) => sum + (productPriceMap[part] || 0), 0);
 
-    return { ...build, totalPrice };
+    const partExplanations = [
+      build.Case,
+      build.Cooler,
+      build.CPU,
+      build.HDD,
+      build.MBoard,
+      build.Power,
+      build.RAM,
+      build.SSD,
+      build.VGA,
+    ].reduce((acc, part) => {
+      acc[part] = productExplanationMap[part] || "No explanation available.";
+      return acc;
+    }, {});
+
+    return { ...build, totalPrice, partExplanations };
   };
 
   // 상세 정보를 클릭했을 때 빌드 상세 정보를 가져오는 함수
   const handleBuildClick = async (buildId: any) => {
     try {
       setLoading(true);
-      // console.log("Fetching details for buildId:", buildId); // 로그 추가
-      // 선택된 빌드의 상세 정보를 가져옴
       const { data: buildDetails, error: buildDetailsError } = await supabase
         .from("builds")
         .select("*")
@@ -231,71 +252,30 @@ const CommunityBuilds = () => {
         );
       }
 
-      // console.log("Build details fetched:", buildDetails); // 로그 추가
+      const { priceMap, explanationMap } = await fetchProductPrices([
+        buildDetails,
+      ]);
+      const buildWithDetails = calculateBuildDetails(
+        buildDetails,
+        priceMap,
+        explanationMap
+      );
 
-      const productsData = await fetchProductPrices([buildDetails]);
-      const buildWithPrices = calculateBuildPrice(buildDetails, productsData);
-
-      setSelectedBuild(buildWithPrices); // 선택된 빌드 설정
-      setSelectedBuildPriceMap(productsData); // 가격 정보 저장
+      setSelectedBuild(buildWithDetails); // 선택된 빌드 설정
+      setSelectedBuildPriceMap(priceMap); // 가격 정보 저장
+      setSelectedBuildExplanations(buildWithDetails.partExplanations); // 설명 정보 저장
       setLoading(false);
-      // console.log("Selected build:", buildWithPrices); // 로그 추가
     } catch (error) {
       setLoading(false);
-      // console.error("Error fetching build details:", error.message);
-    }
-  };
-
-  // 삽입하는 거
-  const insertBuildData = async () => {
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      // console.error(
-      //   "사용자를 가져오는 중 오류 발생:",
-      //   authError || "사용자가 로그인하지 않았습니다."
-      // );
-      return;
-    }
-
-    const uid = user.id;
-
-    let build_id;
-
-    const { data: insertedBuild, error: buildInsertError } = await supabase
-      .from("builds")
-      .insert([buildData])
-      .select();
-
-    if (buildInsertError) {
-      // console.error("Error inserting build data:", buildInsertError);
-      return;
-    }
-
-    build_id = insertedBuild[0].id;
-    // console.log("새로운 build를 삽입했습니다.");
-
-    const { error: savedBuildsError } = await supabase
-      .from("saved_builds")
-      .insert([{ uid, build_id }]);
-
-    if (savedBuildsError) {
-      // console.error("Error inserting into saved_builds:", savedBuildsError);
-    } else {
-      // console.log("Build data and saved_builds entry inserted successfully");
     }
   };
 
   useEffect(() => {
-    // activeTab이 "Community Builds"로 변경되고 tabChange.current가 true일 때만 fetchBuilds 실행
     if (activeTab === "Community Builds" && tabChange.current) {
       fetchBuilds(page);
-      tabChange.current = false; // 실행 후 한번만 실행되도록 변경
+      tabChange.current = false;
     } else if (activeTab !== "Community Builds" && !tabChange.current) {
-      tabChange.current = true; // activeTab이 다른 탭으로 변경되면 다시 true로 변경
+      tabChange.current = true;
     }
   }, [activeTab, page]);
 
@@ -310,20 +290,19 @@ const CommunityBuilds = () => {
   }, [page, minPrice, maxPrice, selectedCategory, sortBy]);
 
   const handlePriceRangeSearch = () => {
-    // 페이지를 1로 초기화하고 useEffect에서 자동으로 빌드를 가져오도록 설정
     setPage(1);
   };
 
   const nextPage = () => {
     if (hasNextPage) {
-      tabChange.current = true; //
+      tabChange.current = true;
       setPage((prev) => prev + 1);
     }
   };
 
   const prevPage = () => {
     if (page > 1) {
-      tabChange.current = true; //
+      tabChange.current = true;
       setPage((prev) => prev - 1);
     }
   };
@@ -362,6 +341,7 @@ const CommunityBuilds = () => {
               <BuildDetailsPanel
                 selectedBuild={selectedBuild}
                 productPriceMap={selectedBuildPriceMap} // 가격 정보 전달
+                partExplanations={selectedBuildExplanations} // 부품 설명 전달
                 theme={theme}
                 onClose={() => setSelectedBuild(null)} // 패널 닫기 기능
                 fetchBuilds={() => fetchBuilds(1)}
