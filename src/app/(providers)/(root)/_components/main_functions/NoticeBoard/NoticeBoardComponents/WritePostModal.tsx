@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { supabase } from "../../../../../../../../supabase/client";
 
-
 interface WritePostModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
 const WritePostModal = ({ isOpen, onClose }: WritePostModalProps) => {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [type, setType] = useState('');
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [type, setType] = useState("");
 
   if (!isOpen) return null;
 
@@ -18,12 +17,12 @@ const WritePostModal = ({ isOpen, onClose }: WritePostModalProps) => {
     e.preventDefault();
 
     const postData = {
-        type,
-        title,
-        content,
-        like:0,
-        created_at: new Date().toISOString(),
-    }
+      type,
+      title,
+      content,
+      like: 0,
+      created_at: new Date().toISOString(),
+    };
     const { data, error } = await supabase.from("post").insert([postData]);
     if (error) {
       console.error("Error inserting post:", error);
@@ -33,10 +32,13 @@ const WritePostModal = ({ isOpen, onClose }: WritePostModalProps) => {
     }
   };
   return (
-    <div onClick={onClose} className="fixed inset-0 flex items-center justify-center">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 flex items-center justify-center"
+    >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white p-10 rounded shadow-lg w-full h-full max-w-[800px] max-h-[600px] ml-[440px] mt-[40px]"
+        className="bg-white p-10 rounded shadow-lg w-[786px] h-[800px] max-w-[800px] max-h-[600px] mt-[183px] ml-[553px]"
       >
         <h3 className="text-xl font-bold mb-4">Write a New Post</h3>
         <form onSubmit={handleSubmit}>
@@ -81,7 +83,7 @@ const WritePostModal = ({ isOpen, onClose }: WritePostModalProps) => {
         </form>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default WritePostModal
+export default WritePostModal;
