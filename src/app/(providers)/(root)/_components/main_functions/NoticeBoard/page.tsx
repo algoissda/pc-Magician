@@ -109,10 +109,8 @@ function NoticeBoard() {
                   {post.like}
                 </span>
                 </div>
-
                 )
               })}
-
             </section>
           </article>
         </section>
