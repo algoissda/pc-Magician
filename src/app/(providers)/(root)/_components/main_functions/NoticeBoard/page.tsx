@@ -17,6 +17,7 @@ function NoticeBoard() {
   const theme = useThemeStore((state) => state.theme);
   const [posts, setPosts] = useState<PostType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<PostType | null>(null);
 
 
   useEffect(() => {
@@ -31,7 +32,14 @@ function NoticeBoard() {
     };
 
     fetchPosts();
-  }, [])
+  }, []);
+
+  const handlePostClick = (post:PostType) => {
+    setSelectedPost(post);
+  }
+  const handleCloseDetail = () => {
+    setSelectedPost(null);
+  }
 
   return (
     <main>
@@ -64,32 +72,12 @@ function NoticeBoard() {
                 <span className="ml-[210px]">작성 날짜</span>
                 <span>Action</span>
               </div>
-              {/* <div
-            className={`flex justify-between p-2 border-b   ${
-              theme === "dark"
-                ? "  border-white text-white"
-                : "  border-[#0d1117] text-[#0d1117] opacity-70 "
-            }  `}
-          >
-            <span>1</span>
-            <span>제목1</span>
-            <span>작성 날짜1</span>
-            <span
-              className={` px-3 py-1 rounded ${
-                theme === "dark"
-                  ? "  border-white text-white"
-                  : "  border-[#0d1117] text-[#0d1117] opacity-70 "
-              } `}
-            >
-              개추
-            </span>
-          </div> */}
-              {/* 반복 돌릴 때 이 아래 부분은 지우고, 위에 부분만 반복 시키면 됨 */}
               {posts.map((post, index) => {
 
                 return(
 
                   <div key={post.id}
+                  onClick={(e) => handlePostClick(post)}
                 className={`flex justify-between p-2 border-b  ${
                   theme === "dark"
                     ? "  border-white text-white"
@@ -109,11 +97,20 @@ function NoticeBoard() {
                   {post.like}
                 </span>
                 </div>
+
                 )
               })}
             </section>
           </article>
         </section>
+        {selectedPost && (
+          <div className="absolute inset-0 bg-white bg-opacity-90 p-5">
+            <h2 className="text-2xl font-bold">{selectedPost.title}</h2>
+            <p className="mt-2 text-gray-600">{new Date(selectedPost.created_at).toLocaleDateString()}</p>
+            <p className="mt-4">{selectedPost.content}</p>
+            <button onClick={handleCloseDetail} className="mt-4 px-4 py-2 bg-gray-300 rounded">Close</button>
+          </div>
+        )}
       </section>
       <div className="flex mt-20 justify-between items-center w-[80%] ml-[300px] pl-48">
         <div className="flex items-center space-x-4">
