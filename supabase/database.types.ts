@@ -1,3 +1,4 @@
+
 export type Json =
   | string
   | number
@@ -11,7 +12,7 @@ export type Database = {
     Tables: {
       builds: {
         Row: {
-          Case: string | null
+          Case: string
           Cooler: string
           CPU: string
           created_at: string
@@ -22,10 +23,11 @@ export type Database = {
           Power: string
           RAM: string
           SSD: string | null
+          total_price: number | null
           VGA: string
         }
         Insert: {
-          Case?: string | null
+          Case: string
           Cooler: string
           CPU: string
           created_at?: string
@@ -36,10 +38,11 @@ export type Database = {
           Power: string
           RAM: string
           SSD?: string | null
+          total_price?: number | null
           VGA: string
         }
         Update: {
-          Case?: string | null
+          Case?: string
           Cooler?: string
           CPU?: string
           created_at?: string
@@ -50,9 +53,101 @@ export type Database = {
           Power?: string
           RAM?: string
           SSD?: string | null
+          total_price?: number | null
           VGA?: string
         }
         Relationships: []
+      }
+      comment: {
+        Row: {
+          content: string
+          created_at: string
+          id: number
+          post_id: number
+          uid: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: number
+          post_id: number
+          uid?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: number
+          post_id?: number
+          uid?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "post"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post: {
+        Row: {
+          content: string
+          created_at: string
+          id: number
+          like: number
+          title: string
+          type: string
+          uid: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: number
+          like: number
+          title: string
+          type: string
+          uid?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: number
+          like?: number
+          title?: string
+          type?: string
+          uid?: string
+        }
+        Relationships: []
+      }
+      post_like: {
+        Row: {
+          created_at: string
+          id: number
+          post_id: number
+          uid: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          post_id: number
+          uid?: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          post_id?: number
+          uid?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_like_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "post"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
@@ -86,24 +181,32 @@ export type Database = {
       }
       saved_builds: {
         Row: {
-          build_id: number | null
+          build_id: number
           created_at: string
           id: number
-          uid: string | null
+          uid: string
         }
         Insert: {
-          build_id?: number | null
+          build_id: number
           created_at?: string
           id?: number
-          uid?: string | null
+          uid?: string
         }
         Update: {
-          build_id?: number | null
+          build_id?: number
           created_at?: string
           id?: number
-          uid?: string | null
+          uid?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "saved_build_build_id_fkey"
+            columns: ["build_id"]
+            isOneToOne: false
+            referencedRelation: "builds"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

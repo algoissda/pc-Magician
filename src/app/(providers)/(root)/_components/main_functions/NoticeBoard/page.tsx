@@ -1,7 +1,36 @@
-import { useThemeStore } from "@/store/useStore";
+'use client';
 
+import { useThemeStore } from "@/store/useStore";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { supabase } from "../../../../../../../supabase/client";
+
+interface PostType {
+  id: number;
+  type: string;
+  title: string;
+  content: string;
+  like: number;
+  created_at: string;
+}
 function NoticeBoard() {
   const theme = useThemeStore((state) => state.theme);
+  const [posts, setPosts] = useState<PostType[]>([]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const {data, error} = await supabase.from("post").select("*");
+      if(error){
+        console.error(error);
+      }else{
+        setPosts(data);
+      }
+
+    };
+
+    fetchPosts();
+  }, [])
+
   return (
     <main>
       <section className="flex flex-col items-center justify-center h-full w-full">
@@ -54,16 +83,20 @@ function NoticeBoard() {
             </span>
           </div> */}
               {/* 반복 돌릴 때 이 아래 부분은 지우고, 위에 부분만 반복 시키면 됨 */}
-              <div
+              {posts.map((post, index) => {
+
+                return(
+
+                  <div key={post.id}
                 className={`flex justify-between p-2 border-b  ${
                   theme === "dark"
                     ? "  border-white text-white"
                     : "  border-[#0d1117] text-[#0d1117] opacity-70 "
                 }  `}
-              >
-                <span>2</span>
-                <span className="">제목2</span>
-                <span className="">작성 날짜2</span>
+                >
+                <span>{index + 1}</span>
+                <span className="">{post.title}</span>
+                <span className="">{new Date(post.created_at).toLocaleDateString()}</span>
                 <span
                   className={` px-3 py-1 rounded ${
                     theme === "dark"
@@ -71,9 +104,13 @@ function NoticeBoard() {
                       : "  border-[#0d1117] text-[#0d1117] opacity-70 "
                   } `}
                 >
-                  개추
+                  {post.like}
                 </span>
-              </div>
+                </div>
+
+                )
+              })}
+
             </section>
           </article>
         </section>
@@ -87,9 +124,9 @@ function NoticeBoard() {
           <span className="w-3 flex justify-center items-center"></span>
           <button className="px-4 py-2 bg-gray-200 rounded-lg">{">"}</button>
         </div>
-        <button className="bg-white font-bold text-black rounded-lg px-5 py-3 w-auto ml-20">
+        <Link href={"/Post"} className="bg-white font-bold text-black rounded-lg px-5 py-3 w-auto ml-20">
           글쓰기
-        </button>
+        </Link>
       </div>
     </main>
   );
