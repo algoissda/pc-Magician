@@ -6,7 +6,7 @@ function NoticeBoard() {
     <main>
       <section className="flex flex-col items-center justify-center h-full w-full">
         <h2
-          className={`text-6xl  ml-[25rem] mt-16 font-serif ${
+          className={`text-6xl  ml-[21rem] mt-16 font-serif ${
             theme === "dark" ? "  text-gray-300" : "  text-gray-800 "
           }`}
         >
@@ -14,7 +14,7 @@ function NoticeBoard() {
         </h2>
         <section className="w-full mt-10 ml-[25rem]">
           <article className="flex-grow">
-            <section className="bg-black bg-opacity-20 min-h-[500px]  ">
+            <section className="bg-black bg-opacity-20 min-h-[500px] mr-20">
               <div
                 className={`flex justify-between p-2 border-b font-bold  ${
                   theme === "dark"
@@ -29,8 +29,8 @@ function NoticeBoard() {
                 >
                   No.
                 </span>
-                <span className="w-1/2 pl-[250px] absolute ">Title</span>
-                <span className="ml-[235px]">작성 날짜</span>
+                <span className="w-1/2 pl-[223px] absolute ">Title</span>
+                <span className="ml-[210px]">작성 날짜</span>
                 <span>Action</span>
               </div>
               {/* <div
@@ -78,7 +78,7 @@ function NoticeBoard() {
           </article>
         </section>
       </section>
-      <div className="flex mt-20 justify-between items-center w-[80%] ml-[300px] pl-60">
+      <div className="flex mt-20 justify-between items-center w-[80%] ml-[300px] pl-48">
         <div className="flex items-center space-x-4">
           <button className="ml-6 px-4 py-2 bg-gray-200 rounded-lg">
             {"<"}
