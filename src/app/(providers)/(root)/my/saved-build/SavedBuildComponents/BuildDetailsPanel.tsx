@@ -15,12 +15,13 @@ const createPartDetails = (build, productPriceMap) => {
     { key: "Case", label: "Case" },
   ];
 
-  return fields.map(({ key, label }) => {
+  return fields.map(({ key, label }, index) => {
     const partName = build?.[key];
     const price =
       partName && productPriceMap ? productPriceMap[partName] : "N/A";
 
     return {
+      key: `${key}-${index}`, // 고유 키 추가
       label,
       value: partName || "N/A",
       price: price || "N/A",
@@ -66,10 +67,10 @@ export const BuildDetailsPanel = ({
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      console.error(
-        "사용자를 가져오는 중 오류 발생:",
-        authError || "사용자가 로그인하지 않았습니다."
-      );
+      // console.error(
+      //   "사용자를 가져오는 중 오류 발생:",
+      //   authError || "사용자가 로그인하지 않았습니다."
+      // );
       setIsDelete(false);
       return;
     }
@@ -85,19 +86,19 @@ export const BuildDetailsPanel = ({
         .eq("build_id", build_id);
 
       if (savedBuildsError) {
-        console.error("Error deleting from saved_builds:", savedBuildsError);
+        // console.error("Error deleting from saved_builds:", savedBuildsError);
         setIsDelete(false);
         return;
       }
 
-      console.log("Saved build entry deleted successfully");
+      // console.log("Saved build entry deleted successfully");
 
       // 삭제 후 목록을 다시 불러오기
       fetchBuilds(1); // 첫 페이지를 로드
       handleClose(); // 패널을 닫음
     } catch (error) {
       setIsDelete(false);
-      console.error("Error deleting build:", error);
+      // console.error("Error deleting build:", error);
     }
   };
 

@@ -15,13 +15,13 @@ const createPartDetails = (build, productPriceMap) => {
     { key: "Case", label: "Case" },
   ];
 
-  return fields.map(({ key, label }) => {
+  return fields.map(({ key, label }, index) => {
     const partName = build?.[key];
     const price =
       partName && productPriceMap ? productPriceMap[partName] : "N/A";
 
     return {
-      key, // 고유 키 추가
+      key: `${key}-${index}`, // 고유 키 추가
       label,
       value: partName || "N/A",
       price: price || "N/A",
@@ -70,10 +70,10 @@ export const BuildDetailsPanel = ({
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      console.error(
-        "사용자를 가져오는 중 오류 발생:",
-        authError || "사용자가 로그인하지 않았습니다."
-      );
+      // console.error(
+      //   "사용자를 가져오는 중 오류 발생:",
+      //   authError || "사용자가 로그인하지 않았습니다."
+      // );
       setIsSaving(false);
       return;
     }
@@ -108,7 +108,7 @@ export const BuildDetailsPanel = ({
       .maybeSingle();
 
     if (buildCheckError) {
-      console.error("Error checking existing build:", buildCheckError);
+      // console.error("Error checking existing build:", buildCheckError);
       setIsSaving(false);
       return;
     }
@@ -125,13 +125,13 @@ export const BuildDetailsPanel = ({
         .select();
 
       if (buildInsertError) {
-        console.error("Error inserting build data:", buildInsertError);
+        // console.error("Error inserting build data:", buildInsertError);
         setIsSaving(false);
         return;
       }
 
       build_id = insertedBuild[0].id;
-      console.log("새로운 build를 삽입했습니다.");
+      // console.log("새로운 build를 삽입했습니다.");
     }
 
     // saved_builds 테이블에서 동일한 build_id가 있는지 확인
@@ -144,17 +144,17 @@ export const BuildDetailsPanel = ({
         .maybeSingle();
 
     if (savedBuildCheckError) {
-      console.error(
-        "Error checking existing saved build:",
-        savedBuildCheckError
-      );
+      // console.error(
+      //   "Error checking existing saved build:",
+      //   savedBuildCheckError
+      // );
       setIsSaving(false);
       return;
     }
 
     if (existingSavedBuild) {
       // 동일한 build_id가 이미 저장되어 있으면 저장하지 않음
-      console.log("동일한 견적이 이미 저장되어 있습니다. 저장하지 않습니다.");
+      // console.log("동일한 견적이 이미 저장되어 있습니다. 저장하지 않습니다.");
       setIsSaving(true);
       return;
     }
@@ -165,12 +165,10 @@ export const BuildDetailsPanel = ({
       .insert([{ uid, build_id }]);
 
     if (savedBuildsError) {
-      console.error("Error inserting into saved_builds:", savedBuildsError);
+      // console.error("Error inserting into saved_builds:", savedBuildsError);
     } else {
-      console.log("Build data and saved_builds entry inserted successfully");
+      // console.log("Build data and saved_builds entry inserted successfully");
     }
-
-    setIsSaving(false);
   };
 
   return (

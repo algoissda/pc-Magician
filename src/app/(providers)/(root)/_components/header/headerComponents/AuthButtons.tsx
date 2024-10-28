@@ -9,7 +9,7 @@ export const AuthButtons = ({
   theme, // 기본값 설정
 }: any) => {
   // theme 값 확인용 로그
-  console.log("Current theme in AuthButtons:", theme);
+  // console.log("Current theme in AuthButtons:", theme);
 
   const buttonClass =
     theme === "dark" ? "bg-white text-black" : "bg-black text-white";

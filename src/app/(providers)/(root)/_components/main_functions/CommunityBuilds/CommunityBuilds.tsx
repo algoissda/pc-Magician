@@ -7,6 +7,7 @@ import { supabase } from "../../../../../../../supabase/client";
 import { BuildCard } from "./CommunityBuildsComponents/BuildCard";
 import { BuildDetailsPanel } from "./CommunityBuildsComponents/BuildDetailsPanel";
 import { SelectBox } from "./CommunityBuildsComponents/SelectBox";
+import page from "../QuestionAnswer/page";
 const CommunityBuilds = () => {
   const [builds, setBuilds] = useState<any[]>([]);
   const [selectedBuild, setSelectedBuild] = useState<any | null>(null); // 선택된 빌드를 저장
@@ -50,10 +51,10 @@ const CommunityBuilds = () => {
             .eq("uid", userId);
 
         if (savedBuildsError) {
-          console.error(
-            "Error fetching user saved builds:",
-            savedBuildsError.message
-          );
+          // console.error(
+          //   "Error fetching user saved builds:",
+          //   savedBuildsError.message
+          // );
           setLoading(false);
           return;
         }
@@ -114,13 +115,13 @@ const CommunityBuilds = () => {
       // 빌드 데이터 가져오기
       const { data: buildsData, error: buildsError } = await query;
       if (buildsError) {
-        console.error("Error fetching builds:", buildsError.message);
+        // console.error("Error fetching builds:", buildsError.message);
         setLoading(false);
         return;
       }
 
       if (!buildsData || buildsData.length === 0) {
-        console.log("No builds found.");
+        // console.log("No builds found.");
         setLoading(false);
         return;
       }
@@ -189,7 +190,7 @@ const CommunityBuilds = () => {
 
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching builds:", error.message);
+      // console.error("Error fetching builds:", error.message);
       setLoading(false);
     }
   };
@@ -247,7 +248,7 @@ const CommunityBuilds = () => {
   const handleBuildClick = async (buildId: any) => {
     try {
       setLoading(true);
-      console.log("Fetching details for buildId:", buildId); // 로그 추가
+      // console.log("Fetching details for buildId:", buildId); // 로그 추가
       // 선택된 빌드의 상세 정보를 가져옴
       const { data: buildDetails, error: buildDetailsError } = await supabase
         .from("builds")
@@ -259,16 +260,16 @@ const CommunityBuilds = () => {
           "Error fetching build details: " + buildDetailsError.message
         );
       }
-      console.log("Build details fetched:", buildDetails); // 로그 추가
+      // console.log("Build details fetched:", buildDetails); // 로그 추가
       const productsData = await fetchProductPrices([buildDetails]);
       const buildWithPrices = calculateBuildPrice(buildDetails, productsData);
       setSelectedBuild(buildWithPrices); // 선택된 빌드 설정
       setSelectedBuildPriceMap(productsData); // 가격 정보 저장
       setLoading(false);
-      console.log("Selected build:", buildWithPrices); // 로그 추가
+      // console.log("Selected build:", buildWithPrices); // 로그 추가
     } catch (error) {
       setLoading(false);
-      console.error("Error fetching build details:", error.message);
+      // console.error("Error fetching build details:", error.message);
     }
   };
 
@@ -446,7 +447,7 @@ const CommunityBuilds = () => {
           <div className="grid grid-cols-4 gap-4 overflow-y-scroll max-h-[100%] pr-2">
             {builds.map((build, index) => (
               <div
-                key={build.id}
+                key={`${build.id}-${index}`} // 고유 키로 ID와 인덱스를 결합
                 className={`transition-all duration-500 ease-out transform ${
                   visibleCards[index]
                     ? "opacity-100 translate-y-0"

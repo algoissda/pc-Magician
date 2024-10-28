@@ -89,7 +89,7 @@ function Build() {
       const genAI = new GoogleGenerativeAI(apiKey);
       return genAI;
     } catch (error) {
-      console.error("Google AI 초기화 실패:", error);
+      // console.error("Google AI 초기화 실패:", error);
       return null;
     }
   };
@@ -167,7 +167,7 @@ function Build() {
             .range(0, limit - 1);
 
           if (error) {
-            console.error(`Error fetching products for type ${type}:`, error);
+            // console.error(`Error fetching products for type ${type}:`, error);
             return;
           }
 
@@ -188,7 +188,7 @@ function Build() {
       );
 
       if (productStrings) {
-        console.log(productStrings);
+        // console.log(productStrings);
 
         // 모든 API 키에 대해 각각 요청
         const promises = apiKeys.map(async (apiKey, index) => {
@@ -224,7 +224,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
 \n[${productStrings} # 예산:${budget}0000원]
 `;
 
-          console.log(prompt);
+          // console.log(prompt);
 
           // Each API call has its abort controller
           const abortController = new AbortController();
@@ -235,12 +235,12 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
           });
 
           if (abortController.signal.aborted) {
-            console.log(`Request ${index + 1} aborted.`);
+            // console.log(`Request ${index + 1} aborted.`);
             return Promise.reject(); // 종료 시 promise를 reject
           }
 
           const responseText = await result2.response.text();
-          console.log(responseText);
+          // console.log(responseText);
 
           const parts = parseParts(responseText);
 
@@ -270,11 +270,11 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
         console.warn("No products found for the given criteria.");
       }
     } catch (error) {
-      console.error("Error:", error);
+      // console.error("Error:", error);
       if (error.name === "AbortError") {
-        console.log("Build process was canceled.");
+        // console.log("Build process was canceled.");
       } else {
-        console.log("Retrying with adjusted parameters.");
+        // console.log("Retrying with adjusted parameters.");
         createBuild(0, limit - 10 > 0 ? limit - 10 : 10);
       }
     }
@@ -303,10 +303,10 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      console.error(
-        "사용자를 가져오는 중 오류 발생:",
-        authError || "사용자가 로그인하지 않았습니다."
-      );
+      // console.error(
+      //   "사용자를 가져오는 중 오류 발생:",
+      //   authError || "사용자가 로그인하지 않았습니다."
+      // );
       setSaved(false);
       return;
     }
@@ -341,7 +341,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
       .maybeSingle();
 
     if (buildCheckError) {
-      console.error("Error checking existing build:", buildCheckError);
+      // console.error("Error checking existing build:", buildCheckError);
       setSaved(false);
       return;
     }
@@ -350,7 +350,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
 
     if (existingBuild) {
       build_id = existingBuild.id;
-      console.log("동일한 견적을 찾았습니다. 기존 build_id를 사용합니다.");
+      // console.log("동일한 견적을 찾았습니다. 기존 build_id를 사용합니다.");
     } else {
       const { data: insertedBuild, error: buildInsertError } = await supabase
         .from("builds")
@@ -358,13 +358,13 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
         .select();
 
       if (buildInsertError) {
-        console.error("Error inserting build data:", buildInsertError);
+        // console.error("Error inserting build data:", buildInsertError);
         setSaved(false);
         return;
       }
 
       build_id = insertedBuild[0].id;
-      console.log("새로운 build를 삽입했습니다.");
+      // console.log("새로운 build를 삽입했습니다.");
     }
 
     const { error: savedBuildsError } = await supabase
@@ -372,10 +372,10 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
       .insert([{ uid, build_id }]);
 
     if (savedBuildsError) {
-      console.error("Error inserting into saved_builds:", savedBuildsError);
+      // console.error("Error inserting into saved_builds:", savedBuildsError);
       setSaved(false);
     } else {
-      console.log("Build data and saved_builds entry inserted successfully");
+      // console.log("Build data and saved_builds entry inserted successfully");
       setSaved(true);
     }
   };

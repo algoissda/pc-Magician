@@ -13,7 +13,6 @@ import {
 import { PartList } from "./BuildComponents/PartList";
 import { InputField } from "./BuildComponents/InputField";
 import { SelectBox } from "./BuildComponents/SelectBox";
-import { rule } from "postcss";
 
 type Part = {
   type: string;
@@ -42,6 +41,7 @@ function Build() {
   const [builded, setBuilded] = useState<boolean>(false);
   const [saved, setSaved] = useState<boolean>(false);
   const cancelTokens = useRef<Array<AbortController>>([]);
+  const isCancelled = useRef(false); // 빌드 중단 상태 플래그
 
   const apiKeys = [
     process.env.NEXT_PUBLIC_GOOGLE_API_KEY_1,
@@ -89,7 +89,7 @@ function Build() {
       const genAI = new GoogleGenerativeAI(apiKey);
       return genAI;
     } catch (error) {
-      console.error("Google AI 초기화 실패:", error);
+      // console.error("Google AI 초기화 실패:", error);
       return null;
     }
   };
@@ -105,7 +105,7 @@ function Build() {
         cancelTokens.current.forEach((token) => token.abort());
         cancelTokens.current = [];
       }
-      setBuilded(false);
+      setBuilded(false); // 빌드 상태를 false로 설정하여 즉시 중단
       return;
     }
 
@@ -144,11 +144,11 @@ function Build() {
               "explanation",
               type === "CPU" || type === "MBoard"
                 ? selectCpuType === "Intel"
-                  ? "%소켓1700%"
+                  ? "%인텔%"
                   : selectCpuType === "AMD"
-                  ? "%소켓AM%"
+                  ? "%AMD%"
                   : purpose === "사무용" || purpose === "보급형"
-                  ? "%소켓1700%"
+                  ? "%"
                   : "%"
                 : "%"
             )
@@ -167,7 +167,7 @@ function Build() {
             .range(0, limit - 1);
 
           if (error) {
-            console.error(`Error fetching products for type ${type}:`, error);
+            // console.error(`Error fetching products for type ${type}:`, error);
             return;
           }
 
@@ -186,13 +186,14 @@ function Build() {
           }
         })
       );
+      console.log(productStrings);
 
       if (productStrings) {
-        console.log(productStrings);
+        // console.log(productStrings);
 
         // 모든 API 키에 대해 각각 요청
         const promises = apiKeys.map(async (apiKey, index) => {
-          const genAI = initializeGoogleAI(apiKey);
+          const genAI = initializeGoogleAI(apiKey!);
           if (!genAI) {
             return Promise.resolve(); // API 초기화 실패 시 skip
           }
@@ -206,14 +207,14 @@ function Build() {
 아래의 규칙에 따라 견적을 작성하시오.
 1. 부품이 제공되는 양식은 부품타입:"부품이름" ~ 가격 이며 구분은 |으로 합니다. 다음은 데이터의 제공방식입니다.
 [{데이터의 리스트} # 예산:{예산}원]
-2. 최대한 좋은 부품을 선택하되 예산에 맞게 선택하시오. (사무용이나 저사양같은경우에는 라이젠 4세대도 좀 써라)
+2. 최대한 좋은 부품을 선택하되 예산에 맞게 선택하시오. (사무용이나 저사양같은경우에는 낮은 사양의 구성도 좋습니다.)
 예를들어 AMD의 경우 7900X보단 7800X3D를 선택 GPU의 경우 예산이 충분할때 4060보단 4060Ti를, 4070보단 4070SUPPER을 4070Ti보단 4070TiSUPPER과 같은 방식이다. 하지만 이 선택지는 모두 예산을 초과하지 않는 선에서의 선택지이다.
 3. 부품을 출력할때는 무작위성을 부여합니다. CPU를 선택할때는 인텔CPU는 60% AMD CPU는 40%입니다. VGA를 선택할때도 NVIDIA는 70% AMD는 30%로 설정합니다.
 4. 출력하는 각 부품의 이름과 가격은 제공된 부품의 이름과 가격이 동일해야 합니다. (출력하는 부품의 이름은 제공된 데이터의 부품이름과 완전히 동일해야합니다.)
 5. 모든 부품의 가격합계는 +- 150000원 이내이여야 합니다. 부품의 가격 합계가 150000원이내일 경우 상점을 5점 획득합니다. 만일 가격합계가 +-150000원을 초과하거나 미만일경우 10000원당 벌점 1점을 부과합니다.
 6. 제공되지 않은 부품의 경우 부품 이름을 공백으로 처리하고, 가격을 0으로 한다.
 7. 출력 양식은 다음과 같이 한다.
-CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가격|MBoard ~ 부품이름 ~ 가격|SSD ~ 부품이름 ~ 가격|HDD ~ 부품이름 ~ 가격|Power ~ 부품이름 ~ 가격|Cooler ~ 부품이름 ~ 가격 |Case ~ 부품이름 ~ 가격|설명 ~ 특수양식 |으로 구성하고 각 부품의 이름과 가격을 출력하고, 구분은 '|'로 한다. Cooler과 HDD의 경우 반드시 출력하도록 한다.(부품이 제공되지 않았다면 출력하지 않는다.) 특수양식의 경우 작성된 견적이 어떠한 용도에 알맞는지 설명한다.(${purpose}에 연관지어 설명한다. 이는 견적이 확정된 이후 그에맞춰 출력하며, 100자 이상의 자세한 설명을 요구한다.)
+CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가격|MBoard ~ 부품이름 ~ 가격|SSD ~ 부품이름 ~ 가격|HDD ~ 부품이름 ~ 가격|Power ~ 부품이름 ~ 가격|Cooler ~ 부품이름 ~ 가격 |Case ~ 부품이름 ~ 가격|설명 ~ 특수양식 |으로 구성하고 각 부품의 이름과 가격을 출력하고, 구분은 '|'로 한다. Cooler과 HDD의 경우 반드시 출력하도록 한다.(부품이 제공되지 않았다면 출력하지 않는다.) 특수양식의 경우 작성된 견적이 어떠한 용도에 알맞는지 설명한다.(${purpose}에 연관지어 설명한다. 이는 견적이 확정된 이후 부품의 이름과 성능에맞춰 출력하며, 100자 이상의 자세한 설명을 요구한다.)
 8. 출력양식 이외의 내용은 출력하지 않는다.
 9. ${
             feedback === 0
@@ -224,7 +225,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
 \n[${productStrings} # 예산:${budget}0000원]
 `;
 
-          console.log(prompt);
+          // console.log(prompt);
 
           // Each API call has its abort controller
           const abortController = new AbortController();
@@ -235,12 +236,12 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
           });
 
           if (abortController.signal.aborted) {
-            console.log(`Request ${index + 1} aborted.`);
+            // console.log(`Request ${index + 1} aborted.`);
             return Promise.reject(); // 종료 시 promise를 reject
           }
 
           const responseText = await result2.response.text();
-          console.log(responseText);
+          // console.log(responseText);
 
           const parts = parseParts(responseText);
 
@@ -270,14 +271,15 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
         console.warn("No products found for the given criteria.");
       }
     } catch (error) {
-      console.error("Error:", error);
+      // console.error("Error:", error);
       if (error.name === "AbortError") {
-        console.log("Build process was canceled.");
+        // console.log("Build process was canceled.");
       } else {
-        console.log("Retrying with adjusted parameters.");
+        // console.log("Retrying with adjusted parameters.");
         createBuild(0, limit - 10 > 0 ? limit - 10 : 10);
       }
     }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   };
 
   const parseParts = (input: string): Part[] => {
@@ -303,10 +305,10 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      console.error(
-        "사용자를 가져오는 중 오류 발생:",
-        authError || "사용자가 로그인하지 않았습니다."
-      );
+      // console.error(
+      //   "사용자를 가져오는 중 오류 발생:",
+      //   authError || "사용자가 로그인하지 않았습니다."
+      // );
       setSaved(false);
       return;
     }
@@ -341,7 +343,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
       .maybeSingle();
 
     if (buildCheckError) {
-      console.error("Error checking existing build:", buildCheckError);
+      // console.error("Error checking existing build:", buildCheckError);
       setSaved(false);
       return;
     }
@@ -350,7 +352,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
 
     if (existingBuild) {
       build_id = existingBuild.id;
-      console.log("동일한 견적을 찾았습니다. 기존 build_id를 사용합니다.");
+      // console.log("동일한 견적을 찾았습니다. 기존 build_id를 사용합니다.");
     } else {
       const { data: insertedBuild, error: buildInsertError } = await supabase
         .from("builds")
@@ -358,13 +360,13 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
         .select();
 
       if (buildInsertError) {
-        console.error("Error inserting build data:", buildInsertError);
+        // console.error("Error inserting build data:", buildInsertError);
         setSaved(false);
         return;
       }
 
       build_id = insertedBuild[0].id;
-      console.log("새로운 build를 삽입했습니다.");
+      // console.log("새로운 build를 삽입했습니다.");
     }
 
     const { error: savedBuildsError } = await supabase
@@ -372,10 +374,10 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
       .insert([{ uid, build_id }]);
 
     if (savedBuildsError) {
-      console.error("Error inserting into saved_builds:", savedBuildsError);
+      // console.error("Error inserting into saved_builds:", savedBuildsError);
       setSaved(false);
     } else {
-      console.log("Build data and saved_builds entry inserted successfully");
+      // console.log("Build data and saved_builds entry inserted successfully");
       setSaved(true);
     }
   };
@@ -407,21 +409,21 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
     ? "opacity-100 pointer-events-auto "
     : "opacity-0 pointer-events-none ";
   const panelThemeStyle = theme === "dark" ? "bg-[#0d1117]" : "bg-white";
-  const panelOpacityThemeStyle = theme === "dark" ? "opacity-50" : "opacity-0";
+  const panelOpacityThemeStyle = theme === "dark" ? "opacity-40" : "opacity-0";
   const panelOpacityThemeStyleReverse =
     theme !== "dark" ? "opacity-70" : "opacity-0";
 
   return (
     <>
       <main
-        className={`${backgroundBorderThemeStyle} relative border-[1px] flex flex-row rounded-[40px] bg-opacity-40 mt-8 mx-20 h-[66vh] overflow-hidden`}
+        className={`${backgroundBorderThemeStyle} relative border-[1px] flex flex-row rounded-[40px] bg-opacity-60 mt-16 mx-20 h-[66vh] overflow-hidden`}
       >
         <div
           className={`${blockedPanelBuildedStyle} ${panelThemeStyle} absolute flex justify-center items-center h-full inset-0 bg-opacity-50 z-40 text-white text-6xl`}
         >
           <span className="z-10">Building...</span>
           <div
-            className={`${panelOpacityThemeStyle} absolute theme-opacity top-0 inset-0 bg-cover bg-center bg-[url('https://embed.pixiv.net/spotlight.php?id=9496&lang=ko')] transition-opacity duration-800`}
+            className={`${panelOpacityThemeStyle} absolute theme-opacity top-0 inset-0 bg-cover bg-center bg-[url('https://i.namu.wiki/i/gE76Z7wOdfiXgbnEAcTTfYnxYKd8KbZIK9hjVdA2SOJeg6vmARMmITvtAZQGWZaX1vFv_W21HwocEEcWBHXwMA.gif')] transition-opacity duration-800`}
           ></div>
           <div
             className={`${panelOpacityThemeStyleReverse} absolute theme-opacity top-0 inset-0 bg-cover transition-opacity duration-800 bg-[url('https://e0.pxfuel.com/wallpapers/885/274/desktop-wallpaper-shikimori-s-not-just-a-cutie-and-background.jpg')]`}
