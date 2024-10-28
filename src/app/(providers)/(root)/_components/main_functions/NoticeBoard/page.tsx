@@ -1,9 +1,9 @@
 'use client';
 
 import { useThemeStore } from "@/store/useStore";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "../../../../../../../supabase/client";
+import WritePostModal from "./NoticeBoardComponents/WritePostModal";
 
 interface PostType {
   id: number;
@@ -16,6 +16,8 @@ interface PostType {
 function NoticeBoard() {
   const theme = useThemeStore((state) => state.theme);
   const [posts, setPosts] = useState<PostType[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -124,10 +126,11 @@ function NoticeBoard() {
           <span className="w-3 flex justify-center items-center"></span>
           <button className="px-4 py-2 bg-gray-200 rounded-lg">{">"}</button>
         </div>
-        <Link href={"/Post"} className="bg-white font-bold text-black rounded-lg px-5 py-3 w-auto ml-20">
+        <button onClick={() => setIsModalOpen(true)} className="bg-white font-bold text-black rounded-lg px-5 py-3 w-auto ml-20">
           글쓰기
-        </Link>
+        </button>
       </div>
+      <WritePostModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </main>
   );
 }
