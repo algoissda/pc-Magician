@@ -54,7 +54,7 @@ const ThemeTitle = ({ theme, setActiveTab }: any) => {
       </h1>
       <h1
         onClick={() => setActiveTab("")}
-        className={`theme-opacity absolute top-0 left-0 inset-0 text-transparent whitespace-nowrap bg-clip-text bg-gradient-to-r from-white via-blue-300 to-violet-500 bg-[60deg] font-serif text-[70px] mb-10 text-left transition-all duration-500 ease-in-out ${
+        className={`theme-opacity absolute top-0 left-0 inset-0 text-transparent whitespace-nowrap bg-clip-text bg-gradient-to-r from-white via-blue-300 to-cyan-400 bg-[60deg] font-serif text-[70px] mb-10 text-left transition-all duration-500 ease-in-out ${
           theme === "dark" ? "opacity-100" : "opacity-0"
         }`}
       >
@@ -63,7 +63,7 @@ const ThemeTitle = ({ theme, setActiveTab }: any) => {
       </h1>
       <h1
         onClick={() => setActiveTab("")}
-        className={`theme-opacity absolute top-0 left-0 inset-0 text-transparent whitespace-nowrap bg-clip-text bg-gradient-to-r from-violet-700 via-blue-950 to-black bg-[60deg] font-serif text-[70px] mb-10 text-left transition-all duration-500 ease-in-out ${
+        className={`theme-opacity absolute top-0 left-0 inset-0 text-transparent whitespace-nowrap bg-clip-text bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 bg-[60deg] font-serif text-[70px] mb-10 text-left transition-all duration-500 ease-in-out ${
           theme !== "dark" ? "opacity-100" : "opacity-0"
         }`}
       >

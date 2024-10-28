@@ -9,17 +9,13 @@ import {
   GoogleGenerativeAI,
   HarmBlockThreshold,
   HarmCategory,
+  Part,
 } from "@google/generative-ai";
 import { PartList } from "./BuildComponents/PartList";
 import { InputField } from "./BuildComponents/InputField";
 import { SelectBox } from "./BuildComponents/SelectBox";
-import { rule } from "postcss";
-
-type Part = {
-  type: string;
-  name: string;
-  price: number;
-};
+import Modal from "../../modal/Loginmodal";
+import { loadingRandomImgArray } from "./BuildComponents/loadingRandomImgArray";
 
 const safetySettings = [
   {
@@ -34,14 +30,19 @@ const safetySettings = [
 
 function Build() {
   const theme = useThemeStore((state) => state.theme);
-  const [budget, setBudget] = useState<string>("60");
+  const [budget, setBudget] = useState<string>("100");
   const [selectCpuType, setCpuType] = useState<string>("");
   const [selectVgaType, setVgaType] = useState<string>("");
   const [build, setBuild] = useState<Part[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [builded, setBuilded] = useState<boolean>(false);
+  const [cancelBuild, setCancelBuild] = useState<boolean>(false);
   const [saved, setSaved] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const cancelTokens = useRef<Array<AbortController>>([]);
+  const [loadingImgIndex, setLoadingImgIndex] = useState<number>(
+    Math.floor(Math.random() * loadingRandomImgArray.length)
+  );
 
   const apiKeys = [
     process.env.NEXT_PUBLIC_GOOGLE_API_KEY_1,
@@ -94,26 +95,32 @@ function Build() {
     }
   };
 
-  const createBuild = async (
-    feedback: number,
-    limit: number = 250,
-    budgetIssues: number = 1
-  ) => {
+  const createBuild = async (feedback = 0, limit = 250, budgetIssues = 1) => {
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      console.error(
+        "사용자를 가져오는 중 오류 발생:",
+        authError || "사용자가 로그인하지 않았습니다."
+      );
+      setIsModalOpen(true);
+      return;
+    }
+
     if (builded) {
       // 이미 빌드 중인 경우 취소 처리
-      if (cancelTokens.current.length > 0) {
-        cancelTokens.current.forEach((token) => token.abort());
-        cancelTokens.current = [];
-      }
-      setBuilded(false);
+      cancelBuildProcess();
       return;
     }
 
     setSaved(false);
-
     setBuilded(true);
     setBuild([]);
     setTotalPrice(0);
+    setCancelBuild(false); // 취소 플래그 초기화
 
     const types = Object.entries(switchStates)
       .filter(([partType, isEnabled]) => isEnabled)
@@ -140,30 +147,6 @@ function Build() {
             .select("product_name, price")
             .eq("type", type)
             .like("purpose", `%${purpose}%`)
-            .like(
-              "explanation",
-              type === "CPU" || type === "MBoard"
-                ? selectCpuType === "Intel"
-                  ? "%소켓1700%"
-                  : selectCpuType === "AMD"
-                  ? "%소켓AM%"
-                  : purpose === "사무용" || purpose === "보급형"
-                  ? "%소켓1700%"
-                  : "%"
-                : "%"
-            )
-            .like(
-              "product_name",
-              type === "VGA"
-                ? selectVgaType === "NVIDIA"
-                  ? Number(budget) < 550
-                    ? "%지포스%"
-                    : "%4090%"
-                  : selectVgaType === "AMD"
-                  ? "%라데온%"
-                  : "%"
-                : "%"
-            )
             .range(0, limit - 1);
 
           if (error) {
@@ -226,7 +209,6 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
 
           console.log(prompt);
 
-          // Each API call has its abort controller
           const abortController = new AbortController();
           cancelTokens.current.push(abortController);
 
@@ -250,17 +232,18 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
             price >= Number(budget + "0000") - 200000 &&
             price <= Number(budget + "0000") * budgetIssues + 100000
           ) {
-            // Valid build found
             setBuild(parts);
             setBuilded(false);
+
             // Cancel ongoing requests
             cancelTokens.current.forEach((token) => token.abort());
+            setLoadingImgIndex(
+              Math.floor(Math.random() * loadingRandomImgArray.length)
+            );
             cancelTokens.current = [];
-            return Promise.resolve(
-              (feedback = price - Number(budget + "0000"))
-            ); // 성공 시 promise를 resolve
+            return Promise.resolve();
           } else {
-            return Promise.reject();
+            return Promise.reject((feedback = price - Number(budget + "0000")));
           }
         });
 
@@ -278,6 +261,14 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
         createBuild(0, limit - 10 > 0 ? limit - 10 : 10);
       }
     }
+  };
+
+  // Cancel build process function
+  const cancelBuildProcess = () => {
+    cancelTokens.current.forEach((token) => token.abort());
+    cancelTokens.current = [];
+    setBuilded(false);
+    setCancelBuild(false); // 취소 상태를 초기화
   };
 
   const parseParts = (input: string): Part[] => {
@@ -419,12 +410,14 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
         <div
           className={`${blockedPanelBuildedStyle} ${panelThemeStyle} absolute flex justify-center items-center h-full inset-0 bg-opacity-50 z-40 text-white text-6xl`}
         >
-          <span className="z-10">Building...</span>
+          <span className="z-10 absolute top-[10%] left-[10%]">
+            {loadingRandomImgArray[loadingImgIndex]}
+          </span>
           <div
-            className={`${panelOpacityThemeStyle} absolute theme-opacity top-0 inset-0 bg-cover bg-center bg-[url('https://embed.pixiv.net/spotlight.php?id=9496&lang=ko')] transition-opacity duration-800`}
+            className={`${panelOpacityThemeStyle} absolute theme-opacity top-0 inset-0 bg-cover bg-center bg-[url('https://i.namu.wiki/i/gE76Z7wOdfiXgbnEAcTTfYnxYKd8KbZIK9hjVdA2SOJeg6vmARMmITvtAZQGWZaX1vFv_W21HwocEEcWBHXwMA.gif')] transition-opacity duration-800`}
           ></div>
           <div
-            className={`${panelOpacityThemeStyleReverse} absolute theme-opacity top-0 inset-0 bg-cover transition-opacity duration-800 bg-[url('https://e0.pxfuel.com/wallpapers/885/274/desktop-wallpaper-shikimori-s-not-just-a-cutie-and-background.jpg')]`}
+            className={`${panelOpacityThemeStyleReverse} absolute theme-opacity top-0 inset-0 bg-cover transition-opacity duration-800 bg-[url('https://lh3.googleusercontent.com/proxy/cEq__V0vkdcIRa8DzYbrP2URzhFFeJSV7Ep6kiUBS1jwfXlSfm3tCdOFp3XGXUlWU1IGVd1WRJcC2z452P-ZLd2qUhuFyJq0wdFxQWTCXtUwRTwMGIY2ihCfOBplKwwclDpWmBzvafFflBQ5ohbGRev0tZU0eanlXJH5Pra3BIEBBBT9vlHK2oAEf3mM86HDxv7z7Sh9NfBoUvWe9fiZD9QODyf-')]`}
           ></div>
         </div>
         <article className="w-3/5 mr-0 lg:mr-4 p-4">
@@ -491,7 +484,13 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
 
       <footer className="w-full mt-6 flex justify-center">
         <button
-          onClick={() => createBuild(0)}
+          onClick={() => {
+            if (builded) {
+              cancelBuildProcess(); // 빌드 취소
+            } else {
+              createBuild(0); // 빌드 시작
+            }
+          }}
           className={`${textThemeLeftButtonPriceStyle} w-full ml-20 mr-1 h-16 p-[1px] bg-gradient-to-r rounded-full text-xl`}
         >
           <div
@@ -511,6 +510,13 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
           </div>
         </button>
       </footer>
+
+      <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <div className="p-6 text-center">
+          <h2 className="text-2xl mb-4">로그인이 필요합니다</h2>
+          <p>견적을 작성하려면 로그인해주세요.</p>
+        </div>
+      </Modal>
     </>
   );
 }

@@ -330,7 +330,7 @@ const CommunityBuilds = () => {
     ? "opacity-100 pointer-events-auto "
     : "opacity-0 pointer-events-none ";
   const borderColorThemeStyle =
-    theme === "dark" ? "border-gray-300" : "border-[#0D1117]";
+    theme === "dark" ? "border-cyan-400" : "border-pink-500";
   const priceRangeTotalStyle = `${backgroundThemeStyle} ${textThemeStyle} max-w-32 h-8 border border-white rounded-xl px-2 flex justify-center items-center`;
   const selectPriceRangeTotalStyle = `${selectBackgroundThemeStyle} ${selectTextThemeStyle} max-w-32 h-8 border border-black rounded-xl px-2 flex justify-center items-center`;
 

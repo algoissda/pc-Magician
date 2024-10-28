@@ -130,7 +130,6 @@ export const BuildDetailsPanel = ({
     if (!existingSavedBuild) {
       await supabase.from("saved_builds").insert([{ uid, build_id }]);
     }
-    setIsSaving(false);
   };
 
   const textThemeStyle = theme === "dark" ? "text-white" : "text-gray-800";
@@ -142,7 +141,12 @@ export const BuildDetailsPanel = ({
   const border_bThemeStyle = `${
     theme === "dark" ? "border-cyan-400" : "border-pink-500"
   }`;
-  const explanationStyle = `${backgroundThemeStyle} ${border_bThemeStyle} w-full bg-opacity-70 border-b-2 p-4 transition-all duration-300 absolute top-0 left-0 `;
+  const shadowThemeStyle = `${
+    theme === "dark"
+      ? "shadow-[rgba(34,211,238,0.7)]"
+      : "shadow-[rgba(236,72,153,0.7)]"
+  }`;
+  const explanationStyle = `${backgroundThemeStyle} ${border_bThemeStyle} ${shadowThemeStyle} shadow-lg w-full border-b-2 p-4 transition-all duration-300 absolute top-0 left-0 `;
 
   return (
     <div
@@ -153,14 +157,14 @@ export const BuildDetailsPanel = ({
     >
       {/* Explanation Display */}
       <div
-        className={`${textThemeStyle} relative left-0 top-0 w-[50%] h-auto text-sm transition-all duration-300`}
+        className={`${textThemeStyle} relative left-0 top-0 w-[50%] h-full text-sm transition-all duration-300 overflow-hidden`}
       >
         <span
           className={`${explanationStyle} ${
             hoveredPartKey ? "opacity-0" : "opacity-100"
           } absolute top-0 left-0`}
         >
-          {selectedBuild?.explanation || "No explanation available."}
+          {" " + selectedBuild?.explanation || "No explanation available."}
         </span>
         {partDetails.map((part) => (
           <span
@@ -169,7 +173,7 @@ export const BuildDetailsPanel = ({
               hoveredPartKey === part.key ? "opacity-100" : "opacity-0"
             } absolute top-0 left-0`}
           >
-            {part.explanation}
+            {" " + part.explanation}
           </span>
         ))}
       </div>
