@@ -33,51 +33,53 @@ const WritePostModal = ({ isOpen, onClose }: WritePostModalProps) => {
     }
   };
   return (
-
-        <div className="fixed inset-0 flex items-center justify-center ">
-        <div className="bg-white p-5 rounded shadow-lg">
+    <div onClick={onClose} className="fixed inset-0 flex items-center justify-center">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white p-10 rounded shadow-lg w-full h-full max-w-[800px] max-h-[600px] ml-[440px] mt-[40px]"
+      >
         <h3 className="text-xl font-bold mb-4">Write a New Post</h3>
         <form onSubmit={handleSubmit}>
-            <input
-                type="text"
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                placeholder="type"
-                className="border rounded w-full p-2 mb-4"
-                required
-            />
-            <input
+          <input
+            type="text"
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            placeholder="Type"
+            className="border rounded w-full p-2 mb-4"
+            required
+          />
+          <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Title"
             className="border rounded w-full p-2 mb-4"
             required
-            />
-            <textarea
+          />
+          <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Content"
-            className="border rounded w-full p-2 mb-4"
+            className="border rounded w-full p-2 mb-4 h-[300px]"
             required
-            />
-            <div className="flex justify-end">
+          />
+          <div className="flex justify-end">
             <button
-                type="button"
-                onClick={onClose}
-                className="mr-2 py-1 px-3 bg-gray-300 rounded"
+              type="button"
+              onClick={onClose}
+              className="mr-2 py-1 px-3 bg-gray-300 rounded"
             >
-                Cancel
+              Cancel
             </button>
             <button
-                type="submit"
-                className="py-1 px-3 bg-blue-500 text-white rounded"
+              type="submit"
+              className="py-1 px-3 bg-blue-500 text-white rounded"
             >
-                Submit
+              Submit
             </button>
-            </div>
+          </div>
         </form>
-        </div>
+      </div>
     </div>
   )
 }
