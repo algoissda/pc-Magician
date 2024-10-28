@@ -74,7 +74,7 @@ const Modal = ({ open, onClose }: ModalProps) => {
         className="bg-black/50 flex items-center justify-center fixed top-0 left-0 right-0 bottom-0 z-20"
       >
         <div
-          className="w-96 h-[650px] p-[2px] rounded-lg"
+          className="w-96 h-auto p-[2px] rounded-lg"
           style={{
             background: lineThemeStyle,
           }}
@@ -120,7 +120,7 @@ const Modal = ({ open, onClose }: ModalProps) => {
 
             <form
               onSubmit={handleSubmit}
-              className="flex flex-col items-center gap-y-4 mx-auto w-full"
+              className="flex flex-col items-center gap-y-2 mx-auto w-full"
             >
               <div className="grid gap-y-1.5 w-full">
                 <label
@@ -143,7 +143,7 @@ const Modal = ({ open, onClose }: ModalProps) => {
                   }`}
                 />
               </div>
-              <div className="grid gap-y-1.5 w-full">
+              <div className="grid gap-y-1.5 w-full mb-8">
                 <label
                   htmlFor="password"
                   className={`text-sm font-medium ${

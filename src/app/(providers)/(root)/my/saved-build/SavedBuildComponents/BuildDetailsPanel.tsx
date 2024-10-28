@@ -40,10 +40,11 @@ export const BuildDetailsPanel = ({
   productPriceMap,
   partExplanations, // 각 부품의 explanation 데이터를 전달받음
   onClose,
+  fetchBuilds, // fetchBuilds 함수를 prop으로 받음
 }) => {
   const [visible, setVisible] = useState(false); // visibility 상태 관리
   const [hoveredPartKey, setHoveredPartKey] = useState(null); // 마우스가 올라간 부품의 key를 추적
-  const [isSaving, setIsSaving] = useState(false); // 저장 상태 관리
+  const [isDelete, setIsDelete] = useState(false); // 삭제 상태 관리
   const partDetails = createPartDetails(
     selectedBuild,
     productPriceMap,
@@ -64,73 +65,47 @@ export const BuildDetailsPanel = ({
   };
 
   // 저장 버튼 클릭 시 빌드 저장 함수
-  const handleSaveBuild = async () => {
-    setIsSaving(true);
-
+  const handleDeleteBuild = async () => {
+    setIsDelete(true);
     const {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      setIsSaving(false);
+      // console.error(
+      //   "사용자를 가져오는 중 오류 발생:",
+      //   authError || "사용자가 로그인하지 않았습니다."
+      // );
+      setIsDelete(false);
       return;
     }
 
     const uid = user.id;
-    const buildData = {
-      CPU: selectedBuild.CPU,
-      Cooler: selectedBuild.Cooler,
-      MBoard: selectedBuild.MBoard,
-      RAM: selectedBuild.RAM,
-      VGA: selectedBuild.VGA,
-      SSD: selectedBuild.SSD,
-      HDD: selectedBuild.HDD,
-      Case: selectedBuild.Case,
-      Power: selectedBuild.Power,
-      explanation: selectedBuild.explanation,
-    };
+    const build_id = selectedBuild.id;
 
-    // 동일한 견적이 있는지 확인
-    const { data: existingBuild } = await supabase
-      .from("builds")
-      .select("id")
-      .eq("CPU", buildData.CPU)
-      .eq("Cooler", buildData.Cooler)
-      .eq("MBoard", buildData.MBoard)
-      .eq("RAM", buildData.RAM)
-      .eq("VGA", buildData.VGA)
-      .eq("SSD", buildData.SSD)
-      .eq("HDD", buildData.HDD)
-      .eq("Case", buildData.Case)
-      .eq("Power", buildData.Power)
-      .maybeSingle();
+    try {
+      const { error: savedBuildsError } = await supabase
+        .from("saved_builds")
+        .delete()
+        .eq("uid", uid)
+        .eq("build_id", build_id);
 
-    let build_id;
+      if (savedBuildsError) {
+        // console.error("Error deleting from saved_builds:", savedBuildsError);
+        setIsDelete(false);
+        return;
+      }
 
-    if (existingBuild) {
-      build_id = existingBuild.id;
-    } else {
-      // 동일한 견적이 없으면 새로 삽입
-      const { data: insertedBuild } = await supabase
-        .from("builds")
-        .insert([buildData])
-        .select();
+      // console.log("Saved build entry deleted successfully");
 
-      build_id = insertedBuild![0].id;
+      // 삭제 후 목록을 다시 불러오기
+      fetchBuilds(1); // 첫 페이지를 로드
+      handleClose(); // 패널을 닫음
+    } catch (error) {
+      setIsDelete(false);
+      // console.error("Error deleting build:", error);
     }
-
-    const { data: existingSavedBuild } = await supabase
-      .from("saved_builds")
-      .select("id")
-      .eq("uid", uid)
-      .eq("build_id", build_id)
-      .maybeSingle();
-
-    if (!existingSavedBuild) {
-      await supabase.from("saved_builds").insert([{ uid, build_id }]);
-    }
-    setIsSaving(false);
   };
 
   const textThemeStyle = theme === "dark" ? "text-white" : "text-gray-800";
@@ -142,7 +117,7 @@ export const BuildDetailsPanel = ({
   const border_bThemeStyle = `${
     theme === "dark" ? "border-cyan-400" : "border-pink-500"
   }`;
-  const explanationStyle = `${backgroundThemeStyle} ${border_bThemeStyle} bg-opacity-70 border-b-2 p-4 transition-all duration-300 absolute top-0 left-0 `;
+  const explanationStyle = `${backgroundThemeStyle} ${border_bThemeStyle} w-full border-b-2 p-4 transition-all duration-300 absolute top-0 left-0 `;
 
   return (
     <div
@@ -161,7 +136,7 @@ export const BuildDetailsPanel = ({
             hoveredPartKey ? "opacity-0" : "opacity-100"
           }`}
         >
-          {selectedBuild?.explanation || "No explanation available."}
+          {" " + selectedBuild?.explanation || "No explanation available."}
         </span>
         {partDetails.map((part) => (
           <span
@@ -170,7 +145,7 @@ export const BuildDetailsPanel = ({
               hoveredPartKey === part.key ? "opacity-100" : "opacity-0"
             }`}
           >
-            {part.explanation}
+            {" " + part.explanation}
           </span>
         ))}
       </div>
@@ -222,11 +197,11 @@ export const BuildDetailsPanel = ({
             {selectedBuild?.totalPrice?.toLocaleString()} 원
           </div>
           <button
-            onClick={handleSaveBuild}
-            disabled={isSaving}
-            className="w-auto mt-1 py-1 px-5 bg-lime-500 text-white font-semibold rounded-md transition-opacity duration-300 hover:bg-lime-600"
+            onClick={handleDeleteBuild}
+            disabled={isDelete}
+            className="w-auto mt-1 py-1 px-5 bg-red-600 text-white font-semibold rounded-md transition-opacity duration-300 hover:bg-red-700"
           >
-            {!isSaving ? "SAVE" : "SAVED"}
+            {isDelete ? "DELETED" : "DELETE"}
           </button>
         </div>
       </div>

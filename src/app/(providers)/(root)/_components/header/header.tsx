@@ -32,13 +32,17 @@ function Header() {
   // 모달 상태 관리
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const backgroundThemeStyle = `${
+    theme === "dark"
+      ? "bg-[#0d1117] shadow-cyan-400"
+      : "bg-white shadow-pink-500"
+  }`;
+  const borderColorThemeStyle =
+    theme === "dark" ? "border-cyan-400" : "border-pink-500";
+
   return (
     <header
-      className={`sticky top-0 h-[100px] border-b-[3px] shadow-md z-10 flex items-center px-16 shrink-0 ${
-        theme === "dark"
-          ? "bg-[#0d1117] border-b-gray-400 shadow-black"
-          : "bg-white border-b-gray-300 shadow-gray-200"
-      }`}
+      className={`${backgroundThemeStyle} ${borderColorThemeStyle} transition-all duration-1000 sticky top-0 h-[100px] border-b-[3px] shadow-md z-10 flex items-center px-16 shrink-0`}
     >
       <button onClick={() => setActiveTab("")}>
         <HeaderButton href="/" theme={theme}>
