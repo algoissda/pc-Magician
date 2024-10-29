@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/alt-text */
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useThemeStore } from "@/store/useStore";
 import { useRouter } from "next/navigation";
@@ -57,6 +59,7 @@ const Modal = ({ open, onClose }: ModalProps) => {
   };
 
   async function signInWithKakao() {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "kakao",
     });
