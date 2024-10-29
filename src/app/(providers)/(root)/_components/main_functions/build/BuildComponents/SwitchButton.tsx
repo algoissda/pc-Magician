@@ -28,6 +28,7 @@ interface SwitchButtonProps {
   isActive: boolean;
   toggleSwitch: (partType: string) => void;
   index: number;
+  theme: string;
 }
 
 // 스위치 버튼 컴포넌트화
@@ -36,6 +37,7 @@ export const SwitchButton = ({
   isActive,
   toggleSwitch,
   index,
+  theme,
 }: SwitchButtonProps) => (
   <button
     onClick={() => toggleSwitch(partType)}
@@ -43,7 +45,13 @@ export const SwitchButton = ({
   >
     <span
       className={`text-4xl transition duration-[0s] ${
-        isActive ? "text-green-500" : "text-red-900"
+        isActive
+          ? theme === "dark"
+            ? "text-cyan-400"
+            : "text-pink-500"
+          : theme === "dark"
+          ? "text-gray-600"
+          : "text-gray-500"
       }`}
     >
       {icons[index]}

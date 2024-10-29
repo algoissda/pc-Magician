@@ -40,6 +40,7 @@ export const PartList = ({
           isActive={switchStates[partType]}
           toggleSwitch={toggleSwitch}
           index={index}
+          theme={theme}
         />
         <div className="flex flex-col w-full pr-5">
           <div className="w-full flex flex-grow justify-between items-center">
