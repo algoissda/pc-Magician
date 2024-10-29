@@ -1,4 +1,6 @@
-
+Need to install the following packages:
+supabase@1.207.9
+Ok to proceed? (y) 
 export type Json =
   | string
   | number
@@ -10,6 +12,24 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      build_coin: {
+        Row: {
+          coin: number | null
+          email: string | null
+          uid: string
+        }
+        Insert: {
+          coin?: number | null
+          email?: string | null
+          uid: string
+        }
+        Update: {
+          coin?: number | null
+          email?: string | null
+          uid?: string
+        }
+        Relationships: []
+      }
       builds: {
         Row: {
           Case: string
