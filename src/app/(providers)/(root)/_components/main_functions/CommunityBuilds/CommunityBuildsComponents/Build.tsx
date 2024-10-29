@@ -2,18 +2,17 @@
 "use client";
 
 import { useThemeStore } from "@/store/useStore";
-import { useState, useRef } from "react";
-import { supabase } from "../../../../../../../supabase/client";
-import Product from "../../../../../../../types/products.type";
 import {
   GoogleGenerativeAI,
   HarmBlockThreshold,
   HarmCategory,
 } from "@google/generative-ai";
-import { PartList } from "./BuildComponents/PartList";
-import { InputField } from "./BuildComponents/InputField";
-import { SelectBox } from "./BuildComponents/SelectBox";
-import { rule } from "postcss";
+import { useRef, useState } from "react";
+import { supabase } from "../../../../../../../../supabase/client";
+import Product from "../../../../../../../../types/products.type";
+import { PartList } from "../../Build/BuildComponents/PartList";
+import { InputField } from "../../Build/BuildComponents/InputField";
+import { SelectBox } from "./SelectBox";
 
 type Part = {
   type: string;
@@ -116,7 +115,7 @@ function Build() {
     setTotalPrice(0);
 
     const types = Object.entries(switchStates)
-      .filter(([partType, isEnabled]) => isEnabled)
+      .filter(([, isEnabled]) => isEnabled)
       .map(([partType]) => partType);
 
     let productStrings = "";
@@ -191,7 +190,7 @@ function Build() {
         // console.log(productStrings);
 
         // 모든 API 키에 대해 각각 요청
-        const promises = apiKeys.map(async (apiKey, index) => {
+        const promises = apiKeys.map(async (apiKey) => {
           const genAI = initializeGoogleAI(apiKey);
           if (!genAI) {
             return Promise.resolve(); // API 초기화 실패 시 skip
