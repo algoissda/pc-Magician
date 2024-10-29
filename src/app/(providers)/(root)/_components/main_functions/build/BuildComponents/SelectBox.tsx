@@ -18,6 +18,7 @@ interface SelectBoxProps {
 }
 
 // PartList Props 타입 정의
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface PartListProps {
   partTypes: string[];
   build: Part[];

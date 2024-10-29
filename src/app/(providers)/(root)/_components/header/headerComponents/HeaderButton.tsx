@@ -1,7 +1,13 @@
 import Link from "next/link";
+import { ReactNode } from "react";
 
-export const HeaderButton = ({ children, href, theme }: any) => {
-  // console.log("HeaderButton theme:", theme);
+type HeaderButtonProps = {
+  children: ReactNode;
+  href: string;
+  theme: "dark" | "light";
+};
+
+export const HeaderButton = ({ children, href, theme }: HeaderButtonProps) => {
   return (
     <Link
       href={href}

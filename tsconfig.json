@@ -6,6 +6,8 @@
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
+    //already file included 안뜨게 할려고 false로 해놓음
+    "forceConsistentCasingInFileNames": false,
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,

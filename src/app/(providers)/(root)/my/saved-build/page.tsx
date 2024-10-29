@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -7,7 +8,6 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "../../../../../../supabase/client";
 import { BuildCard } from "./SavedBuildComponents/BuildCard";
 import { BuildDetailsPanel } from "./SavedBuildComponents/BuildDetailsPanel";
-import build from "next/dist/build";
 import ThemeImage from "./SavedBuildComponents/ThemeImage";
 
 const CommunityBuilds = () => {
@@ -203,8 +203,8 @@ const CommunityBuilds = () => {
   // 빌드의 가격을 계산하는 함수
   const calculateBuildDetails = (
     build,
-    productPriceMap: { [x: string]: any },
-    productExplanationMap: { [x: string]: any }
+    productPriceMap: { [x: string]: string },
+    productExplanationMap: { [x: string]: string }
   ) => {
     const totalPrice = [
       build.Case,
@@ -237,7 +237,7 @@ const CommunityBuilds = () => {
   };
 
   // 상세 정보를 클릭했을 때 빌드 상세 정보를 가져오는 함수
-  const handleBuildClick = async (buildId: any) => {
+  const handleBuildClick = async (buildId: number) => {
     try {
       setLoading(true);
       const { data: buildDetails, error: buildDetailsError } = await supabase
@@ -265,7 +265,7 @@ const CommunityBuilds = () => {
       setSelectedBuildPriceMap(priceMap); // 가격 정보 저장
       setSelectedBuildExplanations(buildWithDetails.partExplanations); // 설명 정보 저장
       setLoading(false);
-    } catch (error) {
+    } catch (err) {
       setLoading(false);
     }
   };
@@ -280,18 +280,18 @@ const CommunityBuilds = () => {
   }, [activeTab, page]);
 
   // 가격 범위와 카테고리 필터 적용 함수
-  const handleCategorySelect = (category: string) => {
-    setSelectedCategory(category);
-    setPage(1); // 페이지를 1로 초기화
-  };
+  // const handleCategorySelect = (category: string) => {
+  //   setSelectedCategory(category);
+  //   setPage(1); // 페이지를 1로 초기화
+  // };
 
   useEffect(() => {
     fetchBuilds(page); // 페이지, 필터, 가격 등이 변경될 때 빌드를 가져옴
   }, [page, minPrice, maxPrice, selectedCategory, sortBy]);
 
-  const handlePriceRangeSearch = () => {
-    setPage(1);
-  };
+  // const handlePriceRangeSearch = () => {
+  //   setPage(1);
+  // };
 
   const nextPage = () => {
     if (hasNextPage) {

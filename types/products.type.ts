@@ -7,5 +7,3 @@ export interface Product {
 }
 
 export default Product;
-
-export interface SavedBuild {}

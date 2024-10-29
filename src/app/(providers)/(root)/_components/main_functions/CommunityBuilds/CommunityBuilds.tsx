@@ -7,7 +7,6 @@ import { supabase } from "../../../../../../../supabase/client";
 import { BuildCard } from "./CommunityBuildsComponents/BuildCard";
 import { BuildDetailsPanel } from "./CommunityBuildsComponents/BuildDetailsPanel";
 import { SelectBox } from "./CommunityBuildsComponents/SelectBox";
-import page from "../QuestionAnswer/page";
 
 const CommunityBuilds = () => {
   const [builds, setBuilds] = useState<any[]>([]);
@@ -193,6 +192,7 @@ const CommunityBuilds = () => {
       });
 
       setLoading(false);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // console.error("Error fetching builds:", error.message);
       setLoading(false);
@@ -200,6 +200,7 @@ const CommunityBuilds = () => {
   };
 
   // 제품 가격 정보를 조회하는 함수
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fetchProductPrices = async (buildsData: any[]) => {
     const productNames = buildsData
       .flatMap((build) => [
@@ -240,9 +241,10 @@ const CommunityBuilds = () => {
 
   // 빌드의 가격 및 부품 설명을 계산하는 함수
   const calculateBuildDetails = (
-    build,
-    productPriceMap: { [x: string]: any },
-    productExplanationMap: { [x: string]: any }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    build: any,
+    productPriceMap: { [x: string]: string },
+    productExplanationMap: { [x: string]: string }
   ) => {
     const totalPrice = [
       build.Case,
@@ -275,7 +277,7 @@ const CommunityBuilds = () => {
   };
 
   // 상세 정보를 클릭했을 때 빌드 상세 정보를 가져오는 함수
-  const handleBuildClick = async (buildId: any) => {
+  const handleBuildClick = async (buildId: string) => {
     try {
       const { data: buildDetails, error: buildDetailsError } = await supabase
         .from("builds")
@@ -324,6 +326,7 @@ const CommunityBuilds = () => {
     fetchBuilds(page);
   }, [page, minPrice, maxPrice, selectedCategory, sortBy]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handlePriceRangeSearch = () => {
     setPage(1);
   };

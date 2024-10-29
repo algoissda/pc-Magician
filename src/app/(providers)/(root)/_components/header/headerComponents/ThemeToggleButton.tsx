@@ -1,7 +1,15 @@
 import { faSun, faMoon } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export const ThemeToggleButton = ({ theme, toggleTheme }: any) => {
+type ThemeToggleButtonProps = {
+  theme: "dark" | "light";
+  toggleTheme: () => void;
+};
+
+export const ThemeToggleButton = ({
+  theme,
+  toggleTheme,
+}: ThemeToggleButtonProps) => {
   return (
     <button
       onClick={toggleTheme}
