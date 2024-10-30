@@ -6,11 +6,13 @@ import { supabase } from "../../../../../../../supabase/client";
 
 interface SelectedBuild {
   build: string;
-  productPriceMap: string;
-  productExplanationMap: string;
 }
 
-const createPartDetails = (build, productPriceMap, productExplanationMap) => {
+const createPartDetails = (
+  build: SelectedBuild,
+  productPriceMap: string,
+  productExplanationMap: string
+) => {
   const fields = [
     { key: "CPU", label: "CPU" },
     { key: "Cooler", label: "Cooler" },

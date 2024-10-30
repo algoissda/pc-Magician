@@ -9,7 +9,6 @@ import { BuildDetailsPanel } from "./CommunityBuildsComponents/BuildDetailsPanel
 import { SelectBox } from "./CommunityBuildsComponents/SelectBox";
 import { Build } from "../../../../../../../types/build.type";
 
-
 interface PriceMap {
   [key: string]: number;
 }
@@ -21,12 +20,10 @@ interface ExplanationMap {
 const CommunityBuilds = () => {
   const [builds, setBuilds] = useState<Build[]>([]);
   const [selectedBuild, setSelectedBuild] = useState<Build | null>(null); // 선택된 빌드를 저장
-  const [selectedBuildPriceMap, setSelectedBuildPriceMap] = useState<
-  PriceMap | null
-  >(null); // 가격 정보 저장
-  const [selectedBuildExplanations, setSelectedBuildExplanations] = useState<
-  ExplanationMap | null
-  >(null); // 부품 설명 정보 저장
+  const [selectedBuildPriceMap, setSelectedBuildPriceMap] =
+    useState<PriceMap | null>(null); // 가격 정보 저장
+  const [selectedBuildExplanations, setSelectedBuildExplanations] =
+    useState<ExplanationMap | null>(null); // 부품 설명 정보 저장
   const [visibleCards, setVisibleCards] = useState<boolean[]>([]); // BuildCard의 표시 상태 관리
   const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState(1);
@@ -243,7 +240,7 @@ const CommunityBuilds = () => {
     const priceMap: PriceMap = {};
     const explanationMap: ExplanationMap = {};
 
-    productsData.forEach(product => {
+    productsData.forEach((product) => {
       priceMap[product.product_name] = product.price ?? 0;
       explanationMap[product.product_name] = product.explanation;
     });
@@ -295,7 +292,8 @@ const CommunityBuilds = () => {
       build.SSD,
       build.VGA,
     ].reduce((acc, part) => {
-      acc[part || ""] = productExplanationMap[part || ""] || "No explanation available.";
+      acc[part || ""] =
+        productExplanationMap[part || ""] || "No explanation available.";
       return acc;
     }, {} as { [key: string]: string });
 

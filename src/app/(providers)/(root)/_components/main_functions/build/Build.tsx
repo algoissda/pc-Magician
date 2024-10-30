@@ -39,7 +39,7 @@ function Build() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const cancelTokens = useRef<Array<AbortController>>([]);
   const [userCoin, setUserCoin] = useState<number>(0); // 사용자 coin 값을 저장할 상태
-  const [loadingImgIndex, setLoadingImgIndex] = useState<number>(
+  const [loadingImgIndex] = useState<number>(
     Math.floor(Math.random() * loadingRandomImgArray.length)
   );
 
