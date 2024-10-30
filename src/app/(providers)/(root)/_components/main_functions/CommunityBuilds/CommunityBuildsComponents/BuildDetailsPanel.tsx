@@ -34,7 +34,31 @@ const createPartDetails = (build, productPriceMap, productExplanationMap) => {
   });
 };
 
-export const BuildDetailsPanel = ({
+//타입지정
+type SelectedBuild = {
+  id: string;
+  CPU: string;
+  VGA: string;
+  RAM: string;
+  Cooler: string;
+  HDD: string;
+  SSD: string;
+  MBoard: string;
+  Power: string;
+  Case: string;
+  explanation: string;
+  totalPrice: number;
+};
+
+type DetailsPanelProps = {
+  selectedBuild: SelectedBuild;
+  theme: "dark" | "light";
+  productPriceMap: string;
+  partExplanations: string;
+  onClose: () => void;
+};
+
+export const BuildDetailsPanel: React.FC<DetailsPanelProps> = ({
   selectedBuild,
   theme,
   productPriceMap,
