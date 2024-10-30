@@ -45,8 +45,8 @@ function Build() {
 
   const apiKeys = [
     process.env.NEXT_PUBLIC_GOOGLE_API_KEY_1,
-    // process.env.NEXT_PUBLIC_GOOGLE_API_KEY_2,
-    // process.env.NEXT_PUBLIC_GOOGLE_API_KEY_3,
+    process.env.NEXT_PUBLIC_GOOGLE_API_KEY_2,
+    process.env.NEXT_PUBLIC_GOOGLE_API_KEY_3,
     // process.env.NEXT_PUBLIC_GOOGLE_API_KEY_4,
     // process.env.NEXT_PUBLIC_GOOGLE_API_KEY_5,
     // process.env.NEXT_PUBLIC_GOOGLE_API_KEY_6,
@@ -371,6 +371,10 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
       .from("build_coin")
       .update({ coin: userCoin - 1 })
       .eq("uid", uid);
+
+    setLoadingImgIndex(
+      Math.floor(Math.random() * loadingRandomImgArray.length)
+    );
 
     if (error) {
       console.error("Error deducting coin:", error);
