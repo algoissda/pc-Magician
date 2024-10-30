@@ -1,4 +1,24 @@
-export const BuildCard = ({ build, theme, onClick, creationDate }) => {
+interface Build {
+  id: string;
+  CPU: string;
+  VGA: string;
+  RAM: string;
+  total_price: number;
+}
+
+interface BuildCardProps {
+  build: Build;
+  theme: "dark" | "light";
+  onClick: () => void;
+  creationDate: string; // Date 객체라면 Date로 지정 가능
+}
+
+export const BuildCard: React.FC<BuildCardProps> = ({
+  build,
+  theme,
+  onClick,
+  creationDate,
+}) => {
   const textThemeH4Style = theme === "dark" ? "text-white" : "text-black";
   const textThemeStyle = theme === "dark" ? "text-gray-300" : "text-gray-900";
   const backgroundThemeStyle =
