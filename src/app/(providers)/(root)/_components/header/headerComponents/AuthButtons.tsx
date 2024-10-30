@@ -7,6 +7,7 @@ export const AuthButtons = ({
   isModalOpen,
   setIsModalOpen,
   theme, // 기본값 설정
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 }: any) => {
   // theme 값 확인용 로그
   // console.log("Current theme in AuthButtons:", theme);

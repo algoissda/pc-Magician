@@ -1,4 +1,26 @@
-export const BuildCard = ({ build, theme, onClick, creationDate }) => {
+import React from "react";
+
+type Build = {
+  id: string;
+  CPU: string;
+  VGA: string;
+  RAM: string;
+  total_price: number;
+};
+
+type BuildCardProps = {
+  build: Build;
+  theme: "dark" | "light";
+  onClick: () => void;
+  creationDate: string;
+};
+
+export const BuildCard: React.FC<BuildCardProps> = ({
+  build,
+  theme,
+  onClick,
+  creationDate,
+}) => {
   const textThemeH4Style = theme === "dark" ? "text-white" : "text-black";
   const textThemeStyle = theme === "dark" ? "text-gray-300" : "text-gray-900";
   const backgroundThemeStyle =
@@ -42,7 +64,7 @@ export const BuildCard = ({ build, theme, onClick, creationDate }) => {
           background: lineThemeStyle,
         }}
       ></span>
-      <footer className={`relative`}>
+      <footer className="relative">
         <span
           className={`${textThemeH4Style} text-right font-bold text-xl flex flex-col`}
         >

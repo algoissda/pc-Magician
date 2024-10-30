@@ -1,8 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from "react";
 import { supabase } from "../../../../../../../supabase/client";
 
 // Helper function to create part details for a build
-const createPartDetails = (build, productPriceMap, productExplanationMap) => {
+
+interface SelectedBuild {
+  build: string;
+}
+
+const createPartDetails = (
+  build: SelectedBuild,
+  productPriceMap: string,
+  productExplanationMap: string
+) => {
   const fields = [
     { key: "CPU", label: "CPU" },
     { key: "Cooler", label: "Cooler" },
@@ -34,7 +44,23 @@ const createPartDetails = (build, productPriceMap, productExplanationMap) => {
   });
 };
 
-export const BuildDetailsPanel = ({
+interface SelectedBuild {
+  id: string;
+  explanation: string;
+  totalPrice: number;
+}
+
+interface BuildDetailProps {
+  selectedBuild: SelectedBuild;
+  theme: "dark" | "light";
+  productPriceMap: string;
+  partExplanations: string;
+  onClose: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fetchBuilds: any;
+}
+
+export const BuildDetailsPanel: React.FC<BuildDetailProps> = ({
   selectedBuild,
   theme,
   productPriceMap,

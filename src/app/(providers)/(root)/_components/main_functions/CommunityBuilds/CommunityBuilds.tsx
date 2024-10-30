@@ -7,17 +7,23 @@ import { supabase } from "../../../../../../../supabase/client";
 import { BuildCard } from "./CommunityBuildsComponents/BuildCard";
 import { BuildDetailsPanel } from "./CommunityBuildsComponents/BuildDetailsPanel";
 import { SelectBox } from "./CommunityBuildsComponents/SelectBox";
-import page from "../QuestionAnswer/page";
+import { Build } from "../../../../../../../types/build.type";
+
+interface PriceMap {
+  [key: string]: number;
+}
+
+interface ExplanationMap {
+  [key: string]: string | null;
+}
 
 const CommunityBuilds = () => {
-  const [builds, setBuilds] = useState<any[]>([]);
-  const [selectedBuild, setSelectedBuild] = useState<any | null>(null); // 선택된 빌드를 저장
-  const [selectedBuildPriceMap, setSelectedBuildPriceMap] = useState<
-    any | null
-  >(null); // 가격 정보 저장
-  const [selectedBuildExplanations, setSelectedBuildExplanations] = useState<
-    any | null
-  >(null); // 부품 설명 정보 저장
+  const [builds, setBuilds] = useState<Build[]>([]);
+  const [selectedBuild, setSelectedBuild] = useState<Build | null>(null); // 선택된 빌드를 저장
+  const [selectedBuildPriceMap, setSelectedBuildPriceMap] =
+    useState<PriceMap | null>(null); // 가격 정보 저장
+  const [selectedBuildExplanations, setSelectedBuildExplanations] =
+    useState<ExplanationMap | null>(null); // 부품 설명 정보 저장
   const [visibleCards, setVisibleCards] = useState<boolean[]>([]); // BuildCard의 표시 상태 관리
   const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState(1);
@@ -65,7 +71,7 @@ const CommunityBuilds = () => {
 
         // 사용자가 저장한 build_id 목록을 배열로 변환
         savedBuildIds = userSavedBuilds
-          ? userSavedBuilds.map((item) => item.build_id)
+          ? userSavedBuilds.map((item) => item.build_id.toString())
           : [];
       }
 
@@ -132,13 +138,17 @@ const CommunityBuilds = () => {
 
       // 정렬 적용 (낮은가격순, 높은가격순, 생성일 순)
       if (sortBy === "낮은가격순") {
-        buildsData.sort(
-          (a, b) => a.builds?.total_price - b.builds?.total_price
-        );
+        buildsData.sort((a, b) => {
+          const priceA = a.builds?.total_price ?? 0; // 기본값 0
+          const priceB = b.builds?.total_price ?? 0; // 기본값 0
+          return priceA - priceB;
+        });
       } else if (sortBy === "높은가격순") {
-        buildsData.sort(
-          (a, b) => b.builds?.total_price - a.builds?.total_price
-        );
+        buildsData.sort((a, b) => {
+          const priceA = a.builds?.total_price ?? 0;
+          const priceB = b.builds?.total_price ?? 0;
+          return priceB - priceA;
+        });
       } else {
         buildsData.sort((a, b) => {
           const dateA = a.builds?.created_at
@@ -158,7 +168,7 @@ const CommunityBuilds = () => {
         .range(pageNumber * buildsPerPage, pageNumber * buildsPerPage);
 
       const { data: nextPageData } = await nextPageQuery;
-      setHasNextPage(nextPageData && nextPageData.length > 0);
+      setHasNextPage(!!(nextPageData && nextPageData.length > 0));
 
       // saved_builds 테이블의 데이터를 builds 테이블 형식으로 변환 및 날짜 변환
       const builds = buildsData
@@ -193,6 +203,7 @@ const CommunityBuilds = () => {
       });
 
       setLoading(false);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // console.error("Error fetching builds:", error.message);
       setLoading(false);
@@ -200,7 +211,8 @@ const CommunityBuilds = () => {
   };
 
   // 제품 가격 정보를 조회하는 함수
-  const fetchProductPrices = async (buildsData: any[]) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const fetchProductPrices = async (buildsData: Build[]) => {
     const productNames = buildsData
       .flatMap((build) => [
         build.Case,
@@ -213,7 +225,7 @@ const CommunityBuilds = () => {
         build.SSD,
         build.VGA,
       ])
-      .filter((part) => part !== null);
+      .filter((part): part is string => part !== null);
     const { data: productsData, error: productsError } = await supabase
       .from("products")
       .select("product_name, price, explanation") // 설명을 포함하여 불러옴
@@ -225,24 +237,34 @@ const CommunityBuilds = () => {
       );
     }
 
-    const priceMap = productsData.reduce((acc, product) => {
-      acc[product.product_name] = product.price;
-      return acc;
-    }, {});
+    const priceMap: PriceMap = {};
+    const explanationMap: ExplanationMap = {};
 
-    const explanationMap = productsData.reduce((acc, product) => {
-      acc[product.product_name] = product.explanation;
-      return acc;
-    }, {});
+    productsData.forEach((product) => {
+      priceMap[product.product_name] = product.price ?? 0;
+      explanationMap[product.product_name] = product.explanation;
+    });
+
+    //예전 방식 오류 나서 바꿈
+    // const priceMap = productsData.reduce((acc, product) => {
+    //   acc[product.product_name] = product.price;
+    //   return acc;
+    // }, {});
+
+    // const explanationMap = productsData.reduce((acc, product) => {
+    //   acc[product.product_name] = product.explanation;
+    //   return acc;
+    // }, {});
 
     return { priceMap, explanationMap };
   };
 
   // 빌드의 가격 및 부품 설명을 계산하는 함수
   const calculateBuildDetails = (
-    build,
-    productPriceMap: { [x: string]: any },
-    productExplanationMap: { [x: string]: any }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    build: Build,
+    productPriceMap: PriceMap,
+    productExplanationMap: ExplanationMap
   ) => {
     const totalPrice = [
       build.Case,
@@ -254,7 +276,10 @@ const CommunityBuilds = () => {
       build.RAM,
       build.SSD,
       build.VGA,
-    ].reduce((sum, part) => sum + (productPriceMap[part] || 0), 0);
+    ].reduce((sum, part) => {
+      const price = productPriceMap[part || ""] ?? 0;
+      return sum + price;
+    }, 0);
 
     const partExplanations = [
       build.Case,
@@ -267,15 +292,16 @@ const CommunityBuilds = () => {
       build.SSD,
       build.VGA,
     ].reduce((acc, part) => {
-      acc[part] = productExplanationMap[part] || "No explanation available.";
+      acc[part || ""] =
+        productExplanationMap[part || ""] || "No explanation available.";
       return acc;
-    }, {});
+    }, {} as { [key: string]: string });
 
     return { ...build, totalPrice, partExplanations };
   };
 
   // 상세 정보를 클릭했을 때 빌드 상세 정보를 가져오는 함수
-  const handleBuildClick = async (buildId: any) => {
+  const handleBuildClick = async (buildId: string) => {
     try {
       const { data: buildDetails, error: buildDetailsError } = await supabase
         .from("builds")
@@ -324,9 +350,11 @@ const CommunityBuilds = () => {
     fetchBuilds(page);
   }, [page, minPrice, maxPrice, selectedCategory, sortBy]);
 
-  const handlePriceRangeSearch = () => {
-    setPage(1);
-  };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //선언은 되었지만 사용이 되지 않았기 때문에 주석처리함
+  // const handlePriceRangeSearch = () => {
+  //   setPage(1);
+  // };
 
   const nextPage = () => {
     if (hasNextPage) {
@@ -487,8 +515,8 @@ const CommunityBuilds = () => {
                 <BuildCard
                   build={build}
                   theme={theme}
-                  creationDate={build.creationDate}
-                  onClick={() => handleBuildClick(build.id)}
+                  creationDate={build.creationDate || "날짜 없음"}
+                  onClick={() => handleBuildClick(build.id.toString())}
                 />
               </div>
             ))}
