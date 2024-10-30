@@ -4,9 +4,9 @@
 import { useActiveStore } from "@/store/useActiveTab";
 import { useThemeStore } from "@/store/useStore";
 import { useEffect, useState } from "react";
-import Build from "./_components/main_functions/Build/Build";
+import Build from "./_components/main_functions/build/Build";
 import CommunityBuilds from "./_components/main_functions/CommunityBuilds/CommunityBuilds";
-import NoticeBoard from "./_components/main_functions/NoticeBoard/page";
+import NoticeBoard from "./_components/main_functions/NoticeBoard/NoticeBoard";
 
 const ThemeButton = ({ isActive, onClick, text, size, theme }: any) => {
   const backgroundActiveThemeStyle = isActive
@@ -154,18 +154,18 @@ function MainPage() {
           <Build />
         </div>
         <div
-          className={`absolute transition-all duration-700 top-0 ${
-            activeTab === "Notice Board" ? "left-0" : "left-[400%]"
-          }`}
-        >
-          <NoticeBoard />
-        </div>
-        <div
           className={`absolute w-full py-14 pl-20 pr-24 block h-full transition-all duration-700 top-0 ${
             activeTab === "Community Builds" ? "left-0" : "left-[400%]"
           }`}
         >
           <CommunityBuilds />
+        </div>
+        <div
+          className={`absolute w-full block h-full transition-all duration-700 top-0 ${
+            activeTab === "Notice Board" ? "left-0" : "left-[400%]"
+          }`}
+        >
+          <NoticeBoard />
         </div>
         <div
           className={`absolute transition-all duration-700 top-0 h-[100%] w-[100%]  ${
