@@ -1,6 +1,11 @@
 import { create } from "zustand";
 
-export const useActiveStore = create((set) => ({
+interface ActiveTabState {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+}
+
+export const useActiveStore = create<ActiveTabState>((set) => ({
   activeTab: "",
-  setActiveTab: (tab: string) => set({ activeTab: tab }),
+  setActiveTab: (tab) => set({ activeTab: tab }),
 }));
