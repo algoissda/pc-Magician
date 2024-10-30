@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../../../../../../../supabase/client";
 
 // Helper function to create part details for a build
-const createPartDetails = (build, productPriceMap, productExplanationMap) => {
+const createPartDetails = (build : SelectedBuild,
+  productPriceMap : { [key: string]: number }, productExplanationMap : { [key: string]: string } ) => {
   const fields = [
     { key: "CPU", label: "CPU" },
     { key: "Cooler", label: "Cooler" },
@@ -13,10 +14,10 @@ const createPartDetails = (build, productPriceMap, productExplanationMap) => {
     { key: "HDD", label: "HDD" },
     { key: "Case", label: "Case" },
     { key: "Power", label: "Power" },
-  ];
+  ] as const;
 
   return fields.map(({ key, label }) => {
-    const partName = build?.[key];
+    const partName = build[key];
     const price =
       partName && productPriceMap ? productPriceMap[partName] : "N/A";
     const explanation =
@@ -53,8 +54,8 @@ type SelectedBuild = {
 type DetailsPanelProps = {
   selectedBuild: SelectedBuild;
   theme: "dark" | "light";
-  productPriceMap: string;
-  partExplanations: string;
+  productPriceMap: { [key: string]: number };
+  partExplanations: { [key: string]: string };
   onClose: () => void;
 };
 
@@ -66,7 +67,7 @@ export const BuildDetailsPanel: React.FC<DetailsPanelProps> = ({
   onClose,
 }) => {
   const [visible, setVisible] = useState(false); // visibility 상태 관리
-  const [hoveredPartKey, setHoveredPartKey] = useState(null); // 마우스가 올라간 부품의 key를 추적
+  const [hoveredPartKey, setHoveredPartKey] = useState<string | null>(null); // 마우스가 올라간 부품의 key를 추적
   const [isSaving, setIsSaving] = useState(false); // 저장 상태 관리
   const partDetails = createPartDetails(
     selectedBuild,
