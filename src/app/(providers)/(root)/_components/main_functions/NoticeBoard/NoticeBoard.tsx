@@ -159,6 +159,7 @@ function NoticeBoard() {
 
     fetchPosts();
     fetchUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
   const fetchComments = async (postId: number) => {
