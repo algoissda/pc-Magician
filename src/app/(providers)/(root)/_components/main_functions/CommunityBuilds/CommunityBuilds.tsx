@@ -7,7 +7,14 @@ import { supabase } from "../../../../../../../supabase/client";
 import { BuildCard } from "./CommunityBuildsComponents/BuildCard";
 import { BuildDetailsPanel } from "./CommunityBuildsComponents/BuildDetailsPanel";
 import { SelectBox } from "./CommunityBuildsComponents/SelectBox";
-import { Build } from "../../../../../../../types/build.type";
+import {
+  calculateBuildDetails,
+  CalculatedBuildDetails,
+} from "@/utils/functions.utils";
+import {
+  Build,
+  BuildWithCreationDate,
+} from "../../../../../../../types/build.type";
 
 interface PriceMap {
   [key: string]: number;
@@ -18,8 +25,9 @@ interface ExplanationMap {
 }
 
 const CommunityBuilds = () => {
-  const [builds, setBuilds] = useState<Build[]>([]);
-  const [selectedBuild, setSelectedBuild] = useState<Build | null>(null); // 선택된 빌드를 저장
+  const [builds, setBuilds] = useState<BuildWithCreationDate[]>([]);
+  const [selectedBuild, setSelectedBuild] =
+    useState<CalculatedBuildDetails | null>(null); // 선택된 빌드를 저장
   const [selectedBuildPriceMap, setSelectedBuildPriceMap] =
     useState<PriceMap | null>(null); // 가격 정보 저장
   const [selectedBuildExplanations, setSelectedBuildExplanations] =
@@ -261,45 +269,6 @@ const CommunityBuilds = () => {
   };
 
   // 빌드의 가격 및 부품 설명을 계산하는 함수
-  const calculateBuildDetails = (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    build: Build,
-    productPriceMap: PriceMap,
-    productExplanationMap: ExplanationMap
-  ) => {
-    const totalPrice = [
-      build.Case,
-      build.Cooler,
-      build.CPU,
-      build.HDD,
-      build.MBoard,
-      build.Power,
-      build.RAM,
-      build.SSD,
-      build.VGA,
-    ].reduce((sum, part) => {
-      const price = productPriceMap[part || ""] ?? 0;
-      return sum + price;
-    }, 0);
-
-    const partExplanations = [
-      build.Case,
-      build.Cooler,
-      build.CPU,
-      build.HDD,
-      build.MBoard,
-      build.Power,
-      build.RAM,
-      build.SSD,
-      build.VGA,
-    ].reduce((acc, part) => {
-      acc[part || ""] =
-        productExplanationMap[part || ""] || "No explanation available.";
-      return acc;
-    }, {} as { [key: string]: string });
-
-    return { ...build, totalPrice, partExplanations };
-  };
 
   // 상세 정보를 클릭했을 때 빌드 상세 정보를 가져오는 함수
   const handleBuildClick = async (buildId: string) => {
@@ -497,6 +466,7 @@ const CommunityBuilds = () => {
           {selectedBuild && (
             <BuildDetailsPanel
               selectedBuild={selectedBuild}
+              setSelectedBuild={setSelectedBuild}
               productPriceMap={selectedBuildPriceMap || {}} // 가격 정보 전달
               partExplanations={selectedBuildExplanations || {}} // 부품 설명 전달
               theme={theme}

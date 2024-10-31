@@ -9,29 +9,20 @@ import { supabase } from "../../../../../../supabase/client";
 import { BuildCard } from "./SavedBuildComponents/BuildCard";
 import { BuildDetailsPanel } from "./SavedBuildComponents/BuildDetailsPanel";
 import ThemeImage from "./SavedBuildComponents/ThemeImage";
+import {
+  calculateBuildDetails,
+  CalculatedBuildDetails,
+} from "@/utils/functions.utils";
+import {
+  Build,
+  BuildWithCreationDate,
+} from "../../../../../../types/build.type";
 
 const CommunityBuilds = () => {
-  interface Build {
-    id: number;
-    Case: string;
-    Cooler: string;
-    CPU: string;
-    HDD: string | null;
-    MBoard: string;
-    Power: string;
-    RAM: string;
-    SSD: string | null;
-    VGA: string;
-    total_price: number | null;
-    created_at: string;
-    creationDate?: string;
-    build?: string;
-    explanation?: string | null;
-    totalPrice?: number;
-  }
-
-  const [builds, setBuilds] = useState<Build[]>([]);
+  const [builds, setBuilds] = useState<BuildWithCreationDate[]>([]);
   const [selectedBuild, setSelectedBuild] = useState<Build | null>(null); // 선택된 빌드를 저장
+  const [selectedBuildWithDetails, setSelectedBuildWithDetails] =
+    useState<CalculatedBuildDetails | null>(null);
   const [selectedBuildPriceMap, setSelectedBuildPriceMap] = useState<{
     [key: string]: number;
   } | null>(null); // 가격 정보 저장
@@ -152,12 +143,15 @@ const CommunityBuilds = () => {
             .getDate()
             .toString()
             .padStart(2, "0")}`;
-          return { ...build, creationDate: formattedDate };
+          return {
+            ...build,
+            creationDate: formattedDate,
+          } as BuildWithCreationDate;
         })
         .filter((build) => build !== null); // null 값 필터링
 
       // 이전 데이터를 유지하지 않고 새로운 데이터를 세팅
-      setBuilds(builds as Build[]);
+      setBuilds(builds);
 
       // visibleCards를 초기화하고 애니메이션 시작
       setVisibleCards(new Array(builds.length).fill(false));
@@ -229,47 +223,6 @@ const CommunityBuilds = () => {
     return { priceMap, explanationMap };
   };
 
-  // 빌드의 가격을 계산하는 함수
-  const calculateBuildDetails = (
-    build: Build,
-    productPriceMap: { [x: string]: number },
-    productExplanationMap: { [x: string]: string }
-  ) => {
-    const totalPrice = [
-      build.Case,
-      build.Cooler,
-      build.CPU,
-      build.HDD,
-      build.MBoard,
-      build.Power,
-      build.RAM,
-      build.SSD,
-      build.VGA,
-    ].reduce(
-      (sum, part) => sum + (part ? Number(productPriceMap[part] || 0) : 0),
-      0
-    );
-
-    const partExplanations: { [key: string]: string } = [
-      build.Case,
-      build.Cooler,
-      build.CPU,
-      build.HDD,
-      build.MBoard,
-      build.Power,
-      build.RAM,
-      build.SSD,
-      build.VGA,
-    ].reduce((acc: { [key: string]: string }, part) => {
-      if (part) {
-        acc[part] = productExplanationMap[part] || "No explanation available.";
-      }
-      return acc;
-    }, {});
-
-    return { ...build, totalPrice, partExplanations };
-  };
-
   // 상세 정보를 클릭했을 때 빌드 상세 정보를 가져오는 함수
   const handleBuildClick = async (buildId: number) => {
     try {
@@ -295,7 +248,7 @@ const CommunityBuilds = () => {
         explanationMap
       );
 
-      setSelectedBuild(buildWithDetails); // 선택된 빌드 설정
+      setSelectedBuildWithDetails(buildWithDetails); // 선택된 빌드 설정
       setSelectedBuildPriceMap(priceMap); // 가격 정보 저장
       setSelectedBuildExplanations(buildWithDetails.partExplanations); // 설명 정보 저장
       setLoading(false);
@@ -371,9 +324,10 @@ const CommunityBuilds = () => {
               <span className={`${textThemeStyle}`}>Loading...</span>
             </div>
             {/* BuildDetailsPanel */}
-            {selectedBuild && (
+            {selectedBuildWithDetails && (
               <BuildDetailsPanel
-                selectedBuild={selectedBuild}
+                selectedBuild={selectedBuildWithDetails}
+                setSelectedBuild={setSelectedBuildWithDetails}
                 productPriceMap={selectedBuildPriceMap || {}} // 가격 정보 전달
                 partExplanations={selectedBuildExplanations || {}} // 부품 설명 전달
                 theme={theme}
