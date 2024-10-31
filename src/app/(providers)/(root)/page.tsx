@@ -8,7 +8,21 @@ import Build from "./_components/main_functions/build/Build";
 import CommunityBuilds from "./_components/main_functions/CommunityBuilds/CommunityBuilds";
 import NoticeBoard from "./_components/main_functions/NoticeBoard/NoticeBoard";
 
-const ThemeButton = ({ isActive, onClick, text, size, theme }: any) => {
+interface ThemeButtonProps {
+  isActive: boolean;
+  onClick: () => void;
+  text: string;
+  size: string;
+  theme: string;
+}
+
+const ThemeButton = ({
+  isActive,
+  onClick,
+  text,
+  size,
+  theme,
+}: ThemeButtonProps) => {
   const backgroundActiveThemeStyle = isActive
     ? theme === "dark"
       ? "bg-white"
@@ -46,7 +60,13 @@ const ThemeButton = ({ isActive, onClick, text, size, theme }: any) => {
 };
 
 // h1 컴포넌트화
-const ThemeTitle = ({ theme, setActiveTab }: any) => {
+const ThemeTitle = ({
+  theme,
+  setActiveTab,
+}: {
+  theme: string;
+  setActiveTab: (tab: string) => void;
+}) => {
   return (
     <div className="relative inline-block w-96">
       <h1 className="invisible text-[70px] font-serif mb-10">
@@ -75,7 +95,15 @@ const ThemeTitle = ({ theme, setActiveTab }: any) => {
 };
 
 // 이미지 컴포넌트화
-const ThemeImage = ({ theme, mouseX, mouseY }: any) => {
+const ThemeImage = ({
+  theme,
+  mouseX,
+  mouseY,
+}: {
+  theme: string;
+  mouseX: number;
+  mouseY: number;
+}) => {
   // window 객체가 존재하는지 확인하여 클라이언트에서만 실행
   const moveX =
     typeof window !== "undefined"
