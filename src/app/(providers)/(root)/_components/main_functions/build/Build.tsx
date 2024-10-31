@@ -8,8 +8,13 @@ import {
   GoogleGenerativeAI,
   HarmBlockThreshold,
   HarmCategory,
-  Part,
 } from "@google/generative-ai";
+
+interface Part {
+  type: string;
+  name: string;
+  price: number;
+}
 import { PartList } from "./BuildComponents/PartList";
 import { InputField } from "./BuildComponents/InputField";
 import { SelectBox } from "./BuildComponents/SelectBox";
@@ -39,7 +44,7 @@ function Build() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const cancelTokens = useRef<Array<AbortController>>([]);
   const [userCoin, setUserCoin] = useState<number>(0); // 사용자 coin 값을 저장할 상태
-  const [loadingImgIndex] = useState<number>(
+  const [loadingImgIndex, setLoadingImgIndex] = useState<number>(
     Math.floor(Math.random() * loadingRandomImgArray.length)
   );
 
@@ -96,7 +101,9 @@ function Build() {
       if (error) {
         console.error("Error fetching coin data:", error);
       } else {
-        setUserCoin(data.coin);
+        if (data.coin !== null) {
+          setUserCoin(data.coin);
+        }
       }
     };
 
@@ -177,7 +184,9 @@ function Build() {
       return;
     }
 
-    setUserCoin(data.coin);
+    if (data.coin !== null) {
+      setUserCoin(data.coin);
+    }
 
     if (userCoin <= 0) {
       console.error("코인이 부족하여 견적 생성을 실행할 수 없습니다.");
@@ -262,6 +271,10 @@ function Build() {
           throw new Error(`Request ${index + 1} was cancelled.`);
         }
 
+        if (!apiKey) {
+          console.error("API key is undefined.");
+          return Promise.reject(); // Skip this iteration if apiKey is undefined
+        }
         const genAI = initializeGoogleAI(apiKey);
         if (!genAI) {
           return Promise.reject(); // API 초기화 실패 시 skip
@@ -366,7 +379,7 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
   };
 
   // 코인 차감 함수
-  const deductCoin = async (uid) => {
+  const deductCoin = async (uid: string) => {
     const { error } = await supabase
       .from("build_coin")
       .update({ coin: userCoin - 1 })
@@ -417,30 +430,30 @@ CPU ~ 부품이름 ~ 가격|VGA ~ 부품이름 ~ 가격|RAM ~ 부품이름 ~ 가
 
     const uid = user.id;
     const buildData = {
-      CPU: build.find((part) => part.type === "CPU")?.name,
-      Cooler: build.find((part) => part.type === "Cooler")?.name,
-      MBoard: build.find((part) => part.type === "MBoard")?.name,
-      RAM: build.find((part) => part.type === "RAM")?.name,
-      VGA: build.find((part) => part.type === "VGA")?.name,
-      SSD: build.find((part) => part.type === "SSD")?.name || null,
-      HDD: build.find((part) => part.type === "HDD")?.name || null,
-      Case: build.find((part) => part.type === "Case")?.name || null,
-      Power: build.find((part) => part.type === "Power")?.name,
-      explanation: build.find((part) => part.type === "설명")?.name,
+      CPU: build.find((part) => part.type === "CPU")?.name || "",
+      Cooler: build.find((part) => part.type === "Cooler")?.name || "",
+      MBoard: build.find((part) => part.type === "MBoard")?.name || "",
+      RAM: build.find((part) => part.type === "RAM")?.name || "",
+      VGA: build.find((part) => part.type === "VGA")?.name || "",
+      SSD: build.find((part) => part.type === "SSD")?.name || "",
+      HDD: build.find((part) => part.type === "HDD")?.name || "",
+      Case: build.find((part) => part.type === "Case")?.name || "",
+      Power: build.find((part) => part.type === "Power")?.name || "",
+      explanation: build.find((part) => part.type === "설명")?.name || "",
     };
 
     const { data: existingBuild, error: buildCheckError } = await supabase
       .from("builds")
       .select("id")
-      .eq("CPU", buildData.CPU)
-      .eq("Cooler", buildData.Cooler)
-      .eq("MBoard", buildData.MBoard)
-      .eq("RAM", buildData.RAM)
-      .eq("VGA", buildData.VGA)
-      .eq("SSD", buildData.SSD)
-      .eq("HDD", buildData.HDD)
-      .eq("Case", buildData.Case)
-      .eq("Power", buildData.Power)
+      .eq("CPU", buildData.CPU ?? "")
+      .eq("Cooler", buildData.Cooler ?? "")
+      .eq("MBoard", buildData.MBoard ?? "")
+      .eq("RAM", buildData.RAM ?? "")
+      .eq("VGA", buildData.VGA ?? "")
+      .eq("SSD", buildData.SSD ?? "")
+      .eq("HDD", buildData.HDD ?? "")
+      .eq("Case", buildData.Case ?? "")
+      .eq("Power", buildData.Power ?? "")
       .eq("total_price", totalPrice)
       .maybeSingle();
 

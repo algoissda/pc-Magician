@@ -11,14 +11,30 @@ import { BuildDetailsPanel } from "./SavedBuildComponents/BuildDetailsPanel";
 import ThemeImage from "./SavedBuildComponents/ThemeImage";
 
 const CommunityBuilds = () => {
-  const [builds, setBuilds] = useState<any[]>([]);
-  const [selectedBuild, setSelectedBuild] = useState<any | null>(null); // 선택된 빌드를 저장
-  const [selectedBuildPriceMap, setSelectedBuildPriceMap] = useState<
-    any | null
-  >(null); // 가격 정보 저장
-  const [selectedBuildExplanations, setSelectedBuildExplanations] = useState<
-    any | null
-  >(null); // 부품 설명 정보 저장
+  interface Build {
+    id: number;
+    Case: string;
+    Cooler: string;
+    CPU: string;
+    HDD: string | null;
+    MBoard: string;
+    Power: string;
+    RAM: string;
+    SSD: string | null;
+    VGA: string;
+    total_price: number | null;
+    created_at: string;
+    creationDate?: string;
+  }
+
+  const [builds, setBuilds] = useState<Build[]>([]);
+  const [selectedBuild, setSelectedBuild] = useState<Build | null>(null); // 선택된 빌드를 저장
+  const [selectedBuildPriceMap, setSelectedBuildPriceMap] = useState<{
+    [key: string]: number;
+  } | null>(null); // 가격 정보 저장
+  const [selectedBuildExplanations, setSelectedBuildExplanations] = useState<{
+    [key: string]: string;
+  } | null>(null); // 부품 설명 정보 저장
   const [visibleCards, setVisibleCards] = useState<boolean[]>([]); // BuildCard의 표시 상태 관리
   const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState(1);
@@ -90,11 +106,11 @@ const CommunityBuilds = () => {
       // 클라이언트 측에서 정렬 적용 (낮은가격순, 높은가격순, 생성일 순)
       if (sortBy === "낮은가격순") {
         buildsData.sort(
-          (a, b) => a.builds?.total_price - b.builds?.total_price
+          (a, b) => (a.builds?.total_price ?? 0) - (b.builds?.total_price ?? 0)
         );
       } else if (sortBy === "높은가격순") {
         buildsData.sort(
-          (a, b) => b.builds?.total_price - a.builds?.total_price
+          (a, b) => (b.builds?.total_price ?? 0) - (a.builds?.total_price ?? 0)
         );
       } else {
         buildsData.sort((a, b) => {
@@ -116,7 +132,7 @@ const CommunityBuilds = () => {
         .range(pageNumber * buildsPerPage, pageNumber * buildsPerPage);
 
       const { data: nextPageData } = await nextPageQuery;
-      setHasNextPage(nextPageData && nextPageData.length > 0);
+      setHasNextPage(!!nextPageData && nextPageData.length > 0);
 
       // saved_builds 테이블의 데이터를 builds 테이블 형식으로 변환 및 날짜 변환
       const builds = buildsData
@@ -161,7 +177,7 @@ const CommunityBuilds = () => {
   };
 
   // 제품 가격 정보를 조회하는 함수
-  const fetchProductPrices = async (buildsData: any[]) => {
+  const fetchProductPrices = async (buildsData: Build[]) => {
     const productNames = buildsData
       .flatMap((build) => [
         build.Case,
@@ -187,23 +203,33 @@ const CommunityBuilds = () => {
       );
     }
 
-    const priceMap = productsData.reduce((acc, product) => {
-      acc[product.product_name] = product.price;
-      return acc;
-    }, {});
-
-    const explanationMap = productsData.reduce((acc, product) => {
-      acc[product.product_name] = product.explanation;
-      return acc;
-    }, {});
+    const priceMap = productsData.reduce(
+      (acc: { [key: string]: number }, product) => {
+        if (product.price !== null) {
+          acc[product.product_name] = product.price;
+        }
+        return acc;
+      },
+      {}
+    );
+    setSelectedBuildPriceMap(priceMap);
+    const explanationMap = productsData.reduce(
+      (acc: { [key: string]: string }, product) => {
+        if (product.explanation !== null) {
+          acc[product.product_name] = product.explanation;
+        }
+        return acc;
+      },
+      {}
+    );
 
     return { priceMap, explanationMap };
   };
 
   // 빌드의 가격을 계산하는 함수
   const calculateBuildDetails = (
-    build,
-    productPriceMap: { [x: string]: string },
+    build: Build,
+    productPriceMap: { [x: string]: number },
     productExplanationMap: { [x: string]: string }
   ) => {
     const totalPrice = [
@@ -216,9 +242,12 @@ const CommunityBuilds = () => {
       build.RAM,
       build.SSD,
       build.VGA,
-    ].reduce((sum, part) => sum + (productPriceMap[part] || 0), 0);
+    ].reduce(
+      (sum, part) => sum + (part ? Number(productPriceMap[part] || 0) : 0),
+      0
+    );
 
-    const partExplanations = [
+    const partExplanations: { [key: string]: string } = [
       build.Case,
       build.Cooler,
       build.CPU,
@@ -228,8 +257,10 @@ const CommunityBuilds = () => {
       build.RAM,
       build.SSD,
       build.VGA,
-    ].reduce((acc, part) => {
-      acc[part] = productExplanationMap[part] || "No explanation available.";
+    ].reduce((acc: { [key: string]: string }, part) => {
+      if (part) {
+        acc[part] = productExplanationMap[part] || "No explanation available.";
+      }
       return acc;
     }, {});
 

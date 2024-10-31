@@ -6,12 +6,13 @@ import { supabase } from "../../../../../../../supabase/client";
 
 interface SelectedBuild {
   build: string;
+  [key: string]: string | number | undefined; // Add index signature
 }
 
 const createPartDetails = (
   build: SelectedBuild,
-  productPriceMap: string,
-  productExplanationMap: string
+  productPriceMap: Record<string, string>,
+  productExplanationMap: Record<string, string>
 ) => {
   const fields = [
     { key: "CPU", label: "CPU" },
@@ -53,8 +54,8 @@ interface SelectedBuild {
 interface BuildDetailProps {
   selectedBuild: SelectedBuild;
   theme: "dark" | "light";
-  productPriceMap: string;
-  partExplanations: string;
+  productPriceMap: Record<string, string>;
+  partExplanations: Record<string, string>;
   onClose: () => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fetchBuilds: any;
@@ -69,7 +70,7 @@ export const BuildDetailsPanel: React.FC<BuildDetailProps> = ({
   fetchBuilds, // fetchBuilds 함수를 prop으로 받음
 }) => {
   const [visible, setVisible] = useState(false); // visibility 상태 관리
-  const [hoveredPartKey, setHoveredPartKey] = useState(null); // 마우스가 올라간 부품의 key를 추적
+  const [hoveredPartKey, setHoveredPartKey] = useState<string | null>(null); // 마우스가 올라간 부품의 key를 추적
   const [isDelete, setIsDelete] = useState(false); // 삭제 상태 관리
   const partDetails = createPartDetails(
     selectedBuild,

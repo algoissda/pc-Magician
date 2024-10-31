@@ -33,7 +33,12 @@ function NoticeBoard() {
   const [userLikes, setUserLikes] = useState<number[]>([]);
   const [comments, setComments] = useState<CommentType[]>([]);
   const [newComment, setNewComment] = useState<string>("");
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  interface UserType {
+    id: string;
+    [key: string]: string | number | boolean; // Add other user properties as needed
+  }
+
+  const [currentUser, setCurrentUser] = useState<UserType | null>(null);
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
   const [type, setType] = useState<string>("");
@@ -108,7 +113,7 @@ function NoticeBoard() {
     );
   };
 
-  const fetchUserLikes = async (user: any) => {
+  const fetchUserLikes = async (user: { id: string }) => {
     if (user) {
       const { data: userLikesData } = await supabase
         .from("post_like")
@@ -122,7 +127,7 @@ function NoticeBoard() {
     }
   };
 
-  const checkMasterAccount = async (user: any) => {
+  const checkMasterAccount = async (user: { id: string }) => {
     if (user) {
       const { data, error } = await supabase
         .from("master_account")
@@ -152,9 +157,13 @@ function NoticeBoard() {
         return;
       }
       const user = data.user;
-      setCurrentUser(user);
-      fetchUserLikes(user);
-      checkMasterAccount(user);
+      const mappedUser: UserType = {
+        id: user.id,
+        ...user.user_metadata, // Assuming user_metadata contains other properties
+      };
+      setCurrentUser(mappedUser);
+      fetchUserLikes(mappedUser);
+      checkMasterAccount(mappedUser);
     };
 
     fetchPosts();
@@ -297,9 +306,14 @@ function NoticeBoard() {
       return;
     }
 
+    if (!selectedPost?.id) {
+      console.error("Post ID is undefined");
+      return;
+    }
+
     const commentData = {
       uid: currentUser.id,
-      post_id: selectedPost?.id,
+      post_id: selectedPost.id,
       content: newComment,
       created_at: new Date().toISOString(),
     };
@@ -328,6 +342,11 @@ function NoticeBoard() {
     }
     if (!title.trim() || !content.trim()) {
       alert("제목과 내용을 입력해야 합니다.");
+      return;
+    }
+
+    if (!currentUser) {
+      console.error("User not logged in");
       return;
     }
 
@@ -395,7 +414,7 @@ function NoticeBoard() {
             type={type}
             setType={setType}
             theme={theme}
-            user={currentUser?.id}
+            user={currentUser?.id || ""}
             isMasterAccount={isMasterAccount}
           />
         )}
