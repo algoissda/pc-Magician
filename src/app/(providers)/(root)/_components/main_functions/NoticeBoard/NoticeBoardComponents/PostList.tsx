@@ -1,5 +1,4 @@
 // PostList.tsx
-import { title } from "process";
 import React from "react";
 
 interface PostType {
