@@ -1,10 +1,4 @@
-interface Build {
-  id: string;
-  CPU: string;
-  VGA: string;
-  RAM: string;
-  total_price: number;
-}
+import { Build } from "../../../../../../../types/build.type";
 
 interface BuildCardProps {
   build: Build;
@@ -66,7 +60,7 @@ export const BuildCard: React.FC<BuildCardProps> = ({
         <span
           className={`${textThemeH4Style} text-right font-bold text-xl flex flex-col`}
         >
-          {build.total_price.toLocaleString()} 원
+          {build.total_price?.toLocaleString() ?? "0"} 원
         </span>
         <span
           className={`${textThemeStyle} absolute text-left bottom-0 font-bold text-xs`}

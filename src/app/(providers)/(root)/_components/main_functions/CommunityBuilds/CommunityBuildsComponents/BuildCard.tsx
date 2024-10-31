@@ -1,19 +1,12 @@
 import React from "react";
+import { Build } from "../../../../../../../../types/build.type";
 
-type Build = {
-  id: string;
-  CPU: string;
-  VGA: string;
-  RAM: string;
-  total_price: number;
-};
-
-type BuildCardProps = {
+interface BuildCardProps {
   build: Build;
   theme: "dark" | "light";
   onClick: () => void;
-  creationDate: string;
-};
+  creationDate: string; // Date 객체라면 Date로 지정 가능
+}
 
 export const BuildCard: React.FC<BuildCardProps> = ({
   build,
@@ -68,7 +61,7 @@ export const BuildCard: React.FC<BuildCardProps> = ({
         <span
           className={`${textThemeH4Style} text-right font-bold text-xl flex flex-col`}
         >
-          {build.total_price.toLocaleString()} 원
+          {(build.total_price ?? 0).toLocaleString()} 원
         </span>
         <span
           className={`${textThemeStyle} absolute text-left bottom-0 font-bold text-xs`}

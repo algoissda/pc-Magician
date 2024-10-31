@@ -205,7 +205,7 @@ function Build() {
     setTotalPrice(0);
 
     const types = Object.entries(switchStates)
-      .filter(([_, isEnabled]) => isEnabled)
+      .filter(([isEnabled]) => isEnabled)
       .map(([partType]) => partType);
 
     let productStrings = "";

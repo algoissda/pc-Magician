@@ -1,9 +1,16 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../../../../../../../supabase/client";
 
-// Helper function to create part details for a build
-const createPartDetails = (build : SelectedBuild,
-  productPriceMap : { [key: string]: number }, productExplanationMap : { [key: string]: string } ) => {
+interface SelectedBuild {
+  build: string;
+  [key: string]: string | number; // Remove undefined from index signature
+}
+
+const createPartDetails = (
+  build: SelectedBuild,
+  productPriceMap: Record<string, string>,
+  productExplanationMap: Record<string, string>
+) => {
   const fields = [
     { key: "CPU", label: "CPU" },
     { key: "Cooler", label: "Cooler" },
@@ -14,10 +21,10 @@ const createPartDetails = (build : SelectedBuild,
     { key: "HDD", label: "HDD" },
     { key: "Case", label: "Case" },
     { key: "Power", label: "Power" },
-  ] as const;
+  ];
 
   return fields.map(({ key, label }) => {
-    const partName = build[key];
+    const partName = build?.[key];
     const price =
       partName && productPriceMap ? productPriceMap[partName] : "N/A";
     const explanation =
@@ -35,31 +42,24 @@ const createPartDetails = (build : SelectedBuild,
   });
 };
 
-//타입지정
-type SelectedBuild = {
+interface SelectedBuild {
   id: string;
-  CPU: string;
-  VGA: string;
-  RAM: string;
-  Cooler: string;
-  HDD: string;
-  SSD: string;
-  MBoard: string;
-  Power: string;
-  Case: string;
   explanation: string;
   totalPrice: number;
-};
+}
 
-type DetailsPanelProps = {
+interface BuildDetailProps {
   selectedBuild: SelectedBuild;
+  setSelectedBuild: React.Dispatch<React.SetStateAction<SelectedBuild | null>>;
   theme: "dark" | "light";
-  productPriceMap: { [key: string]: number };
-  partExplanations: { [key: string]: string };
+  productPriceMap: Record<string, number>;
+  partExplanations: Record<string, string>;
   onClose: () => void;
-};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fetchBuilds: any;
+}
 
-export const BuildDetailsPanel: React.FC<DetailsPanelProps> = ({
+export const BuildDetailsPanel: React.FC<BuildDetailProps> = ({
   selectedBuild,
   theme,
   productPriceMap,
@@ -71,7 +71,12 @@ export const BuildDetailsPanel: React.FC<DetailsPanelProps> = ({
   const [isSaving, setIsSaving] = useState(false); // 저장 상태 관리
   const partDetails = createPartDetails(
     selectedBuild,
-    productPriceMap,
+    Object.fromEntries(
+      Object.entries(productPriceMap).map(([key, value]) => [
+        key,
+        value.toString(),
+      ])
+    ),
     partExplanations
   );
 
@@ -104,15 +109,15 @@ export const BuildDetailsPanel: React.FC<DetailsPanelProps> = ({
 
     const uid = user.id;
     const buildData = {
-      CPU: selectedBuild.CPU,
-      Cooler: selectedBuild.Cooler,
-      MBoard: selectedBuild.MBoard,
-      RAM: selectedBuild.RAM,
-      VGA: selectedBuild.VGA,
-      SSD: selectedBuild.SSD,
-      HDD: selectedBuild.HDD,
-      Case: selectedBuild.Case,
-      Power: selectedBuild.Power,
+      CPU: selectedBuild.CPU.toString(),
+      Cooler: selectedBuild.Cooler.toString(),
+      MBoard: selectedBuild.MBoard.toString(),
+      RAM: selectedBuild.RAM.toString(),
+      VGA: selectedBuild.VGA.toString(),
+      SSD: selectedBuild.SSD.toString(),
+      HDD: selectedBuild.HDD.toString(),
+      Case: selectedBuild.Case.toString(),
+      Power: selectedBuild.Power.toString(),
       explanation: selectedBuild.explanation,
     };
 

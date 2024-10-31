@@ -29,7 +29,7 @@ interface PostDetailProps {
   onAddComment: () => void;
   newComment: string;
   setNewComment: React.Dispatch<React.SetStateAction<string>>;
-  currentUser: any;
+  currentUser: { id: string } | null;
   isMasterAccount: boolean;
   theme: string;
 }
