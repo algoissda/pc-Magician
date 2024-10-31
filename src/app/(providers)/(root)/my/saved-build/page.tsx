@@ -25,6 +25,9 @@ const CommunityBuilds = () => {
     total_price: number | null;
     created_at: string;
     creationDate?: string;
+    build?: string;
+    explanation?: string | null;
+    totalPrice?: number;
   }
 
   const [builds, setBuilds] = useState<Build[]>([]);
@@ -154,7 +157,7 @@ const CommunityBuilds = () => {
         .filter((build) => build !== null); // null 값 필터링
 
       // 이전 데이터를 유지하지 않고 새로운 데이터를 세팅
-      setBuilds(builds);
+      setBuilds(builds as Build[]);
 
       // visibleCards를 초기화하고 애니메이션 시작
       setVisibleCards(new Array(builds.length).fill(false));
@@ -284,7 +287,7 @@ const CommunityBuilds = () => {
       }
 
       const { priceMap, explanationMap } = await fetchProductPrices([
-        buildDetails,
+        buildDetails as Build,
       ]);
       const buildWithDetails = calculateBuildDetails(
         buildDetails,
@@ -371,8 +374,8 @@ const CommunityBuilds = () => {
             {selectedBuild && (
               <BuildDetailsPanel
                 selectedBuild={selectedBuild}
-                productPriceMap={selectedBuildPriceMap} // 가격 정보 전달
-                partExplanations={selectedBuildExplanations} // 부품 설명 전달
+                productPriceMap={selectedBuildPriceMap || {}} // 가격 정보 전달
+                partExplanations={selectedBuildExplanations || {}} // 부품 설명 전달
                 theme={theme}
                 onClose={() => setSelectedBuild(null)} // 패널 닫기 기능
                 fetchBuilds={() => fetchBuilds(1)}
@@ -392,7 +395,7 @@ const CommunityBuilds = () => {
                   <BuildCard
                     build={build}
                     theme={theme}
-                    creationDate={build.creationDate} // 생성 날짜 전달
+                    creationDate={build.creationDate ?? ""} // 생성 날짜 전달
                     onClick={() => handleBuildClick(build.id)} // 클릭 시 handleBuildClick 호출
                   />
                 </div>

@@ -23,7 +23,7 @@ const CommunityBuilds = () => {
   const [selectedBuildPriceMap, setSelectedBuildPriceMap] =
     useState<PriceMap | null>(null); // 가격 정보 저장
   const [selectedBuildExplanations, setSelectedBuildExplanations] =
-    useState<ExplanationMap | null>(null); // 부품 설명 정보 저장
+    useState<Record<string, string> | null>(null); // 부품 설명 정보 저장
   const [visibleCards, setVisibleCards] = useState<boolean[]>([]); // BuildCard의 표시 상태 관리
   const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState(1);
@@ -242,7 +242,8 @@ const CommunityBuilds = () => {
 
     productsData.forEach((product) => {
       priceMap[product.product_name] = product.price ?? 0;
-      explanationMap[product.product_name] = product.explanation;
+      explanationMap[product.product_name] =
+        product.explanation || "No explanation available.";
     });
 
     //예전 방식 오류 나서 바꿈
@@ -496,8 +497,8 @@ const CommunityBuilds = () => {
           {selectedBuild && (
             <BuildDetailsPanel
               selectedBuild={selectedBuild}
-              productPriceMap={selectedBuildPriceMap} // 가격 정보 전달
-              partExplanations={selectedBuildExplanations} // 부품 설명 전달
+              productPriceMap={selectedBuildPriceMap || {}} // 가격 정보 전달
+              partExplanations={selectedBuildExplanations || {}} // 부품 설명 전달
               theme={theme}
               onClose={() => setSelectedBuild(null)} // 패널 닫기 기능
             />

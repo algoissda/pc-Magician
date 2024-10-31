@@ -6,7 +6,7 @@ import { supabase } from "../../../../../../../supabase/client";
 
 interface SelectedBuild {
   build: string;
-  [key: string]: string | number | undefined; // Add index signature
+  [key: string]: string | number; // Remove undefined from index signature
 }
 
 const createPartDetails = (
@@ -53,8 +53,9 @@ interface SelectedBuild {
 
 interface BuildDetailProps {
   selectedBuild: SelectedBuild;
+  setSelectedBuild: React.Dispatch<React.SetStateAction<SelectedBuild | null>>;
   theme: "dark" | "light";
-  productPriceMap: Record<string, string>;
+  productPriceMap: Record<string, number>;
   partExplanations: Record<string, string>;
   onClose: () => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -74,7 +75,12 @@ export const BuildDetailsPanel: React.FC<BuildDetailProps> = ({
   const [isDelete, setIsDelete] = useState(false); // 삭제 상태 관리
   const partDetails = createPartDetails(
     selectedBuild,
-    productPriceMap,
+    Object.fromEntries(
+      Object.entries(productPriceMap).map(([key, value]) => [
+        key,
+        value.toString(),
+      ])
+    ),
     partExplanations
   );
 
