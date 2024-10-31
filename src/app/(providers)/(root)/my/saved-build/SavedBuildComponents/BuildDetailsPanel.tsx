@@ -1,31 +1,30 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from "react";
 import { supabase } from "../../../../../../../supabase/client";
+import {
+  BuildWithCreationDate,
+  BuildWithCreationDateAndTotalPrice,
+} from "../../../../../../../types/build.type";
+import { CalculatedBuildDetails } from "@/utils/functions.utils";
 
 // Helper function to create part details for a build
-
-interface SelectedBuild {
-  build: string;
-  [key: string]: string | number; // Remove undefined from index signature
-}
+const fields = [
+  { key: "CPU", label: "CPU" },
+  { key: "Cooler", label: "Cooler" },
+  { key: "MBoard", label: "MBoard" },
+  { key: "RAM", label: "RAM" },
+  { key: "VGA", label: "VGA" },
+  { key: "SSD", label: "SSD" },
+  { key: "HDD", label: "HDD" },
+  { key: "Case", label: "Case" },
+  { key: "Power", label: "Power" },
+] as const;
 
 const createPartDetails = (
-  build: SelectedBuild,
+  build: CalculatedBuildDetails,
   productPriceMap: Record<string, string>,
   productExplanationMap: Record<string, string>
 ) => {
-  const fields = [
-    { key: "CPU", label: "CPU" },
-    { key: "Cooler", label: "Cooler" },
-    { key: "MBoard", label: "MBoard" },
-    { key: "RAM", label: "RAM" },
-    { key: "VGA", label: "VGA" },
-    { key: "SSD", label: "SSD" },
-    { key: "HDD", label: "HDD" },
-    { key: "Case", label: "Case" },
-    { key: "Power", label: "Power" },
-  ];
-
   return fields.map(({ key, label }) => {
     const partName = build?.[key];
     const price =
@@ -45,15 +44,11 @@ const createPartDetails = (
   });
 };
 
-interface SelectedBuild {
-  id: string;
-  explanation: string;
-  totalPrice: number;
-}
-
 interface BuildDetailProps {
-  selectedBuild: SelectedBuild;
-  setSelectedBuild: React.Dispatch<React.SetStateAction<SelectedBuild | null>>;
+  selectedBuild: CalculatedBuildDetails;
+  setSelectedBuild: React.Dispatch<
+    React.SetStateAction<CalculatedBuildDetails | null>
+  >;
   theme: "dark" | "light";
   productPriceMap: Record<string, number>;
   partExplanations: Record<string, string>;

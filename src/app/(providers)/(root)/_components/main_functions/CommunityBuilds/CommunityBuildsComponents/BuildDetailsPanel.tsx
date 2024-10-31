@@ -1,13 +1,9 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../../../../../../../supabase/client";
-
-interface SelectedBuild {
-  build: string;
-  [key: string]: string | number; // Remove undefined from index signature
-}
+import { CalculatedBuildDetails } from "@/utils/functions.utils";
 
 const createPartDetails = (
-  build: SelectedBuild,
+  build: CalculatedBuildDetails,
   productPriceMap: Record<string, string>,
   productExplanationMap: Record<string, string>
 ) => {
@@ -21,7 +17,7 @@ const createPartDetails = (
     { key: "HDD", label: "HDD" },
     { key: "Case", label: "Case" },
     { key: "Power", label: "Power" },
-  ];
+  ] as const;
 
   return fields.map(({ key, label }) => {
     const partName = build?.[key];
@@ -42,21 +38,16 @@ const createPartDetails = (
   });
 };
 
-interface SelectedBuild {
-  id: string;
-  explanation: string;
-  totalPrice: number;
-}
-
 interface BuildDetailProps {
-  selectedBuild: SelectedBuild;
-  setSelectedBuild: React.Dispatch<React.SetStateAction<SelectedBuild | null>>;
+  selectedBuild: CalculatedBuildDetails;
+  setSelectedBuild: React.Dispatch<
+    React.SetStateAction<CalculatedBuildDetails | null>
+  >;
   theme: "dark" | "light";
   productPriceMap: Record<string, number>;
   partExplanations: Record<string, string>;
   onClose: () => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  fetchBuilds: any;
 }
 
 export const BuildDetailsPanel: React.FC<BuildDetailProps> = ({
@@ -114,15 +105,14 @@ export const BuildDetailsPanel: React.FC<BuildDetailProps> = ({
       MBoard: selectedBuild.MBoard.toString(),
       RAM: selectedBuild.RAM.toString(),
       VGA: selectedBuild.VGA.toString(),
-      SSD: selectedBuild.SSD.toString(),
-      HDD: selectedBuild.HDD.toString(),
+      SSD: selectedBuild.SSD?.toString(),
+      HDD: selectedBuild.HDD?.toString(),
       Case: selectedBuild.Case.toString(),
       Power: selectedBuild.Power.toString(),
       explanation: selectedBuild.explanation,
     };
 
-    // 동일한 견적이 있는지 확인
-    const { data: existingBuild } = await supabase
+    const query = supabase
       .from("builds")
       .select("id")
       .eq("CPU", buildData.CPU)
@@ -130,11 +120,18 @@ export const BuildDetailsPanel: React.FC<BuildDetailProps> = ({
       .eq("MBoard", buildData.MBoard)
       .eq("RAM", buildData.RAM)
       .eq("VGA", buildData.VGA)
-      .eq("SSD", buildData.SSD)
-      .eq("HDD", buildData.HDD)
       .eq("Case", buildData.Case)
-      .eq("Power", buildData.Power)
-      .maybeSingle();
+      .eq("Power", buildData.Power);
+
+    if (buildData.SSD) {
+      query.eq("SSD", buildData.SSD);
+    }
+    if (buildData.HDD) {
+      query.eq("SSD", buildData.HDD);
+    }
+
+    const singleQuery = query.maybeSingle();
+    const { data: existingBuild } = await singleQuery;
 
     let build_id;
 
